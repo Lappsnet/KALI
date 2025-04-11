@@ -5,9 +5,17 @@ libs = ["lib"]
 optimizer = true
 optimizer_runs = 200
 via_ir = true
+ffi = true
+allowed-paths = ["deployments"]
+
 
 remappings = ["@openzeppelin=lib/openzeppelin-contracts"]
 # The remappings are used to map the imports in your Solidity files to the correct paths.
+
+[profile.out]
+out = "out"
+libs = ["lib"]
+# The out section specifies the output directory for the compiled contracts and libraries.
 
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

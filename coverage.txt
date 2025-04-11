@@ -1,2 +1,113 @@
-Compiling 48 files with Solc 0.8.28
-Solc 0.8.28 finished in 5.46s
+Compiling 49 files with Solc 0.8.28
+Solc 0.8.28 finished in 26.19s
+Compiler run successful with warnings:
+Warning (2018): Function state mutability can be restricted to pure
+   --> src/FractionalOwnership.sol:190:5:
+    |
+190 |     function onERC721Received(
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Analysing contracts...
+Running tests...
+
+Ran 6 tests for test/FractionalOwnership.t.sol:FractionalOwnershipTest
+[PASS] testAccessControl() (gas: 91381)
+[PASS] testDefractionalizeProperty() (gas: 270704)
+[PASS] testDirectShareTransfer() (gas: 264119)
+[PASS] testFractionalizeProperty() (gas: 243150)
+[PASS] testIsPropertyFractionalized() (gas: 231217)
+[PASS] testPurchaseShares() (gas: 299)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 18.39ms (12.48ms CPU time)
+
+Ran 11 tests for test/RentableToken.t.sol:RentableTokenTest
+[PASS] testAdminFunctions() (gas: 74559)
+[PASS] testEmergencyPause() (gas: 250363)
+[PASS] testEmergencyWithdraw() (gas: 202413)
+[PASS] testPurchaseTokens() (gas: 163207)
+[PASS] testReceiveFunction() (gas: 158978)
+[PASS] testStaking() (gas: 287495)
+[PASS] testTransferLimitExemption() (gas: 208778)
+[PASS] testTransferLimits() (gas: 205248)
+[PASS] testYieldClaim() (gas: 233090)
+[PASS] testYieldDistribution() (gas: 210301)
+[PASS] test_RevertWhen_UnstakingBeforeLockPeriod() (gas: 313905)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 19.95ms (24.78ms CPU time)
+
+Ran 6 tests for test/RentalAgreement.t.sol:RentalAgreementTest
+[PASS] testCreateRental() (gas: 338130)
+[PASS] testExpireRental() (gas: 332497)
+[PASS] testIsRentOverdue() (gas: 327899)
+[PASS] testPayRent() (gas: 328654)
+[PASS] testReturnSecurityDeposit() (gas: 336350)
+[PASS] testTerminateRental() (gas: 334894)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 19.99ms (28.83ms CPU time)
+
+Ran 10 tests for test/RealEstateSale.t.sol:RealEstateSaleTest
+[PASS] testAuthorizeAndRemoveNotary() (gas: 36001)
+[PASS] testCancelSale() (gas: 273113)
+[PASS] testCompleteSale() (gas: 496155)
+[PASS] testConfigureRentableTokens() (gas: 532516)
+[PASS] testCreateSale() (gas: 286926)
+[PASS] testDepositEscrow() (gas: 360729)
+[PASS] testExpressInterest() (gas: 311811)
+[PASS] testUpdateFeeCollector() (gas: 22962)
+[PASS] testUpdatePlatformFee() (gas: 22251)
+[PASS] testUpdateSalePrice() (gas: 287992)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 20.37ms (29.02ms CPU time)
+
+Ran 8 tests for test/LendingProtocol.t.sol:LendingProtocolTest
+[PASS] testAdminFunctions() (gas: 88037)
+[PASS] testFullLoanRepayment() (gas: 737811)
+[PASS] testLiquidationAuction() (gas: 805416)
+[PASS] testLoanApproval() (gas: 414187)
+[PASS] testLoanDefault() (gas: 624465)
+[PASS] testLoanFunding() (gas: 609119)
+[PASS] testLoanRepayment() (gas: 775940)
+[PASS] testLoanRequest() (gas: 390639)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 20.37ms (49.26ms CPU time)
+
+Ran 9 tests for test/RealStateERC721.t.sol:RealEstateERC721Test
+[PASS] testAdminManagement() (gas: 71173)
+[PASS] testApprovalForAll() (gas: 403944)
+[PASS] testApproveAndTransfer() (gas: 382095)
+[PASS] testMintProperty() (gas: 365394)
+[PASS] testQueryFunctions() (gas: 647214)
+[PASS] testTransferProperty() (gas: 376363)
+[PASS] testUpdateProperty() (gas: 414751)
+[PASS] test_RevertWhen_DuplicateCadastralNumber() (gas: 349692)
+[PASS] test_RevertWhen_NonOwnerAddsAdmin() (gas: 20642)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 20.54ms (27.37ms CPU time)
+
+Ran 7 tests for test/MarketplaceOrchestrator.t.sol:MarketplaceOrchestratorTest
+[SKIP] testInitiateRentalFromListing() (gas: 0)
+[SKIP] testInitiateSaleFromListing() (gas: 0)
+[PASS] testListPropertyForRent() (gas: 185547)
+[PASS] testListPropertyForSale() (gas: 185263)
+[PASS] testQueryFunctions() (gas: 491205)
+[PASS] testUnlistProperty() (gas: 165172)
+[PASS] testUpdateListing() (gas: 207528)
+Suite result: ok. 5 passed; 0 failed; 2 skipped; finished in 28.42ms (9.72ms CPU time)
+
+Ran 7 test suites in 33.11ms (148.04ms CPU time): 55 tests passed, 0 failed, 2 skipped (57 total tests)
+
+╭----------------------------------+------------------+------------------+-----------------+------------------╮
+| File                             | % Lines          | % Statements     | % Branches      | % Funcs          |
++=============================================================================================================+
+| script/DeployRentableToken.s.sol | 0.00% (0/42)     | 0.00% (0/41)     | 100.00% (0/0)   | 0.00% (0/2)      |
+|----------------------------------+------------------+------------------+-----------------+------------------|
+| src/FractionalOwnership.sol      | 47.37% (27/57)   | 35.59% (21/59)   | 4.55% (1/22)    | 60.00% (6/10)    |
+|----------------------------------+------------------+------------------+-----------------+------------------|
+| src/LendingProtocol.sol          | 64.73% (134/207) | 66.83% (137/205) | 7.50% (9/120)   | 53.57% (15/28)   |
+|----------------------------------+------------------+------------------+-----------------+------------------|
+| src/MarketplaceOrchestrator.sol  | 73.40% (69/94)   | 72.22% (65/90)   | 29.17% (14/48)  | 80.00% (8/10)    |
+|----------------------------------+------------------+------------------+-----------------+------------------|
+| src/RealEstateERC721.sol         | 90.78% (128/141) | 89.66% (104/116) | 7.35% (5/68)    | 94.12% (32/34)   |
+|----------------------------------+------------------+------------------+-----------------+------------------|
+| src/RealEstateSale.sol           | 80.28% (114/142) | 77.69% (101/130) | 8.70% (6/69)    | 76.92% (20/26)   |
+|----------------------------------+------------------+------------------+-----------------+------------------|
+| src/RentableToken.sol            | 78.88% (127/161) | 76.84% (136/177) | 12.31% (8/65)   | 82.61% (19/23)   |
+|----------------------------------+------------------+------------------+-----------------+------------------|
+| src/RentalAgreement.sol          | 57.58% (38/66)   | 56.45% (35/62)   | 10.26% (4/39)   | 77.78% (7/9)     |
+|----------------------------------+------------------+------------------+-----------------+------------------|
+| Total                            | 70.00% (637/910) | 68.07% (599/880) | 10.90% (47/431) | 75.35% (107/142) |
+╰----------------------------------+------------------+------------------+-----------------+------------------╯

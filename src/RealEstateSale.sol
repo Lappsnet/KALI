@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "./RealEstateERC721.sol";
-import "./RentableToken.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {RealEstateERC721} from "./RealEstateERC721.sol";
+import {RentableToken} from "./RentableToken.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title RealEstateSale

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "forge-std/Test.sol";
-import "../src/RealEstateERC721.sol";
+import {Test} from "forge-std/Test.sol";
+import {RealEstateERC721} from "../src/RealEstateERC721.sol";
 
 contract RealEstateERC721Test is Test {
     RealEstateERC721 public token;

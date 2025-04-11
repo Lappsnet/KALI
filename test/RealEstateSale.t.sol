@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "forge-std/Test.sol";
-import "../src/RealEstateSale.sol";
-import "../src/RealEstateERC721.sol";
-import "../src/RentableToken.sol";
+import {Test} from "forge-std/Test.sol";
+import {RealEstateSale} from "../src/RealEstateSale.sol";
+import {RealEstateERC721} from "../src/RealEstateERC721.sol";
+import {RentableToken} from "../src/RentableToken.sol";
 
 contract RealEstateSaleTest is Test {
     RealEstateERC721 public realEstateToken;
@@ -86,7 +86,7 @@ contract RealEstateSaleTest is Test {
     }
     
     // Helper function to verify sale details
-    function _verifySaleDetails(uint256 _saleId, uint256 _price, string memory _saleDocumentURI) internal {
+    function _verifySaleDetails(uint256 _saleId, uint256 _price, string memory _saleDocumentURI) internal view {
         (
             uint256 _propertyId,
             address _seller,
@@ -243,7 +243,7 @@ contract RealEstateSaleTest is Test {
     }
     
     // Helper function to verify sale completed
-    function _verifySaleCompleted() internal {
+    function _verifySaleCompleted() internal view {
         // Check sale status
         (, , , , , RealEstateSale.SaleStatus _status, , , uint256 _completedAt, , , ) = saleContract.sales(saleId);
         assertEq(uint256(_status), uint256(RealEstateSale.SaleStatus.Completed));

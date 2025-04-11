@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
-import "./RealEstateERC721.sol";
+import {ERC20, ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import {AccessControlEnumerable} from "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
+import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import {RealEstateERC721} from "./RealEstateERC721.sol";
 
 /**
  * @title FractionalOwnership
  * @dev Contract for fractionalizing real estate ownership
  */
-contract FractionalOwnership is ERC20Burnable, AccessControlEnumerable {
+contract FractionalOwnership is ERC20Burnable, AccessControlEnumerable, IERC721Receiver {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     
     RealEstateERC721 public propertyToken;
@@ -107,17 +108,20 @@ contract FractionalOwnership is ERC20Burnable, AccessControlEnumerable {
      * @return The address of a seller with enough shares
      */
     function findSeller(uint256 shares) private view returns (address) {
-        // In a real implementation, this would use an order book or similar mechanism
-        // For simplicity, we'll just check if any admin has enough shares
-        address[] memory admins = getAdmins();
+        // First check if any admin has enough shares
+        uint256 adminCount = getRoleMemberCount(ADMIN_ROLE);
         
-        for (uint256 i = 0; i < admins.length; i++) {
-            if (balanceOf(admins[i]) >= shares) {
-                return admins[i];
+        for (uint256 i = 0; i < adminCount; i++) {
+            address admin = getRoleMember(ADMIN_ROLE, i);
+            if (balanceOf(admin) >= shares) {
+                return admin;
             }
         }
         
-        return address(0);
+        // If no admin has enough shares, check all token holders
+        // This is a simplified approach and would be too gas-intensive for production
+        // In a real implementation, you would use an order book or similar mechanism
+        return address(0); // No seller found
     }
     
     /**
@@ -127,7 +131,6 @@ contract FractionalOwnership is ERC20Burnable, AccessControlEnumerable {
     function getAdmins() private view returns (address[] memory) {
         // Get the count of members with ADMIN_ROLE
         uint256 adminCount = getRoleMemberCount(ADMIN_ROLE);
-        require(adminCount > 0, "No admins found");
         
         // Create array to hold admin addresses
         address[] memory admins = new address[](adminCount);
@@ -180,6 +183,19 @@ contract FractionalOwnership is ERC20Burnable, AccessControlEnumerable {
         return _fractionalizedProperties[propertyId].active;
     }
     
+    /**
+     * @dev Implementation of IERC721Receiver interface
+     * This function is called by the ERC721 contract when a token is transferred to this contract
+     */
+    function onERC721Received(
+        address /* operator */,
+        address /* from */,
+        uint256 /* tokenId */,
+        bytes calldata /* data */
+    ) external override returns (bytes4) {
+        return this.onERC721Received.selector;
+    }
+    
     // Override required functions
     function supportsInterface(bytes4 interfaceId)
         public
@@ -187,7 +203,8 @@ contract FractionalOwnership is ERC20Burnable, AccessControlEnumerable {
         override(AccessControlEnumerable)
         returns (bool)
     {
-        return super.supportsInterface(interfaceId);
+        return 
+            interfaceId == type(IERC721Receiver).interfaceId || 
+            super.supportsInterface(interfaceId);
     }
 }
-

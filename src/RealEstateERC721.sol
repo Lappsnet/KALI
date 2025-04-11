@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+
 /**
  * @title RealEstateERC721
  * @dev Implementation of the ERC721 token standard for real estate tokenization
@@ -511,20 +513,27 @@ contract RealEstateERC721 {
         return size > 0;
     }
     
-    /**
-     * @dev Simplified check for ERC721 receiver
-     * @param from Address sending the token
-     * @param to Address receiving the token
-     * @param tokenId ID of the token
-     * @param data Additional data with no specified format
-     * @return Whether the transfer was accepted
-     */
-    function _checkOnERC721Received(address from, address to, uint256 tokenId, bytes memory data) 
-        internal returns (bool) 
-    {
-        // This is a simplified implementation
-        // In a production environment, you would want to call onERC721Received on the recipient
-        // and check the return value
+    function _checkOnERC721Received(
+    address from,
+    address to,
+    uint256 tokenId,
+    bytes memory data
+) internal returns (bool) {
+    if (_isContract(to)) {
+        try IERC721Receiver(to).onERC721Received(msg.sender, from, tokenId, data) returns (bytes4 retval) {
+            return retval == IERC721Receiver.onERC721Received.selector;
+        } catch (bytes memory reason) {
+            if (reason.length == 0) {
+                revert("ERC721: transfer to non ERC721Receiver implementer");
+            } else {
+                assembly {
+                    revert(add(32, reason), mload(reason))
+                }
+            }
+        }
+    } else {
         return true;
     }
+}
+
 }
