@@ -64,7 +64,6 @@ contract FractionalOwnership is ERC20Burnable, AccessControlEnumerable, IERC721R
             active: true
         });
         
-        // Mint initial shares to property owner
         _mint(msg.sender, totalShares);
         
         emit PropertyFractionalized(propertyId, totalShares, sharePrice);

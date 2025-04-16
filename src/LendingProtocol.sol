@@ -71,10 +71,10 @@ contract LendingProtocol is ReentrancyGuard, IERC721Receiver {
     
     // Protocol parameters
     uint256 public minLoanAmount;
-    uint256 public maxLoanToValueRatio;    // In basis points
-    uint256 public liquidationThreshold;   // In basis points
-    uint256 public liquidationPenalty;     // In basis points
-    uint256 public protocolFeePercentage;  // In basis points
+    uint256 public maxLoanToValueRatio;    
+    uint256 public liquidationThreshold;   
+    uint256 public liquidationPenalty;     
+    uint256 public protocolFeePercentage; 
     address public feeCollector;
     
     // Liquidation auction
@@ -114,17 +114,11 @@ contract LendingProtocol is ReentrancyGuard, IERC721Receiver {
     // MODIFIERS
     // ==========
     
-    /**
-     * @dev Ensures caller is the contract owner
-     */
     modifier onlyOwner() {
         require(msg.sender == owner, "LendingProtocol: caller is not the owner");
         _;
     }
     
-    /**
-     * @dev Ensures caller is a loan officer
-     */
     modifier onlyLoanOfficer() {
         require(loanOfficers[msg.sender], "LendingProtocol: caller is not a loan officer");
         _;
