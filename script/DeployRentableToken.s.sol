@@ -38,11 +38,9 @@ contract DeployRentableToken is Script {
     uint256 public constant PROTOCOL_FEE_PERCENTAGE = 200; // 2%
     
     function run() external {
-        // For local deployment, we'll use the first account from Anvil
-        uint256 deployerPrivateKey = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
+        uint256 deployerPrivateKey = 0xb3becc287d92f53db0c83dff1b2612b31eb33e81af2322b2dfa49db09e36e830;
         
-        // The fee collector will be the second account from Anvil
-        address feeCollector = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8;
+        address feeCollector = 0x8155c2F6F4F40340eD085a6cBCB3d5C7DEE0DfA5;
         
         // Start broadcasting transactions
         vm.startBroadcast(deployerPrivateKey);
@@ -116,11 +114,11 @@ contract DeployRentableToken is Script {
         // Create some initial data for testing
         // Mint a property
         uint256 propertyId = realEstateToken.mintProperty(
-            0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, // First Anvil account
-            "PROP123",
-            "123 Main St, New York",
-            100 ether, // Property value: 100 ETH
-            "ipfs://property-metadata-uri"
+            0x251d8803f71a8402dD96893E0709588e99F6267c, // First Anvil account
+            "Apartment 1",
+            "213 Pharos St, San Salvador",
+            1 ether, // Property value: 100 ETH
+            "ipfs://QmNZE2XhW4N17DYZD73TisYuGR9sPEb22BUZLXj22ZBFQp"
         );
         console.log("Minted property with ID:", propertyId);
         
