@@ -9,7 +9,7 @@ import { Building, Upload, Check } from "lucide-react"
 import { useRealEstateContract } from "../hooks/useRealEstateContract"
 
 interface MintPropertiesProps {
-  sendHash: (hash: `0x${string}`) => void
+  sendHash?: (hash: `0x${string}`) => void
 }
 
 export const MintProperties = ({ sendHash }: MintPropertiesProps) => {
@@ -30,7 +30,7 @@ export const MintProperties = ({ sendHash }: MintPropertiesProps) => {
   const [mintedTokenId, setMintedTokenId] = useState<bigint | null>(null)
 
   useEffect(() => {
-    if (txHash && isSuccess) {
+    if (txHash && isSuccess && sendHash) {
       sendHash(txHash)
     }
   }, [txHash, isSuccess, sendHash])

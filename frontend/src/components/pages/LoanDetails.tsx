@@ -7,6 +7,7 @@ import { ActionButton } from "../ActionButton"
 import { DollarSign, Clock, AlertTriangle, CheckCircle, Loader, ArrowRight, Calendar } from "lucide-react"
 import { useLendingProtocolContract, type LoanWithDetails, LoanStatus } from "../hooks/useLendingProtocolContract"
 import { useRealEstateContract } from "../hooks/useRealEstateContract"
+import "./LoanDetails.css"
 
 export const LoanDetails = () => {
   const { id } = useParams<{ id: string }>()

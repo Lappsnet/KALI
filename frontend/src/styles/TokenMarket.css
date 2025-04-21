@@ -1,0 +1,265 @@
+/* TokenMarket.css */
+:root {
+  --token-primary: #6e56cf;
+  --token-secondary: #4338ca;
+  --token-accent: #10b981;
+  --token-background: rgba(17, 24, 39, 0.95);
+  --token-surface: rgba(31, 41, 55, 0.7);
+  --token-border: rgba(75, 85, 99, 0.3);
+  --token-text: #e5e7eb;
+  --token-text-secondary: #9ca3af;
+  --token-hover: rgba(55, 65, 81, 0.7);
+  --token-shadow: rgba(0, 0, 0, 0.25);
+  --token-glow: rgba(110, 86, 207, 0.15);
+  --token-success: #059669;
+  --token-warning: #d97706;
+  --token-error: #dc2626;
+}
+
+.token-market-container {
+  padding: 2rem;
+  min-height: 100vh;
+  background: var(--token-background);
+  color: var(--token-text);
+}
+
+.market-header {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--token-surface);
+  border-radius: 12px;
+  border: 1px solid var(--token-border);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 6px var(--token-shadow),
+              0 0 20px var(--token-glow);
+}
+
+.market-header h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, var(--token-text), var(--token-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.search-filter {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-box,
+.filter-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--token-border);
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+  flex: 1;
+}
+
+.search-box input,
+.filter-box select {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--token-text);
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-box input::placeholder {
+  color: var(--token-text-secondary);
+}
+
+.filter-box select option {
+  background: var(--token-background);
+  color: var(--token-text);
+}
+
+.tokens-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.token-card {
+  background: var(--token-surface);
+  border-radius: 12px;
+  border: 1px solid var(--token-border);
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+}
+
+.token-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px var(--token-shadow),
+              0 0 25px var(--token-glow);
+}
+
+.token-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.token-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.token-card:hover .token-image img {
+  transform: scale(1.05);
+}
+
+.token-header {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--token-border);
+}
+
+.token-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--token-text), var(--token-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-badge.available {
+  background: var(--token-success);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(5, 150, 105, 0.3);
+}
+
+.status-badge.rented {
+  background: var(--token-warning);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(217, 119, 6, 0.3);
+}
+
+.status-badge.expired {
+  background: var(--token-error);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+}
+
+.token-details {
+  padding: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--token-text-secondary);
+}
+
+.detail-item svg {
+  color: var(--token-primary);
+  filter: drop-shadow(0 0 4px var(--token-glow));
+}
+
+.token-actions {
+  padding: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  border-top: 1px solid var(--token-border);
+}
+
+.view-button,
+.rent-button {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.view-button {
+  background: var(--token-surface);
+  border: 1px solid var(--token-border);
+  color: var(--token-text);
+  text-decoration: none;
+}
+
+.view-button:hover {
+  background: var(--token-hover);
+  border-color: var(--token-primary);
+  box-shadow: 0 0 15px var(--token-glow);
+}
+
+.rent-button {
+  background: var(--token-primary);
+  border: none;
+  color: white;
+}
+
+.rent-button:hover {
+  background: var(--token-secondary);
+  box-shadow: 0 0 20px var(--token-glow);
+  transform: translateY(-2px);
+}
+
+.loading,
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 2rem;
+  background: var(--token-surface);
+  border-radius: 12px;
+  border: 1px solid var(--token-border);
+  backdrop-filter: blur(12px);
+}
+
+.error {
+  color: var(--token-error);
+}
+
+@media (max-width: 1024px) {
+  .token-market-container {
+    padding: 1rem;
+  }
+
+  .tokens-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .search-filter {
+    flex-direction: column;
+  }
+
+  .search-box,
+  .filter-box {
+    width: 100%;
+  }
+
+  .token-card {
+    margin-bottom: 1rem;
+  }
+} 

@@ -1,88 +1,96 @@
 "use client"
 
-import { createAppKit } from "@reown/appkit/react"
-import { WagmiProvider } from "wagmi"
-import { useState } from "react"
+import { createAppKit } from "@reown/appkit"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
-
+import { Suspense, useEffect } from "react"
 import { Layout } from "./components/Layout"
-import { Dashboard } from "./pages/Dashboard"
-import { Marketplace } from "../src/components/pages/Marketplace"
-import { Launch } from "../src/components/pages/Launch"
-import { MintProperties } from "../src/components/pages/MintProperties"
-import { SaleProperties } from "../src/components/pages/SaleProperties"
-import { Settings } from "../src/components/pages/Settings"
-import { PropertyDetails } from "../src/components/pages/PropertyDetails"
-import { LoanRequest } from "../src/components/pages/LoanRequest"
-import { MyLoans } from "../src/components/pages/MyLoans"
-import { LoanDetails } from "../src/components/pages/LoanDetails"
+import { Dashboard } from "./components/pages/Dashboard"
+import { Marketplace } from "./components/pages/Marketplace"
+import { Launch } from "./components/pages/Launch"
+import { MintProperties } from "./components/pages/MintProperties"
+import { SaleProperties } from "./components/pages/SaleProperties"
+import { Settings } from "./components/pages/Settings"
+import { PropertyDetails } from "./components/pages/PropertyDetails"
+import { LoanRequest } from "./components/pages/LoanRequest"
+import { MyLoans } from "./components/pages/MyLoans"
+import { LoanDetails } from "./components/pages/LoanDetails"
+import RentableToken from "./components/pages/RentableToken"
+import MyTokens from "./components/pages/MyTokens"
+import { TokenMarket } from "./components/pages/TokenMarket"
+import { Yield } from "./components/pages/Yield"
+import { MyProperties } from "./components/pages/MyProperties"
+import { PropertyDocuments } from "./components/pages/PropertyDocuments"
+import { ActiveListings } from "./components/pages/ActiveListings"
+import { SaleHistory } from "./components/pages/SaleHistory"
+import { NotaryPanel } from "./components/pages/NotaryPanel"
+import { AccessControl } from "./components/pages/AccessControl"
+import { UserRegistry } from "./components/pages/UserRegistry"
+import { Security } from "./components/pages/Security"
+import { Profile } from "./components/pages/Profile"
 import { projectId, metadata, networks, wagmiAdapter } from "./config"
 
 import "./styles/App.css"
 
 const queryClient = new QueryClient()
 
-const generalConfig = {
-  projectId,
-  networks,
-  metadata,
-  themeMode: "dark" as const,
-  themeVariables: {
-    "--w3m-accent": "#0ea5e9",
-    "--w3m-background-color": "#000000",
-    "--w3m-text-color": "#ffffff",
-  },
-}
-
-// Create modal
+// Initialize AppKit
 createAppKit({
-  adapters: [wagmiAdapter],
-  ...generalConfig,
-  features: {
-    analytics: true,
-  },
+  projectId,
+  metadata,
+  networks,
+  adapters: [wagmiAdapter]
 })
 
-export function App() {
-  const [transactionHash, setTransactionHash] = useState<`0x${string}` | undefined>(undefined)
-  const [signedMsg, setSignedMsg] = useState("")
-  const [balance, setBalance] = useState("")
-
-  const receiveHash = (hash: `0x${string}`) => {
-    setTransactionHash(hash)
-  }
-
-  const receiveSignedMsg = (signedMsg: string) => {
-    setSignedMsg(signedMsg)
-  }
-
-  const receiveBalance = (balance: string) => {
-    setBalance(balance)
-  }
+function AppContent() {
+  useEffect(() => {
+    console.log('App mounted')
+  }, [])
 
   return (
-    <WagmiProvider config={wagmiAdapter.wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <Router>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/launch" element={<Launch />} />
-              <Route path="/dashboard/mint-properties" element={<MintProperties sendHash={receiveHash} />} />
-              <Route path="/dashboard/sale-properties" element={<SaleProperties />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/property/:id" element={<PropertyDetails />} />
-              <Route path="/property/:id/loan" element={<LoanRequest />} />
-              <Route path="/loans" element={<MyLoans />} />
-              <Route path="/loan/:id" element={<LoanDetails />} />
-            </Routes>
-          </Layout>
-        </Router>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <Layout>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/launch" element={<Launch />} />
+          <Route path="/dashboard/mint-properties" element={<MintProperties />} />
+          <Route path="/dashboard/sale-properties" element={<SaleProperties />} />
+          <Route path="/dashboard/properties" element={<MyProperties />} />
+          <Route path="/dashboard/documents" element={<PropertyDocuments />} />
+          <Route path="/dashboard/listings" element={<ActiveListings />} />
+          <Route path="/dashboard/sales-history" element={<SaleHistory />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/property/:id" element={<PropertyDetails />} />
+          <Route path="/property/:id/loan" element={<LoanRequest />} />
+          <Route path="/dashboard/request-loan" element={<LoanRequest />} />
+          <Route path="/loans" element={<MyLoans />} />
+          <Route path="/loan/:id" element={<LoanDetails />} />
+          <Route path="/tokens/:id" element={<RentableToken />} />
+          <Route path="/my-tokens" element={<MyTokens />} />
+          <Route path="/token-market" element={<TokenMarket />} />
+          <Route path="/yield" element={<Yield />} />
+          <Route path="/dashboard/notary" element={<NotaryPanel />} />
+          <Route path="/dashboard/access" element={<AccessControl />} />
+          <Route path="/dashboard/users" element={<UserRegistry />} />
+          <Route path="/dashboard/security" element={<Security />} />
+          <Route path="/dashboard/profile" element={<Profile />} />
+        </Routes>
+      </Suspense>
+    </Layout>
+  )
+}
+
+export function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Suspense fallback={<div>Loading app...</div>}>
+          <AppContent />
+        </Suspense>
+      </Router>
+    </QueryClientProvider>
   )
 }
 

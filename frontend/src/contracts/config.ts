@@ -1,33 +1,54 @@
 // Contract addresses for different networks
-export const CONTRACT_ADDRESSES = {
-    // Ethereum Mainnet
-    1: {
-      realEstateERC721: "0x5FbDB2315678afecb367f032d93F642f64180aa3" as `0x${string}`, // Replace with actual address
-    address: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
-      lendingProtocol: "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9" as `0x${string}`, // Replace with actual address
-    },
-    // Sepolia Testnet
-    11155111: {
-      realEstateERC721: "0x5FbDB2315678afecb367f032d93F642f64180aa3" as `0x${string}`, // Replace with actual address
-      realEstateSale: "0x5FbDB2315678afecb367f032d93F642f64180aa3" as `0x${string}`, // Replace with actual address
-      lendingProtocol: "0x5FbDB2315678afecb367f032d93F642f64180aa3" as `0x${string}`, // Replace with actual address
-    },
-     // Anvil
-    31337: {
-        realEstateERC721: "0x5FbDB2315678afecb367f032d93F642f64180aa3" as `0x${string}`, // Replace with actual address
-        realEstateSale: "0x5FbDB2315678afecb367f032d93F642f64180aa3" as `0x${string}`, // Replace with actual address
-        lendingProtocol: "0x5FbDB2315678afecb367f032d93F642f64180aa3" as `0x${string}`, // Replace with actual address
-      },
+import { defineChain } from '@reown/appkit/networks';
+import { type Chain } from 'wagmi/chains';
 
-      // DP Labs Devnet
+export const pharos = {
+  id: 50002,
+  name: 'Pharos Network',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Pharos',
+    symbol: 'PTT',
+  },
+  rpcUrls: {
+    default: {
+      http: [],
+      webSocket: [],
+    },
+    public: {
+      http: [],
+      webSocket: [],
+    }
+  },
+  blockExplorers: {
+    default: { name: 'Explorer', url: 'https://pharosscan.xyz/' },
+  },
+  testnet: true,
+  contracts: {
+    realEstateERC721: { address: "0xd95d1ff6618aee41e431c6a2cfa3d5e8ff3d5f33" },
+    realEstateSale: { address: "0x43B69480Cf9308F10781fB3eEab20770c14ee73D" },
+    lendingProtocol: { address: "0x6B2C23cf212011beBF015FDF05E0E5414754701c" },
+    fractionalOwnership: { address: "0xB9b3A7AE4c7bd499Dd5CB626362E6d866e129771" },
+    marketplaceOrchestrator: { address: "0x43B69480Cf9308F10781fB3eEab20770c14ee73D" },
+    rentableToken: { address: "0x407b230D1439A83Ed81577009e2118e7a4d50694" },
+    rentalAgreement: { address: "0x60B5cC9C3A6bb42A293Cd445d67DE23CcdA442c3" },
+  },
+} as const satisfies Chain;
+
+export const CONTRACT_ADDRESSES = { // DP Labs Devnet
       50002: {
-        realEstateERC721: "0xd95d1ff6618aee41e431c6a2cfa3d5e8ff3d5f33" as `0x${string}`, // Replace with actual address
-        realEstateSale: "0x5FbDB2315678afecb367f032d93F642f64180aa3" as `0x${string}`, // Replace with actual address
-        lendingProtocol: "0x6B2C23cf212011beBF015FDF05E0E5414754701c" as `0x${string}`, // Replace with actual address
+          realEstateERC721: "0xd95d1ff6618aee41e431c6a2cfa3d5e8ff3d5f33" as `0x${string}`,
+          realEstateSale: "0x43B69480Cf9308F10781fB3eEab20770c14ee73D" as `0x${string}`,
+          lendingProtocol: "0x6B2C23cf212011beBF015FDF05E0E5414754701c" as `0x${string}`,
+          fractionalOwnership: "0xB9b3A7AE4c7bd499Dd5CB626362E6d866e129771" as `0x${string}`,
+          marketplaceOrchestrator: "0x43B69480Cf9308F10781fB3eEab20770c14ee73D" as `0x${string}`,
+          rentableToken: "0x407b230D1439A83Ed81577009e2118e7a4d50694" as `0x${string}`,
+          rentalAgreement: "0x60B5cC9C3A6bb42A293Cd445d67DE23CcdA442c3" as `0x${string}`,
+        platformFeePercentage: 250,
       },
-
-
   }
+
+
   
   // IPFS Gateway for metadata
   export const IPFS_GATEWAY = "https://ipfs.io/ipfs/"
@@ -60,6 +81,7 @@ export const CONTRACT_ADDRESSES = {
       },
     ],
   }
+
   
   // Default sale document template
   export const DEFAULT_SALE_DOCUMENT = {

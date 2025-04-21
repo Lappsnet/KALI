@@ -4,8 +4,8 @@ import { useCallback, useState } from "react"
 import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react"
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi"
 import { formatEther, parseEther } from "viem"
-import { LendingProtocolABI } from "../../contracts/abis"
-import { CONTRACT_ADDRESSES, LENDING_PROTOCOL_PARAMS } from "/home/jhonny/kali/frontend/src/contracts/config.ts"
+import LendingProtocolABI from "../abis/LendingProtocol.abi.json"
+import { CONTRACT_ADDRESSES, LENDING_PROTOCOL_PARAMS } from "../../contracts/config"
 import { type UseReadContractReturnType } from 'wagmi'
 
 // Loan type from the contract
@@ -104,6 +104,7 @@ export enum LoanStatus {
 }
 
 type ContractLoanData = {
+  loanOfficer: `0x${string}`
   propertyId: bigint;
   borrower: `0x${string}`;
   principal: bigint;
@@ -304,7 +305,8 @@ export function useLendingProtocolContract() {
           args: [propertyId],
         })
 
-        return loanId
+        const loanIdResult = loanId as { data: bigint | null }
+        return loanIdResult.data
       } catch (err) {
         console.error("Error getting active loan:", err)
         setError("Failed to get active loan")
@@ -332,7 +334,8 @@ export function useLendingProtocolContract() {
           args: [borrower],
         })
 
-        return loanIds
+        const loanIdsResult = loanIds as { data: bigint[] }
+        return loanIdsResult.data
       } catch (err) {
         console.error("Error getting borrower loans:", err)
         setError("Failed to get borrower loans")
@@ -388,11 +391,15 @@ export function useLendingProtocolContract() {
           functionName: "getAuction",
           args: [loanId],
         })
-
         const now = new Date()
-        const startTime = new Date(Number(auction.startTime) * 1000)
-        const endTime = new Date(Number(auction.endTime) * 1000)
-        const isActive = !auction.finalized && now < endTime
+        const auctionTimeData = auction?.data as {
+          startTime: bigint;
+          endTime: bigint;
+          finalized: boolean;
+        } | undefined;
+        const startTime = new Date(Number(auctionTimeData?.startTime ?? 0) * 1000)
+        const endTime = new Date(Number(auctionTimeData?.endTime ?? 0) * 1000)
+        const isActive = !auctionTimeData?.finalized && now < endTime
 
         // Calculate time remaining
         let timeRemaining = ""
@@ -417,12 +424,25 @@ export function useLendingProtocolContract() {
         const totalDuration = endTime.getTime() - startTime.getTime()
         const elapsed = now.getTime() - startTime.getTime()
         const progressPercentage = totalDuration > 0 ? Math.min(100, Math.max(0, (elapsed / totalDuration) * 100)) : 0
+        const auctionData = auction?.data as {
+          propertyId: bigint;
+          finalized: boolean;
+          loanId: bigint;
+          startingPrice: bigint;
+          currentPrice: bigint;
+        } | undefined;
 
         return {
-          ...auction,
-          formattedStartingPrice: formatEther(auction.startingPrice),
-          formattedCurrentPrice: formatEther(auction.currentPrice),
-          formattedHighestBid: formatEther(auction.highestBid),
+          propertyId: auctionData?.propertyId ?? 0n,
+          finalized: auctionData?.finalized ?? false,
+          loanId: auctionData?.loanId ?? 0n,
+          startingPrice: auctionData?.startingPrice ?? 0n,
+          highestBid: 0n,
+          highestBidder: "0x0000000000000000000000000000000000000000",
+          formattedHighestBid: "0",
+          currentPrice: auctionData?.currentPrice ?? 0n,
+          formattedStartingPrice: formatEther(auctionData?.startingPrice ?? 0n),
+          formattedCurrentPrice: formatEther(auctionData?.currentPrice ?? 0n),
           startTime,
           endTime,
           isActive,
@@ -463,16 +483,8 @@ export function useLendingProtocolContract() {
           abi: LendingProtocolABI,
           functionName: "requestLoan",
           args: [propertyId, parseEther(loanAmount), BigInt(interestRate), BigInt(term * 24 * 60 * 60)], // Convert term from days to seconds
-          onSuccess(data) {
-            console.log("Loan requested successfully:", data)
-            // In a real app, you would get the loan ID from the event logs
-            // For this example, we'll use a placeholder loan ID
-            if (onSuccess) onSuccess(BigInt(Date.now()))
-          },
-          onError(error) {
-            console.error("Error requesting loan:", error)
-            setError("Failed to request loan")
-          },
+
+
         })
 
         return true
@@ -504,13 +516,7 @@ export function useLendingProtocolContract() {
           abi: LendingProtocolABI,
           functionName: "approveLoan",
           args: [loanId],
-          onSuccess(data) {
-            console.log("Loan approved successfully:", data)
-          },
-          onError(error) {
-            console.error("Error approving loan:", error)
-            setError("Failed to approve loan")
-          },
+
         })
 
         return true
@@ -543,13 +549,6 @@ export function useLendingProtocolContract() {
           functionName: "fundLoan",
           args: [loanId],
           value: parseEther(amount),
-          onSuccess(data) {
-            console.log("Loan funded successfully:", data)
-          },
-          onError(error) {
-            console.error("Error funding loan:", error)
-            setError("Failed to fund loan")
-          },
         })
 
         return true
@@ -582,13 +581,7 @@ export function useLendingProtocolContract() {
           functionName: "makeRepayment",
           args: [loanId],
           value: parseEther(amount),
-          onSuccess(data) {
-            console.log("Repayment made successfully:", data)
-          },
-          onError(error) {
-            console.error("Error making repayment:", error)
-            setError("Failed to make repayment")
-          },
+
         })
 
         return true
@@ -620,13 +613,7 @@ export function useLendingProtocolContract() {
           abi: LendingProtocolABI,
           functionName: "markAsDefaulted",
           args: [loanId],
-          onSuccess(data) {
-            console.log("Loan marked as defaulted successfully:", data)
-          },
-          onError(error) {
-            console.error("Error marking loan as defaulted:", error)
-            setError("Failed to mark loan as defaulted")
-          },
+
         })
 
         return true
@@ -658,22 +645,13 @@ export function useLendingProtocolContract() {
           abi: LendingProtocolABI,
           functionName: "startLiquidationAuction",
           args: [loanId, BigInt(auctionDuration * 24 * 60 * 60)], // Convert days to seconds
-          onSuccess(data) {
-            console.log("Liquidation auction started successfully:", data)
-          },
-          onError(error) {
-            console.error("Error starting liquidation auction:", error)
-            setError("Failed to start liquidation auction")
-          },
+
         })
 
         return true
       } catch (err) {
         console.error("Error starting liquidation auction:", err)
-        setError("Failed to start liquidation auction")
         return false
-      } finally {
-        setIsLoading(false)
       }
     },
     [contractAddress, isConnected, writeContract],
@@ -697,13 +675,7 @@ export function useLendingProtocolContract() {
           functionName: "placeBid",
           args: [loanId],
           value: parseEther(bidAmount),
-          onSuccess(data) {
-            console.log("Bid placed successfully:", data)
-          },
-          onError(error) {
-            console.error("Error placing bid:", error)
-            setError("Failed to place bid")
-          },
+
         })
 
         return true
@@ -735,13 +707,7 @@ export function useLendingProtocolContract() {
           abi: LendingProtocolABI,
           functionName: "finalizeAuction",
           args: [loanId],
-          onSuccess(data) {
-            console.log("Auction finalized successfully:", data)
-          },
-          onError(error) {
-            console.error("Error finalizing auction:", error)
-            setError("Failed to finalize auction")
-          },
+
         })
 
         return true

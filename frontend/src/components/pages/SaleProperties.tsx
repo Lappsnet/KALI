@@ -10,6 +10,7 @@ import { DollarSign, Plus, Loader, FileText } from "lucide-react"
 import { useRealEstateContract, type PropertyWithMetadata } from "../hooks/useRealEstateContract"
 import { useRealEstateSaleContract } from "../hooks/useRealEstateSaleContract"
 import { formatEther } from "viem"
+import "../../styles/SaleProperties.css"
 
 export const SaleProperties = () => {
   const { isConnected } = useAppKitAccount()

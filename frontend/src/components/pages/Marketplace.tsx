@@ -9,6 +9,7 @@ import { Search, Filter, Loader } from "lucide-react"
 import { useRealEstateContract, type PropertyWithMetadata } from "../hooks/useRealEstateContract"
 import { useRealEstateSaleContract } from "../hooks/useRealEstateSaleContract"
 import { formatEther } from "viem"
+import { mockProperties } from "../../data/mockProperties"
 
 export const Marketplace = () => {
   const navigate = useNavigate()
@@ -66,10 +67,20 @@ export const Marketplace = () => {
 
       // Filter only properties with active sales for the marketplace
       const activeProperties = propertiesWithSaleStatus.filter((p) => p.hasActiveSale)
-      setProperties(activeProperties)
-      setFilteredProperties(activeProperties)
+      
+      // If no properties from contract, use mock data
+      if (activeProperties.length === 0) {
+        setProperties(mockProperties)
+        setFilteredProperties(mockProperties)
+      } else {
+        setProperties(activeProperties)
+        setFilteredProperties(activeProperties)
+      }
     } catch (error) {
       console.error("Error loading properties:", error)
+      // Fallback to mock data on error
+      setProperties(mockProperties)
+      setFilteredProperties(mockProperties)
     } finally {
       setIsLoadingData(false)
     }
@@ -147,7 +158,7 @@ export const Marketplace = () => {
               key={property.tokenId.toString()}
               title={property.metadata?.name || property.cadastralNumber}
               address={property.location}
-              price={`${formatEther(property.valuationRaw)} ETH`}
+              price={`${property.valuation} ETH`}
               image={property.metadata?.image || "/suburban-house-exterior.png"}
               status="For Sale"
               onClick={() => handlePropertyClick(property)}

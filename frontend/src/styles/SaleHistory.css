@@ -1,0 +1,214 @@
+/* SaleHistory.css */
+:root {
+  --sale-primary: #6e56cf;
+  --sale-secondary: #4338ca;
+  --sale-accent: #10b981;
+  --sale-background: rgba(17, 24, 39, 0.95);
+  --sale-surface: rgba(31, 41, 55, 0.7);
+  --sale-border: rgba(75, 85, 99, 0.3);
+  --sale-text: #e5e7eb;
+  --sale-text-secondary: #9ca3af;
+  --sale-hover: rgba(55, 65, 81, 0.7);
+  --sale-shadow: rgba(0, 0, 0, 0.25);
+  --sale-glow: rgba(110, 86, 207, 0.15);
+}
+
+.page-container {
+  padding: 2rem;
+  min-height: 100vh;
+  background: var(--sale-background);
+  color: var(--sale-text);
+}
+
+.page-header {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--sale-surface);
+  border-radius: 12px;
+  border: 1px solid var(--sale-border);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 6px var(--sale-shadow),
+              0 0 20px var(--sale-glow);
+}
+
+.page-header h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--sale-text), var(--sale-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.page-header p {
+  color: var(--sale-text-secondary);
+}
+
+.sales-filters {
+  margin-bottom: 2rem;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-button {
+  padding: 0.75rem 1.5rem;
+  background: var(--sale-surface);
+  border: 1px solid var(--sale-border);
+  border-radius: 8px;
+  color: var(--sale-text);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.filter-button:hover {
+  background: var(--sale-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--sale-shadow);
+}
+
+.filter-button.active {
+  background: var(--sale-primary);
+  border-color: var(--sale-secondary);
+  box-shadow: 0 0 15px var(--sale-glow);
+}
+
+.sales-table {
+  background: var(--sale-surface);
+  border-radius: 12px;
+  border: 1px solid var(--sale-border);
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 6px var(--sale-shadow);
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+th {
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  font-weight: 600;
+  text-align: left;
+  color: var(--sale-text-secondary);
+  border-bottom: 1px solid var(--sale-border);
+}
+
+td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--sale-border);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover {
+  background: var(--sale-hover);
+}
+
+.property-info,
+.price-info,
+.user-info,
+.date-info,
+.transaction-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.property-info {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.property-id {
+  font-size: 0.875rem;
+  color: var(--sale-text-secondary);
+  padding: 0.25rem 0.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.property-location {
+  font-size: 0.875rem;
+  color: var(--sale-text-secondary);
+}
+
+.transaction-info a {
+  color: var(--sale-accent);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.transaction-info a:hover {
+  color: var(--sale-primary);
+  text-decoration: underline;
+}
+
+.connect-prompt {
+  text-align: center;
+  padding: 3rem;
+  background: var(--sale-surface);
+  border-radius: 12px;
+  border: 1px solid var(--sale-border);
+  backdrop-filter: blur(12px);
+}
+
+.connect-prompt h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, var(--sale-text), var(--sale-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.loading,
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  background: var(--sale-surface);
+  border-radius: 12px;
+  border: 1px solid var(--sale-border);
+  backdrop-filter: blur(12px);
+}
+
+.error {
+  color: #ef4444;
+}
+
+@media (max-width: 1024px) {
+  .page-container {
+    padding: 1rem;
+  }
+
+  .sales-table {
+    overflow-x: auto;
+  }
+
+  table {
+    min-width: 800px;
+  }
+}
+
+@media (max-width: 640px) {
+  .filter-buttons {
+    flex-direction: column;
+  }
+
+  .filter-button {
+    width: 100%;
+    text-align: center;
+  }
+} 

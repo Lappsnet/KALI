@@ -4,11 +4,17 @@ import { useCallback, useState } from "react"
 import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react"
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi"
 import { formatEther, parseEther } from "viem"
-import { RealEstateSaleABI, SaleStatus } from "../../contracts/abis"
-import { CONTRACT_ADDRESSES, DEFAULT_SALE_DOCUMENT, IPFS_GATEWAY } from "/home/jhonny/kali/frontend/src/contracts/config.ts"
+import RealEstateSaleABI from "../abis/RealEstateSale.abi.json"
+import { CONTRACT_ADDRESSES, DEFAULT_SALE_DOCUMENT, IPFS_GATEWAY } from "../../contracts/config"
 
-// Re-export SaleStatus
-export { SaleStatus }
+export enum SaleStatus {
+  Created = 0,
+  Active = 1,
+  PendingApproval = 2,
+  Approved = 3,
+  Completed = 4,
+  Cancelled = 5
+}
 
 // Sale type from the contract
 export interface Sale {
@@ -61,15 +67,15 @@ export function useRealEstateSaleContract() {
   // Helper function to get status text
   const getStatusText = (status: number): string => {
     switch (status) {
-      case SaleStatus.Created:
+      case 0:
         return "Created"
-      case SaleStatus.Active:
+      case 1:
         return "Active"
-      case SaleStatus.PendingApproval:
+      case 2:
         return "Pending Approval"
-      case SaleStatus.Approved:
+      case 3:
         return "Approved"
-      case SaleStatus.Completed:
+      case 4:
         return "Completed"
       case SaleStatus.Cancelled:
         return "Cancelled"
@@ -147,8 +153,8 @@ export function useRealEstateSaleContract() {
           saleDocument,
           rentableTokensIncluded: sale.rentableTokensIncluded,
           rentableTokenAmount: sale.rentableTokenAmount,
-          escrowBalance: formatEther(escrowBalance.data),
-          escrowBalanceRaw: escrowBalance.data,
+          escrowBalance: formatEther(BigInt(escrowBalance?.toString() || '0')),
+          escrowBalanceRaw: BigInt(escrowBalance?.toString() || '0'),
         }
       } catch (err) {
         console.error("Error getting sale details:", err)
@@ -177,7 +183,7 @@ export function useRealEstateSaleContract() {
           args: [propertyId],
         })
 
-        return saleId
+        return saleId ? BigInt(saleId.toString()) : null
       } catch (err) {
         console.error("Error getting active sale:", err)
         setError("Failed to get active sale")
@@ -206,21 +212,17 @@ export function useRealEstateSaleContract() {
         setIsLoading(true)
         setError(null)
 
-        writeContract({
+        const result = writeContract({
           address: contractAddress,
           abi: RealEstateSaleABI,
           functionName: "createSale",
           args: [propertyId, parseEther(price), saleDocumentURI],
-          onSettled(data, error) {
-            if (error) {
-              console.error("Error creating sale:", error)
-              setError("Failed to create sale")
-            } else {
-              console.log("Sale created successfully:", data)
-              if (onSuccess) onSuccess(BigInt(Date.now()))
-            }
-          },
         })
+
+        if (onSuccess ) {
+          console.log("Sale created successfully:", result)
+          onSuccess(BigInt(Date.now()))
+        }
 
         return true
       } catch (err) {
@@ -246,19 +248,11 @@ export function useRealEstateSaleContract() {
         setIsLoading(true)
         setError(null)
 
-        writeContract({
+        await writeContract({
           address: contractAddress,
           abi: RealEstateSaleABI,
           functionName: "expressInterest",
           args: [saleId],
-          onSettled(data, error) {
-            if (error) {
-              console.error("Error expressing interest:", error)
-              setError("Failed to express interest")
-            } else {
-              console.log("Interest expressed successfully:", data)
-            }
-          },
         })
 
         return true
@@ -285,20 +279,12 @@ export function useRealEstateSaleContract() {
         setIsLoading(true)
         setError(null)
 
-        writeContract({
+        await writeContract({
           address: contractAddress,
           abi: RealEstateSaleABI,
           functionName: "depositEscrow",
           args: [saleId],
           value: parseEther(amount),
-          onSettled(data, error) {
-            if (error) {
-              console.error("Error depositing escrow:", error)
-              setError("Failed to deposit escrow")
-            } else {
-              console.log("Escrow deposited successfully:", data)
-            }
-          },
         })
 
         return true
@@ -325,19 +311,11 @@ export function useRealEstateSaleContract() {
         setIsLoading(true)
         setError(null)
 
-        writeContract({
+        await writeContract({
           address: contractAddress,
           abi: RealEstateSaleABI,
           functionName: "assignNotary",
           args: [saleId],
-          onSettled(data, error) {
-            if (error) {
-              console.error("Error assigning notary:", error)
-              setError("Failed to assign notary")
-            } else {
-              console.log("Notary assigned successfully:", data)
-            }
-          },
         })
 
         return true
@@ -364,19 +342,11 @@ export function useRealEstateSaleContract() {
         setIsLoading(true)
         setError(null)
 
-        writeContract({
+        await writeContract({
           address: contractAddress,
           abi: RealEstateSaleABI,
           functionName: "approveSale",
           args: [saleId],
-          onSettled(data, error) {
-            if (error) {
-              console.error("Error approving sale:", error)
-              setError("Failed to approve sale")
-            } else {
-              console.log("Sale approved successfully:", data)
-            }
-          },
         })
 
         return true
@@ -403,19 +373,11 @@ export function useRealEstateSaleContract() {
         setIsLoading(true)
         setError(null)
 
-        writeContract({
+        await writeContract({
           address: contractAddress,
           abi: RealEstateSaleABI,
           functionName: "completeSale",
           args: [saleId],
-          onSettled(data, error) {
-            if (error) {
-              console.error("Error completing sale:", error)
-              setError("Failed to complete sale")
-            } else {
-              console.log("Sale completed successfully:", data)
-            }
-          },
         })
 
         return true
@@ -442,19 +404,11 @@ export function useRealEstateSaleContract() {
         setIsLoading(true)
         setError(null)
 
-        writeContract({
+        await writeContract({
           address: contractAddress,
           abi: RealEstateSaleABI,
           functionName: "cancelSale",
           args: [saleId, reason],
-          onSettled(data, error) {
-            if (error) {
-              console.error("Error cancelling sale:", error)
-              setError("Failed to cancel sale")
-            } else {
-              console.log("Sale cancelled successfully:", data)
-            }
-          },
         })
 
         return true
@@ -481,19 +435,11 @@ export function useRealEstateSaleContract() {
         setIsLoading(true)
         setError(null)
 
-        writeContract({
+        await writeContract({
           address: contractAddress,
           abi: RealEstateSaleABI,
           functionName: "updateSalePrice",
           args: [saleId, parseEther(newPrice)],
-          onSettled(data, error) {
-            if (error) {
-              console.error("Error updating sale price:", error)
-              setError("Failed to update sale price")
-            } else {
-              console.log("Sale price updated successfully:", data)
-            }
-          },
         })
 
         return true

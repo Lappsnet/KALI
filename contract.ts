@@ -59,6 +59,6 @@ export function getContract(name: keyof typeof CONTRACTS): ethers.Contract {
 
   return new ethers.Contract(contractData.address, contractData.abi, signer);
 }
-
 // 🧪 Export signer & provider
 export { signer, provider };
+

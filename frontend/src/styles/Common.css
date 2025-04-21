@@ -1,0 +1,207 @@
+/* Common Components */
+:root {
+  --primary-gradient: linear-gradient(135deg, #00c6ff, #0072ff);
+  --secondary-gradient: linear-gradient(135deg, #667eea, #764ba2);
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+  --neon-shadow: 0 0 10px rgba(0, 198, 255, 0.5);
+  --text-glow: 0 0 5px rgba(255, 255, 255, 0.8);
+}
+
+/* Buttons */
+.action-button {
+  padding: 0.8rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.action-button.primary {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: 0 0 15px rgba(0, 198, 255, 0.5);
+}
+
+.action-button.secondary {
+  background: var(--secondary-gradient);
+  color: white;
+  box-shadow: 0 0 15px rgba(118, 75, 162, 0.5);
+}
+
+.action-button.outline {
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  border: 1px solid rgba(0, 198, 255, 0.2);
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(0, 198, 255, 0.7);
+}
+
+/* Inputs */
+.input-group {
+  margin-bottom: 1.5rem;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: var(--text-glow);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 0.8rem 1.2rem;
+  border: 1px solid rgba(0, 198, 255, 0.2);
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #00c6ff;
+  box-shadow: 0 0 15px rgba(0, 198, 255, 0.5);
+}
+
+/* Error Messages */
+.error-message {
+  background: rgba(255, 77, 77, 0.2);
+  color: #ff4d4d;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
+  text-shadow: 0 0 5px rgba(255, 77, 77, 0.5);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.loading-spinner::after {
+  content: '';
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid rgba(0, 198, 255, 0.2);
+  border-top-color: #00c6ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  box-shadow: 0 0 10px rgba(0, 198, 255, 0.5);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Glass Card */
+.glass-card {
+  background: var(--glass-bg);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: var(--neon-shadow);
+  backdrop-filter: blur(10px);
+  border: var(--glass-border);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 20px rgba(0, 198, 255, 0.7);
+}
+
+/* Page Container */
+.page-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  border: var(--glass-border);
+  box-shadow: var(--neon-shadow);
+}
+
+/* Page Header */
+.page-header {
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: var(--text-glow);
+  margin-bottom: 0.5rem;
+}
+
+.page-header p {
+  color: #a0aec0;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+/* Connect Prompt */
+.connect-prompt {
+  text-align: center;
+  padding: 4rem;
+  background: var(--glass-bg);
+  border-radius: 1rem;
+  box-shadow: var(--neon-shadow);
+  backdrop-filter: blur(10px);
+  border: var(--glass-border);
+}
+
+.connect-prompt h2 {
+  margin-bottom: 1.5rem;
+  color: #fff;
+  text-shadow: var(--text-glow);
+  font-size: 2rem;
+}
+
+.connect-prompt p {
+  color: #a0aec0;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+  }
+
+  .action-button {
+    width: 100%;
+  }
+
+  .input-group input {
+    font-size: 0.8rem;
+  }
+} 

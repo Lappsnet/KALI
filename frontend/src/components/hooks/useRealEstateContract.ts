@@ -3,9 +3,12 @@
 import { useCallback, useState } from "react"
 import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react"
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi"
+import { readContract, writeContract, waitForTransactionReceipt } from "@wagmi/core"
 import { formatEther, parseEther } from "viem"
-import { RealEstateERC721ABI } from "../../contracts/abis"
-import { CONTRACT_ADDRESSES, IPFS_GATEWAY, DEFAULT_METADATA_TEMPLATE } from "/home/jhonny/kali/frontend/src/contracts/config.ts"
+import { RealEstateERC721ABI } from "../../contracts/RealEstateERC721"
+import { CONTRACT_ADDRESSES, IPFS_GATEWAY, DEFAULT_METADATA_TEMPLATE } from "../../contracts/config"
+import type { ReadContractParameters } from '@wagmi/core'
+import { useConfig } from 'wagmi'
 
 // Property details type from the contract
 export interface PropertyDetails {
@@ -42,6 +45,7 @@ export interface PropertyWithMetadata {
 export function useRealEstateContract() {
   const { address, isConnected } = useAppKitAccount()
   const { chainId } = useAppKitNetwork()
+  const config = useConfig()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -78,7 +82,7 @@ export function useRealEstateContract() {
         setError(null)
 
         // Get property details from contract
-        const propertyDetails = await readContract({
+        const propertyDetails = await readContract(config, {
           address: contractAddress,
           abi: RealEstateERC721ABI,
           functionName: "getPropertyDetails",
@@ -86,18 +90,18 @@ export function useRealEstateContract() {
         })
 
         // Get owner of the token
-        const owner = await readContract({
+        const owner = await readContract(config, {
           address: contractAddress,
           abi: RealEstateERC721ABI,
           functionName: "ownerOf",
           args: [tokenId],
-        })
+        }) as string
 
         // Fetch metadata if available
         let metadata = null
-        if (propertyDetails.metadataURI) {
+        if ((propertyDetails as any).metadataURI) {
           try {
-            const metadataUrl = propertyDetails.metadataURI.replace("ipfs://", IPFS_GATEWAY)
+            const metadataUrl = (propertyDetails as any).metadataURI.replace("ipfs://", IPFS_GATEWAY)
             const response = await fetch(metadataUrl)
             metadata = await response.json()
           } catch (err) {
@@ -105,15 +109,16 @@ export function useRealEstateContract() {
           }
         }
 
+        const details = propertyDetails as any
         return {
           tokenId,
-          cadastralNumber: propertyDetails.cadastralNumber,
-          location: propertyDetails.location,
-          valuation: formatEther(propertyDetails.valuation),
-          valuationRaw: propertyDetails.valuation,
-          active: propertyDetails.active,
-          lastUpdated: new Date(Number(propertyDetails.lastUpdated) * 1000),
-          metadataURI: propertyDetails.metadataURI,
+          cadastralNumber: details.cadastralNumber,
+          location: details.location,
+          valuation: formatEther(details.valuation),
+          valuationRaw: details.valuation,
+          active: details.active,
+          lastUpdated: new Date(Number(details.lastUpdated) * 1000),
+          metadataURI: details.metadataURI,
           owner,
           metadata,
         }
@@ -125,7 +130,7 @@ export function useRealEstateContract() {
         setIsLoading(false)
       }
     },
-    [contractAddress, isConnected],
+    [contractAddress, isConnected, config],
   )
 
   // Get all properties
@@ -161,13 +166,13 @@ export function useRealEstateContract() {
       setError(null)
 
       const properties = await Promise.all(
-        allTokenIds.map(async (tokenId) => {
-          const owner = await readContract({
+        (allTokenIds as bigint[]).map(async (tokenId) => {
+          const owner = await readContract(config, {
             address: contractAddress,
             abi: RealEstateERC721ABI,
             functionName: "ownerOf",
             args: [tokenId],
-          })
+          }) as string
 
           if (owner.toLowerCase() === address.toLowerCase()) {
             return await getPropertyDetails(tokenId)
@@ -184,7 +189,7 @@ export function useRealEstateContract() {
     } finally {
       setIsLoading(false)
     }
-  }, [contractAddress, isConnected, address, allTokenIds, getPropertyDetails])
+  }, [contractAddress, isConnected, address, allTokenIds, getPropertyDetails, config])
 
   // Mint a new property
   const mintProperty = useCallback(
@@ -221,34 +226,28 @@ export function useRealEstateContract() {
           attributes: propertyData.attributes || DEFAULT_METADATA_TEMPLATE.attributes,
         }
 
-        // In a real app, you would upload this metadata to IPFS
-        // For this example, we'll use a placeholder URI
-        const metadataURI = `ipfs://QmExample/${propertyData.cadastralNumber}`
+        const metadataURI = `ipfs://QmbAP3QH6n3G6YSw8LHNU1YNE2YajxshbNeNdMdh4J9qXt/${propertyData.cadastralNumber}`
 
         // Call the contract to mint the property
-        writeContract({
+        const { hash } : any = writeContract({
           address: contractAddress,
           abi: RealEstateERC721ABI,
           functionName: "mintProperty",
           args: [
-            address,
+            address as `0x${string}`,
             propertyData.cadastralNumber,
             propertyData.location,
             parseEther(propertyData.valuation),
             metadataURI,
           ],
-          onSuccess(data) {
-            console.log("Property minted successfully:", data)
-            // In a real app, you would wait for the transaction to be mined
-            // and then get the token ID from the event logs
-            // For this example, we'll use a placeholder token ID
-            if (onSuccess) onSuccess(BigInt(Date.now()))
-          },
-          onError(error) {
-            console.error("Error minting property:", error)
-            setError("Failed to mint property")
-          },
         })
+
+        if (onSuccess) {
+          // Wait for transaction confirmation
+          const receipt = await waitForTransactionReceipt(config, { hash })
+          // In a real app, you would get the token ID from the event logs
+          onSuccess(BigInt(Date.now()))
+        }
 
         return true
       } catch (err) {
@@ -259,7 +258,7 @@ export function useRealEstateContract() {
         setIsLoading(false)
       }
     },
-    [contractAddress, isConnected, address, writeContract],
+    [contractAddress, isConnected, address],
   )
 
   // Update property status (active/inactive)
@@ -274,20 +273,15 @@ export function useRealEstateContract() {
         setIsLoading(true)
         setError(null)
 
-        writeContract({
+        const { hash } : any = await writeContract({
           address: contractAddress,
           abi: RealEstateERC721ABI,
           functionName: "setPropertyStatus",
           args: [tokenId, active],
-          onSuccess(data) {
-            console.log("Property status updated successfully:", data)
-          },
-          onError(error) {
-            console.error("Error updating property status:", error)
-            setError("Failed to update property status")
-          },
         })
 
+        // Wait for transaction confirmation
+        await waitForTransactionReceipt(config, { hash })
         return true
       } catch (err) {
         console.error("Error updating property status:", err)
@@ -297,7 +291,7 @@ export function useRealEstateContract() {
         setIsLoading(false)
       }
     },
-    [contractAddress, isConnected, writeContract],
+    [contractAddress, isConnected, config],
   )
 
   // Update property valuation
@@ -312,20 +306,15 @@ export function useRealEstateContract() {
         setIsLoading(true)
         setError(null)
 
-        writeContract({
+        const { hash } :any = await writeContract({
           address: contractAddress,
           abi: RealEstateERC721ABI,
           functionName: "updatePropertyValuation",
           args: [tokenId, parseEther(newValuation)],
-          onSuccess(data) {
-            console.log("Property valuation updated successfully:", data)
-          },
-          onError(error) {
-            console.error("Error updating property valuation:", error)
-            setError("Failed to update property valuation")
-          },
         })
 
+        // Wait for transaction confirmation
+        await waitForTransactionReceipt(config, { hash })
         return true
       } catch (err) {
         console.error("Error updating property valuation:", err)
@@ -335,7 +324,7 @@ export function useRealEstateContract() {
         setIsLoading(false)
       }
     },
-    [contractAddress, isConnected, writeContract],
+    [contractAddress, isConnected, config],
   )
 
   // Transfer property to another address
@@ -350,20 +339,15 @@ export function useRealEstateContract() {
         setIsLoading(true)
         setError(null)
 
-        writeContract({
+        const { hash } : any = writeContract({
           address: contractAddress,
           abi: RealEstateERC721ABI,
           functionName: "safeTransferFrom",
-          args: [address, toAddress, tokenId],
-          onSuccess(data) {
-            console.log("Property transferred successfully:", data)
-          },
-          onError(error) {
-            console.error("Error transferring property:", error)
-            setError("Failed to transfer property")
-          },
+          args: [address as `0x${string}`, toAddress, tokenId],
         })
 
+        // Wait for transaction confirmation
+        await waitForTransactionReceipt(config, { hash })
         return true
       } catch (err) {
         console.error("Error transferring property:", err)
@@ -373,11 +357,8 @@ export function useRealEstateContract() {
         setIsLoading(false)
       }
     },
-    [contractAddress, isConnected, address, writeContract],
+    [contractAddress, isConnected, address, config],
   )
-
-  // Helper function for read contract calls
-  const readContract = useReadContract
 
   return {
     contractAddress,

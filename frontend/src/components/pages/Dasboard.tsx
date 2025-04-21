@@ -18,8 +18,8 @@ export const Dashboard = () => {
     return (
       <div className="page-container">
         <div className="hero-section">
-          <h1 className="hero-title">REOWN</h1>
-          <p className="hero-subtitle">Real Estate Ownership on the Blockchain</p>
+          <h1 className="hero-title">KALI</h1>
+          <p className="hero-subtitle">Real Estate Marketplace on the Pharos Network</p>
           <div className="hero-actions">
             <appkit-button />
           </div>

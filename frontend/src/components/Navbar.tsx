@@ -25,7 +25,7 @@ export const Navbar = () => {
       <div className="navbar-container">
         <div className="navbar-logo">
           <Link to="/">
-            <span className="logo-text">REOWN</span>
+            <span className="logo-text">KALI</span>
           </Link>
         </div>
 

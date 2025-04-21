@@ -11,8 +11,8 @@ export const Launch = () => {
     <div className="page-container">
       <div className="hero-section">
         <div className="new-badge">NEW</div>
-        <h1 className="hero-title">REOWN</h1>
-        <p className="hero-subtitle">Real Estate Ownership on the Blockchain</p>
+        <h1 className="hero-title">KALI</h1>
+        <p className="hero-subtitle">Real Estate Marketplace on the Pharos Network</p>
 
         <div className="hero-description">
           <p>Tokenize, trade, and manage real estate properties with blockchain technology</p>

@@ -4,12 +4,6 @@ pragma solidity ^0.8.20;
 import "forge-std/Script.sol";
 import {RealEstateERC721} from "../src/RealEstateERC721.sol"; 
 
-/**
- * @title DeployRealEstateERC721
- * @notice Script to deploy the RealEstateERC721 contract using Foundry.
- * @dev Reads the deployer private key from the PRIVATE_KEY environment variable.
- * Uses constants for token name and symbol, but these could also be read from env vars.
- */
 contract DeployRealEstateERC721 is Script {
 
     string public constant TOKEN_NAME = "Kali Real Estate"; 
@@ -23,8 +17,6 @@ contract DeployRealEstateERC721 is Script {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        // --- Deploy Contract ---
-        console.log("Deploying RealEstateERC721 with Name:", TOKEN_NAME, "Symbol:", TOKEN_SYMBOL);
         RealEstateERC721 realEstateToken = new RealEstateERC721(
             TOKEN_NAME,
             TOKEN_SYMBOL

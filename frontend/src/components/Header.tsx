@@ -15,8 +15,8 @@ export const Header = () => {
     <header className="app-header">
       <div className="header-content">
         <div className="logo-container">
-          <img src="/reown.svg" alt="Reown" className="logo" />
-          <h1>Reown AppKit Dashboard</h1>
+          <img src="/kali.svg" alt="Kali" className="logo" />
+          <h1>KALI Marketplace</h1>
         </div>
 
         <div className="header-actions">

@@ -5,11 +5,12 @@ interface PropertyCardProps {
   address: string
   price: string
   image: string
+  property: any
   status: "For Sale" | "Owned" | "Pending"
   onClick?: () => void
 }
 
-export const PropertyCard = ({ title, address, price, image, status, onClick }: PropertyCardProps) => {
+export const PropertyCard = ({ title, address, price, image, status, property,onClick }: PropertyCardProps) => {
   return (
     <div className="property-card" onClick={onClick}>
       <div className="property-image">

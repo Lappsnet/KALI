@@ -1,0 +1,13 @@
+Network: Pharos Devnet (Chain ID: 50002)
+Deployment Date: 2024-04-18
+
+Contracts:
+----------
+RentableToken=0xDaDf0E874c7615b8521dc8FF5b8C354474B15Dcc
+
+Contract Parameters:
+-------------------
+Token Name: Rentable Token
+Token Symbol: RENT
+Initial Token Price: 0.001 ether
+Initial Yield Rate: 500 (5% annual) 
