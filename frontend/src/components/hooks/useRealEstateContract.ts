@@ -1,370 +1,358 @@
+
 "use client"
 
-import { useCallback, useState } from "react"
+import { useCallback, useState, useEffect } from "react"
 import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react"
-import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi"
-import { readContract, writeContract, waitForTransactionReceipt } from "@wagmi/core"
-import { formatEther, parseEther } from "viem"
-import { RealEstateERC721ABI } from "../../contracts/RealEstateERC721"
-import { CONTRACT_ADDRESSES, IPFS_GATEWAY, DEFAULT_METADATA_TEMPLATE } from "../../contracts/config"
-import type { ReadContractParameters } from '@wagmi/core'
-import { useConfig } from 'wagmi'
+import { useReadContract, useWriteContract, useWaitForTransactionReceipt, useConfig } from "wagmi"
+import { readContract } from "@wagmi/core"
+import { formatEther, parseEther, decodeEventLog, Address, Hex } from "viem"
+import RealEstateERC721ABI from "../abis/RealEstateERC721.abi.json"
+import { CONTRACT_ADDRESSES, IPFS_GATEWAY } from "../../config/index.ts"
 
-// Property details type from the contract
+type PropertyDetailsTuple = readonly [string, string, bigint, boolean, bigint, string];
+
 export interface PropertyDetails {
-  cadastralNumber: string
-  location: string
-  valuation: bigint
-  active: boolean
-  lastUpdated: bigint
-  metadataURI: string
+  cadastralNumber: string;
+  location: string;
+  valuation: bigint;
+  active: boolean;
+  lastUpdated: bigint;
+  metadataURI: string;
 }
 
-// Extended property details with token ID and formatted values
-export interface PropertyWithMetadata {
-  tokenId: bigint
-  cadastralNumber: string
-  location: string
-  valuation: string
-  valuationRaw: bigint
-  active: boolean
-  lastUpdated: Date
-  metadataURI: string
-  owner: string
-  metadata: {
-    name: string
-    description: string
-    image: string
-    attributes: Array<{
-      trait_type: string
-      value: string | number
-    }>
-  } | null
+export interface PropertyWithMetadata extends PropertyDetails {
+  tokenId: bigint;
+  valuationFormatted: string;
+  lastUpdatedDate: Date;
+  owner: Address;
+  metadata: { name: string; description: string; image: string; attributes: Array<{ trait_type: string; value: string | number; }>; } | null;
+}
+
+interface PropertyMintedEventArgs { tokenId?: bigint; }
+interface TransferEventArgs { from?: Address; to?: Address; tokenId?: bigint; }
+
+type MintCallbacks = {
+    onSuccess?: (tokenId: bigint, hash: `0x${string}`) => void;
+    onError?: (errorMsg: string) => void;
 }
 
 export function useRealEstateContract() {
   const { address, isConnected } = useAppKitAccount()
   const { chainId } = useAppKitNetwork()
   const config = useConfig()
-  const [isLoading, setIsLoading] = useState(false)
+  const [isReadLoading, setIsReadLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [currentTxCallbacks, setCurrentTxCallbacks] = useState<MintCallbacks>({});
 
-  // Get contract address based on current chain
   const contractAddress = chainId
     ? CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES]?.realEstateERC721
     : undefined
 
-  // Write contract hook
-  const { writeContract, isPending, isSuccess, data: txHash } = useWriteContract()
+  const {
+    writeContract,
+    isPending: isWritePending,
+    data: txHash,
+    reset: resetWriteContract,
+    error: writeError,
+  } = useWriteContract()
 
-  // Wait for transaction receipt
-  const { data: receipt, isLoading: isWaitingForReceipt } = useWaitForTransactionReceipt({
-    hash: txHash,
-  })
+  const {
+    data: receipt,
+    isLoading: isReceiptLoading,
+    isSuccess: isTxSuccess,
+    error: receiptError,
+  } = useWaitForTransactionReceipt({ hash: txHash });
 
-  // Get all token IDs
-  const { data: allTokenIds, refetch: refetchAllTokenIds } = useReadContract({
+  const { data: allTokenIds, refetch: refetchAllTokenIds, isLoading: isTokenIdsLoading } = useReadContract({
     address: contractAddress,
     abi: RealEstateERC721ABI,
     functionName: "getAllTokenIds",
-    query: {
-      enabled: !!contractAddress && isConnected,
-    },
+    query: { enabled: !!contractAddress && isConnected },
   })
 
-  // Get property details by token ID
   const getPropertyDetails = useCallback(
     async (tokenId: bigint): Promise<PropertyWithMetadata | null> => {
-      if (!contractAddress || !isConnected) return null
-
+      if (!contractAddress || !isConnected || !config) return null;
+      setIsReadLoading(true);
+      setError(null);
       try {
-        setIsLoading(true)
-        setError(null)
-
-        // Get property details from contract
-        const propertyDetails = await readContract(config, {
-          address: contractAddress,
-          abi: RealEstateERC721ABI,
-          functionName: "getPropertyDetails",
-          args: [tokenId],
-        })
-
-        // Get owner of the token
-        const owner = await readContract(config, {
-          address: contractAddress,
-          abi: RealEstateERC721ABI,
-          functionName: "ownerOf",
-          args: [tokenId],
-        }) as string
-
-        // Fetch metadata if available
-        let metadata = null
-        if ((propertyDetails as any).metadataURI) {
+        const [propertyDetailsResult, ownerResult] = await Promise.all([
+          readContract(config, { address: contractAddress, abi: RealEstateERC721ABI, functionName: "getPropertyDetails", args: [tokenId] }),
+          readContract(config, { address: contractAddress, abi: RealEstateERC721ABI, functionName: "ownerOf", args: [tokenId] }),
+        ]);
+        const detailsTuple = propertyDetailsResult as PropertyDetailsTuple;
+        const owner = ownerResult as Address;
+        const propertyData: PropertyDetails = { cadastralNumber: detailsTuple[0], location: detailsTuple[1], valuation: detailsTuple[2], active: detailsTuple[3], lastUpdated: detailsTuple[4], metadataURI: detailsTuple[5] };
+        let metadata = null;
+        if (propertyData.metadataURI && propertyData.metadataURI.startsWith('ipfs://')) { // Only fetch valid IPFS URIs
           try {
-            const metadataUrl = (propertyDetails as any).metadataURI.replace("ipfs://", IPFS_GATEWAY)
-            const response = await fetch(metadataUrl)
-            metadata = await response.json()
+            const metadataUrl = propertyData.metadataURI.replace("ipfs://", IPFS_GATEWAY);
+            const response = await fetch(metadataUrl);
+            if (!response.ok) {
+                 console.error(`Error fetch metadata: ${response.status} ${metadataUrl}`);
+                 throw new Error(`HTTP error ${response.status}`);
+            }
+            metadata = await response.json();
           } catch (err) {
-            console.error("Error fetching metadata:", err)
+            console.error(`Failed fetch/parse metadata ${propertyData.metadataURI}:`, err);
           }
+        } else if (propertyData.metadataURI) {
+             console.warn(`Metadata URI is not an IPFS URI: ${propertyData.metadataURI}`);
         }
-
-        const details = propertyDetails as any
-        return {
-          tokenId,
-          cadastralNumber: details.cadastralNumber,
-          location: details.location,
-          valuation: formatEther(details.valuation),
-          valuationRaw: details.valuation,
-          active: details.active,
-          lastUpdated: new Date(Number(details.lastUpdated) * 1000),
-          metadataURI: details.metadataURI,
-          owner,
-          metadata,
-        }
-      } catch (err) {
-        console.error("Error getting property details:", err)
-        setError("Failed to get property details")
-        return null
+        return { ...propertyData, tokenId, valuationFormatted: formatEther(propertyData.valuation), lastUpdatedDate: new Date(Number(propertyData.lastUpdated) * 1000), owner, metadata };
+      } catch (error: any) {
+        console.error(`Error getPropertyDetails token ${tokenId}:`, error);
+        setError(`Failed to get property details: ${error.message || ''}`);
+        return null;
       } finally {
-        setIsLoading(false)
+        setIsReadLoading(false);
       }
     },
-    [contractAddress, isConnected, config],
-  )
+    [contractAddress, isConnected, config] // Added IPFS_GATEWAY implicitly
+  );
 
-  // Get all properties
   const getAllProperties = useCallback(async (): Promise<PropertyWithMetadata[]> => {
-    if (!contractAddress || !isConnected || !allTokenIds) return []
-
+    if (!contractAddress || !isConnected || !allTokenIds || !Array.isArray(allTokenIds) || allTokenIds.length === 0) return [];
+    setIsReadLoading(true);
+    setError(null);
     try {
-      setIsLoading(true)
-      setError(null)
-
-      const properties = await Promise.all(
-        allTokenIds.map(async (tokenId) => {
-          return await getPropertyDetails(tokenId)
-        }),
-      )
-
-      return properties.filter((p): p is PropertyWithMetadata => p !== null)
-    } catch (err) {
-      console.error("Error getting all properties:", err)
-      setError("Failed to get properties")
-      return []
+      const properties = await Promise.all((allTokenIds as bigint[]).map(tokenId => getPropertyDetails(tokenId)));
+      return properties.filter((p): p is PropertyWithMetadata => p !== null);
+    } catch (err: any) {
+      console.error("Error getAllProperties:", err);
+      setError(`Failed to get all properties: ${err.message || ''}`);
+      return [];
     } finally {
-      setIsLoading(false)
+      setIsReadLoading(false);
     }
-  }, [contractAddress, isConnected, allTokenIds, getPropertyDetails])
+  }, [contractAddress, isConnected, allTokenIds, getPropertyDetails]);
 
-  // Get properties owned by current user
   const getMyProperties = useCallback(async (): Promise<PropertyWithMetadata[]> => {
-    if (!contractAddress || !isConnected || !address || !allTokenIds) return []
-
+    if (!isConnected || !address) return [];
+    setError(null);
     try {
-      setIsLoading(true)
-      setError(null)
-
-      const properties = await Promise.all(
-        (allTokenIds as bigint[]).map(async (tokenId) => {
-          const owner = await readContract(config, {
-            address: contractAddress,
-            abi: RealEstateERC721ABI,
-            functionName: "ownerOf",
-            args: [tokenId],
-          }) as string
-
-          if (owner.toLowerCase() === address.toLowerCase()) {
-            return await getPropertyDetails(tokenId)
-          }
-          return null
-        }),
-      )
-
-      return properties.filter((p): p is PropertyWithMetadata => p !== null)
-    } catch (err) {
-      console.error("Error getting my properties:", err)
-      setError("Failed to get your properties")
-      return []
-    } finally {
-      setIsLoading(false)
+      const allProps = await getAllProperties();
+      return allProps.filter(prop => prop.owner.toLowerCase() === address.toLowerCase());
+    } catch (err: any) {
+      console.error("Error getMyProperties:", err);
+      setError(`Failed to get your properties: ${err.message || ''}`);
+      return [];
     }
-  }, [contractAddress, isConnected, address, allTokenIds, getPropertyDetails, config])
+  }, [address, isConnected, getAllProperties]);
 
-  // Mint a new property
+  // --- Write Functions ---
+
   const mintProperty = useCallback(
     async (
-      propertyData: {
-        cadastralNumber: string
-        location: string
-        valuation: string
-        name: string
-        description: string
-        image: string
-        attributes?: Array<{
-          trait_type: string
-          value: string | number
-        }>
-      },
-      onSuccess?: (tokenId: bigint) => void,
-    ) => {
-      if (!contractAddress || !isConnected || !address) {
-        setError("Wallet not connected")
-        return null
+      propertyArgs: { cadastralNumber: string; location: string; valuation: string; },
+      metadataUri: string,
+      onSuccess?: (tokenId: bigint, hash: `0x${string}`) => void,
+      onError?: (errorMsg: string) => void
+    ): Promise<boolean> => {
+      const prerequisitesMet = contractAddress && isConnected && address && config && writeContract;
+      if (!prerequisitesMet) {
+        const msg = "Cannot mint: Wallet not connected or configuration missing.";
+        setError(msg);
+        if (onError) onError(msg);
+        return false;
       }
 
+      setError(null);
+      resetWriteContract();
+      setCurrentTxCallbacks({ onSuccess, onError }); // Store callbacks specifically for this mint tx
+
       try {
-        setIsLoading(true)
-        setError(null)
-
-        // Create metadata
-        const metadata = {
-          ...DEFAULT_METADATA_TEMPLATE,
-          name: propertyData.name,
-          description: propertyData.description,
-          image: propertyData.image,
-          attributes: propertyData.attributes || DEFAULT_METADATA_TEMPLATE.attributes,
-        }
-
-        const metadataURI = `ipfs://QmbAP3QH6n3G6YSw8LHNU1YNE2YajxshbNeNdMdh4J9qXt/${propertyData.cadastralNumber}`
-
-        // Call the contract to mint the property
-        const { hash } : any = writeContract({
+        writeContract({
           address: contractAddress,
           abi: RealEstateERC721ABI,
           functionName: "mintProperty",
           args: [
-            address as `0x${string}`,
-            propertyData.cadastralNumber,
-            propertyData.location,
-            parseEther(propertyData.valuation),
-            metadataURI,
+            address,
+            propertyArgs.cadastralNumber,
+            propertyArgs.location,
+            parseEther(propertyArgs.valuation),
+            metadataUri,
           ],
-        })
-
-        if (onSuccess) {
-          // Wait for transaction confirmation
-          const receipt = await waitForTransactionReceipt(config, { hash })
-          // In a real app, you would get the token ID from the event logs
-          onSuccess(BigInt(Date.now()))
-        }
-
-        return true
-      } catch (err) {
-        console.error("Error minting property:", err)
-        setError("Failed to mint property")
-        return null
-      } finally {
-        setIsLoading(false)
+        });
+        return true;
+      } catch (err: any) {
+        console.error("Error submitting mint tx:", err);
+        const errorMsg = `Failed to submit mint transaction: ${err.message || err}`;
+        setError(errorMsg);
+        if (onError) onError(errorMsg);
+        setCurrentTxCallbacks({});
+        return false;
       }
     },
-    [contractAddress, isConnected, address],
-  )
+    [contractAddress, isConnected, address, config, writeContract, resetWriteContract, setCurrentTxCallbacks]
+  );
 
-  // Update property status (active/inactive)
   const updatePropertyStatus = useCallback(
-    async (tokenId: bigint, active: boolean) => {
-      if (!contractAddress || !isConnected) {
-        setError("Wallet not connected")
-        return false
+    async (tokenId: bigint, active: boolean): Promise<boolean> => {
+      const prerequisitesMet = contractAddress && isConnected && address && config && writeContract;
+      if (!prerequisitesMet) {
+        setError("Cannot update status: prerequisites missing.");
+        return false;
       }
+      setError(null);
+      resetWriteContract();
+      setCurrentTxCallbacks({}); // Clear any pending mint callbacks
 
       try {
-        setIsLoading(true)
-        setError(null)
-
-        const { hash } : any = await writeContract({
+        writeContract({
           address: contractAddress,
           abi: RealEstateERC721ABI,
           functionName: "setPropertyStatus",
           args: [tokenId, active],
-        })
-
-        // Wait for transaction confirmation
-        await waitForTransactionReceipt(config, { hash })
-        return true
-      } catch (err) {
-        console.error("Error updating property status:", err)
-        setError("Failed to update property status")
-        return false
-      } finally {
-        setIsLoading(false)
+        });
+        return true;
+      } catch (err: any) {
+        console.error("Error submitting update status tx:", err);
+        setError(`Failed to submit update status transaction: ${err.message || err}`);
+        return false;
       }
     },
-    [contractAddress, isConnected, config],
-  )
+    [contractAddress, isConnected, address, config, writeContract, resetWriteContract, setCurrentTxCallbacks]
+  );
 
-  // Update property valuation
   const updatePropertyValuation = useCallback(
-    async (tokenId: bigint, newValuation: string) => {
-      if (!contractAddress || !isConnected) {
-        setError("Wallet not connected")
-        return false
-      }
+    async (tokenId: bigint, newValuation: string): Promise<boolean> => {
+       const prerequisitesMet = contractAddress && isConnected && address && config && writeContract;
+       if (!prerequisitesMet) {
+         setError("Cannot update valuation: prerequisites missing.");
+         return false;
+       }
+      setError(null);
+      resetWriteContract();
+      setCurrentTxCallbacks({});
 
       try {
-        setIsLoading(true)
-        setError(null)
-
-        const { hash } :any = await writeContract({
+        writeContract({
           address: contractAddress,
           abi: RealEstateERC721ABI,
           functionName: "updatePropertyValuation",
           args: [tokenId, parseEther(newValuation)],
-        })
-
-        // Wait for transaction confirmation
-        await waitForTransactionReceipt(config, { hash })
-        return true
-      } catch (err) {
-        console.error("Error updating property valuation:", err)
-        setError("Failed to update property valuation")
-        return false
-      } finally {
-        setIsLoading(false)
+        });
+        return true;
+      } catch (err: any) {
+        console.error("Error submitting update valuation tx:", err);
+        setError(`Failed to submit update valuation transaction: ${err.message || err}`);
+        return false;
       }
     },
-    [contractAddress, isConnected, config],
-  )
+    [contractAddress, isConnected, address, config, writeContract, resetWriteContract, setCurrentTxCallbacks]
+  );
 
-  // Transfer property to another address
   const transferProperty = useCallback(
-    async (tokenId: bigint, toAddress: `0x${string}`) => {
-      if (!contractAddress || !isConnected || !address) {
-        setError("Wallet not connected")
-        return false
+    async (tokenId: bigint, toAddress: Address): Promise<boolean> => {
+      const prerequisitesMet = contractAddress && isConnected && address && config && writeContract;
+      if (!prerequisitesMet) {
+        setError("Cannot transfer: prerequisites missing.");
+        return false;
       }
+      if (address.toLowerCase() === toAddress.toLowerCase()) {
+          setError("Cannot transfer property to yourself.");
+          return false;
+      }
+      setError(null);
+      resetWriteContract();
+      setCurrentTxCallbacks({});
 
       try {
-        setIsLoading(true)
-        setError(null)
-
-        const { hash } : any = writeContract({
+        writeContract({
           address: contractAddress,
           abi: RealEstateERC721ABI,
           functionName: "safeTransferFrom",
-          args: [address as `0x${string}`, toAddress, tokenId],
-        })
-
-        // Wait for transaction confirmation
-        await waitForTransactionReceipt(config, { hash })
-        return true
-      } catch (err) {
-        console.error("Error transferring property:", err)
-        setError("Failed to transfer property")
-        return false
-      } finally {
-        setIsLoading(false)
+          args: [address, toAddress, tokenId],
+        });
+        return true;
+      } catch (err: any) {
+        console.error("Error submitting transfer tx:", err);
+        setError(`Failed to submit transfer transaction: ${err.message || err}`);
+        return false;
       }
     },
-    [contractAddress, isConnected, address, config],
-  )
+    [contractAddress, isConnected, address, config, writeContract, resetWriteContract, setCurrentTxCallbacks]
+  );
+
+   // Effect to handle transaction result (primarily for mintProperty callbacks)
+   useEffect(() => {
+      const { onSuccess, onError } = currentTxCallbacks; // Get callbacks stored for the current tx attempt
+
+      // Check if the completed transaction matches the hash we are tracking
+      // and if the callbacks are still relevant for this hash
+      if (txHash && receipt && receipt.transactionHash === txHash) {
+         if (isTxSuccess) {
+            // Transaction succeeded, try to parse logs for minting
+            let mintedTokenId: bigint | null = null;
+            try {
+               for (const log of receipt.logs) {
+                  try {
+                      const decodedEvent = decodeEventLog({ abi: RealEstateERC721ABI, data: log.data as Hex, topics: log.topics as [Hex, ...Hex[]] });
+                      if (decodedEvent.eventName === 'PropertyMinted') {
+                          mintedTokenId = (decodedEvent.args as PropertyMintedEventArgs).tokenId ?? null;
+                          if (mintedTokenId !== null) break;
+                      } else if (decodedEvent.eventName === 'Transfer') {
+                          const args = decodedEvent.args as TransferEventArgs;
+                          if (args.from === '0x0000000000000000000000000000000000000000') {
+                              mintedTokenId = args.tokenId ?? null;
+                              if (mintedTokenId !== null) break;
+                          }
+                      }
+                  } catch { /* Ignore logs that don't match */ }
+               }
+
+               // Call onSuccess only if it exists and we found a token ID
+               if (mintedTokenId !== null && onSuccess) {
+                   onSuccess(mintedTokenId, receipt.transactionHash);
+                   refetchAllTokenIds(); // Good place to refetch after mint
+               } else if (mintedTokenId === null && onSuccess) {
+                    // Tx succeeded but couldn't find ID - might be non-mint tx or log issue
+                   console.warn("Transaction successful but couldn't parse mint Token ID from logs.");
+                   // Decide if onSuccess should still be called, maybe without tokenId
+                   // onSuccess(BigInt(-1), receipt.transactionHash); // Example: Indicate success but no ID found
+               } else if (mintedTokenId === null && !onSuccess) {
+                    // Tx succeeded, maybe not a mint, no specific callback needed
+               }
+
+            } catch(parseError: any) {
+                console.error("Error parsing logs:", parseError);
+                if(onError) onError(`Transaction successful, but failed to parse events: ${parseError.message}`);
+            } finally {
+                resetWriteContract();
+                setCurrentTxCallbacks({}); // Clear callbacks after handling
+            }
+
+         } else { // Transaction failed (isTxSuccess is false but receipt exists)
+            const errorMsg = `Transaction failed (receipt status: ${receipt.status})`;
+            console.error(errorMsg, receipt);
+            setError(errorMsg);
+            if (onError) onError(errorMsg);
+            resetWriteContract();
+            setCurrentTxCallbacks({});
+         }
+      } else if (receiptError || writeError) {
+          // Error occurred before getting receipt or during wait
+          const errorMsg = `Transaction error: ${ (receiptError || writeError)?.message || 'Unknown error'}`;
+          console.error(errorMsg, receiptError || writeError);
+          setError(errorMsg);
+          if (onError) onError(errorMsg);
+          resetWriteContract();
+          setCurrentTxCallbacks({});
+      }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [receipt, isTxSuccess, receiptError, writeError, txHash]); // Dependencies focus on tx outcome
+
 
   return {
     contractAddress,
-    isLoading: isLoading || isPending || isWaitingForReceipt,
-    isSuccess,
-    error,
+    isLoading: isReadLoading || isTokenIdsLoading || isWritePending || isReceiptLoading,
+    isReading: isReadLoading || isTokenIdsLoading,
+    isWriting: isWritePending || isReceiptLoading,
+    isConfirming: isWritePending,
+    isProcessing: isReceiptLoading,
+    isSuccess: isTxSuccess,
+    error: error || writeError?.message || receiptError?.message,
     txHash,
     receipt,
     getPropertyDetails,
@@ -375,5 +363,7 @@ export function useRealEstateContract() {
     updatePropertyValuation,
     transferProperty,
     refetchAllTokenIds,
-  }
+    clearError: () => setError(null),
+    resetWriteState: resetWriteContract,
+  };
 }

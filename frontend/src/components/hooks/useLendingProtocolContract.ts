@@ -5,7 +5,7 @@ import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react"
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi"
 import { formatEther, parseEther } from "viem"
 import LendingProtocolABI from "../abis/LendingProtocol.abi.json"
-import { CONTRACT_ADDRESSES, LENDING_PROTOCOL_PARAMS } from "../../contracts/config"
+import { CONTRACT_ADDRESSES, LENDING_PROTOCOL_PARAMS } from "../../config/index.ts"
 import { type UseReadContractReturnType } from 'wagmi'
 
 // Loan type from the contract

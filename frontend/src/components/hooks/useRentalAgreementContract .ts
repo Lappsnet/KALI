@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react";
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { type UseReadContractReturnType } from 'wagmi';
-import { CONTRACT_ADDRESSES } from "../../contracts/config.ts";
+import { CONTRACT_ADDRESSES } from "../../config/index.ts";
 import RentalAgreementABI from "../../components/abis/RentalAgreement.abi.json";
 
 interface Rental {

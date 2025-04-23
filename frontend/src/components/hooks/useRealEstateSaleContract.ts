@@ -5,7 +5,7 @@ import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react"
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi"
 import { formatEther, parseEther } from "viem"
 import RealEstateSaleABI from "../abis/RealEstateSale.abi.json"
-import { CONTRACT_ADDRESSES, DEFAULT_SALE_DOCUMENT, IPFS_GATEWAY } from "../../contracts/config"
+import { CONTRACT_ADDRESSES, DEFAULT_SALE_DOCUMENT, IPFS_GATEWAY } from "../../config/index.ts"
 
 export enum SaleStatus {
   Created = 0,

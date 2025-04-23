@@ -9,7 +9,7 @@ import { ActionButton } from "../ActionButton"
 import { Calculator, DollarSign, Loader, Clock, Percent } from "lucide-react"
 import { useRealEstateContract, type PropertyWithMetadata } from "../hooks/useRealEstateContract"
 import { useLendingProtocolContract } from "../hooks/useLendingProtocolContract"
-import { LENDING_PROTOCOL_PARAMS } from "/home/jhonny/kali/frontend/src/contracts/config.ts"
+import { LENDING_PROTOCOL_PARAMS } from "../../config/index.ts"
 
 export const LoanRequest = () => {
   const { id } = useParams<{ id: string }>()

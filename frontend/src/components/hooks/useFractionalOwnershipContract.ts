@@ -5,7 +5,7 @@ import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react";
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { type UseReadContractReturnType } from 'wagmi';
 import FractionalOwnershipABI from "../../components/abis/FractionalOwnership.abi.json";
-import { CONTRACT_ADDRESSES } from "../../contracts/config.ts";
+import { CONTRACT_ADDRESSES } from "../../config/index.ts";
 
 interface FractionalizedProperty {
     propertyId: bigint;
