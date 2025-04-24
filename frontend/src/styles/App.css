@@ -908,11 +908,10 @@ select {
 }
 
 .file-input {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  position: relative;
+  left: 50%;
+  width: 40%;
+  height: 40%;
   opacity: 0;
   cursor: pointer;
 }

@@ -1,0 +1,55 @@
+{
+  "transactions": [
+    {
+      "hash": null,
+      "transactionType": "CALL",
+      "contractName": null,
+      "contractAddress": "0xd2dd7e9d3adf3d1adfed1ea5a2771ecf507885e5",
+      "function": "grantRole(bytes32,address)",
+      "arguments": [
+        "0x97667070c54ef182b0f5858b034beac1b6f3089aa2d3188bb1e8929f4fa9b929",
+        "0x251d8803f71a8402dD96893E0709588e99F6267c"
+      ],
+      "transaction": {
+        "from": "0x251d8803f71a8402dd96893e0709588e99f6267c",
+        "to": "0xd2dd7e9d3adf3d1adfed1ea5a2771ecf507885e5",
+        "gas": "0xa5e9",
+        "value": "0x0",
+        "input": "0x2f2ff15d97667070c54ef182b0f5858b034beac1b6f3089aa2d3188bb1e8929f4fa9b929000000000000000000000000251d8803f71a8402dd96893e0709588e99f6267c",
+        "nonce": "0x21",
+        "chainId": "0xc352"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": null,
+      "transactionType": "CALL",
+      "contractName": null,
+      "contractAddress": "0xd2dd7e9d3adf3d1adfed1ea5a2771ecf507885e5",
+      "function": "revokeRole(bytes32,address)",
+      "arguments": [
+        "0x97667070c54ef182b0f5858b034beac1b6f3089aa2d3188bb1e8929f4fa9b929",
+        "0x251d8803f71a8402dD96893E0709588e99F6267c"
+      ],
+      "transaction": {
+        "from": "0x251d8803f71a8402dd96893e0709588e99f6267c",
+        "to": "0xd2dd7e9d3adf3d1adfed1ea5a2771ecf507885e5",
+        "gas": "0x9fba",
+        "value": "0x0",
+        "input": "0xd547741f97667070c54ef182b0f5858b034beac1b6f3089aa2d3188bb1e8929f4fa9b929000000000000000000000000251d8803f71a8402dd96893e0709588e99f6267c",
+        "nonce": "0x22",
+        "chainId": "0xc352"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    }
+  ],
+  "receipts": [],
+  "libraries": [],
+  "pending": [],
+  "returns": {},
+  "timestamp": 1745509783,
+  "chain": 50002,
+  "commit": "0236e55"
+}

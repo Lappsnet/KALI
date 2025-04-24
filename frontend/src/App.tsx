@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAppKit } from "@reown/appkit";
 import { WagmiProvider } from 'wagmi';
 
-import { projectId, metadata, chains, wagmiAdapter } from "./config"; // Adjust path if needed
+import { projectId, metadata, chains, wagmiAdapter } from "./config/index.ts"; // Adjust path if needed
 
 import { Layout } from "./components/Layout";
 import { Dashboard } from "./components/pages/Dashboard";
@@ -32,6 +32,7 @@ import { AccessControl } from "./components/pages/AccessControl";
 import { UserRegistry } from "./components/pages/UserRegistry";
 import { Security } from "./components/pages/Security";
 import { Profile } from "./components/pages/Profile";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 import "./styles/App.css"; // Adjust path if needed
 
@@ -57,7 +58,11 @@ function AppContent() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/launch" element={<Launch />} />
-          <Route path="/dashboard/mint-properties" element={<MintProperties />} />
+          <Route path="/dashboard/mint-properties" element={
+            <ErrorBoundary>
+              <MintProperties />
+            </ErrorBoundary>
+          } />
           <Route path="/dashboard/sale-properties" element={<SaleProperties />} />
           <Route path="/dashboard/properties" element={<MyProperties />} />
           <Route path="/dashboard/documents" element={<PropertyDocuments />} />

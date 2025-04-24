@@ -1,0 +1,34 @@
+{
+  "transactions": [
+    {
+      "hash": null,
+      "transactionType": "CALL",
+      "contractName": null,
+      "contractAddress": "0x43b69480cf9308f10781fb3eeab20770c14ee73d",
+      "function": "createSale(uint256,uint256,string)",
+      "arguments": [
+        "1",
+        "10000000000000000",
+        "ipfs://bafkreib2zox7cqpuayzpqeu3o6ovx5j6pmdbz6vucw6qgjdqx3kh5zhrzm"
+      ],
+      "transaction": {
+        "from": "0x251d8803f71a8402dd96893e0709588e99f6267c",
+        "to": "0x43b69480cf9308f10781fb3eeab20770c14ee73d",
+        "gas": "0x693a4",
+        "value": "0x0",
+        "input": "0xeb1fde320000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000002386f26fc1000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000042697066733a2f2f6261666b72656962327a6f78376371707561797a70716575336f366f7678356a36706d64627a36767563773671676a647178336b68357a68727a6d000000000000000000000000000000000000000000000000000000000000",
+        "nonce": "0x21",
+        "chainId": "0xc352"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    }
+  ],
+  "receipts": [],
+  "libraries": [],
+  "pending": [],
+  "returns": {},
+  "timestamp": 1745508398,
+  "chain": 50002,
+  "commit": "0236e55"
+}
