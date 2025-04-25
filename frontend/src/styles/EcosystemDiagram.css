@@ -72,39 +72,52 @@
 /* Node Types */
 .node-role {
   border-color: var(--primary-color);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.2),
+              inset 0 0 5px rgba(99, 102, 241, 0.1);
 }
 
 .node-role:hover {
-  box-shadow: 0 6px 12px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4),
+              inset 0 0 8px rgba(99, 102, 241, 0.2);
 }
 
 .node-core {
   border-color: var(--secondary-color);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.2),
+              inset 0 0 5px rgba(139, 92, 246, 0.1);
 }
 
 .node-core:hover {
-  box-shadow: 0 6px 12px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.4),
+              inset 0 0 8px rgba(139, 92, 246, 0.2);
 }
 
 .node-token {
   border-color: var(--accent-color);
+  box-shadow: 0 0 10px rgba(236, 72, 153, 0.2),
+              inset 0 0 5px rgba(236, 72, 153, 0.1);
 }
 
 .node-token:hover {
-  box-shadow: 0 6px 12px rgba(236, 72, 153, 0.2);
+  box-shadow: 0 0 15px rgba(236, 72, 153, 0.4),
+              inset 0 0 8px rgba(236, 72, 153, 0.2);
 }
 
 .node-external {
   border-color: var(--warning-color);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.2),
+              inset 0 0 5px rgba(245, 158, 11, 0.1);
 }
 
 .node-external:hover {
-  box-shadow: 0 6px 12px rgba(245, 158, 11, 0.2);
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.4),
+              inset 0 0 8px rgba(245, 158, 11, 0.2);
 }
 
 .node-platform {
   border: 2px solid var(--secondary-color);
-  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3),
+              inset 0 0 8px rgba(139, 92, 246, 0.15);
   min-height: 110px;
   justify-self: center;
   align-self: center;
@@ -127,7 +140,8 @@
 }
 
 .node-platform:hover {
-  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5),
+              inset 0 0 12px rgba(139, 92, 246, 0.25);
 }
 
 /* Grid Placements */

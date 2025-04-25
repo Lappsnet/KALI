@@ -270,45 +270,45 @@ export const mockProperties: MockProperty[] = [
   {
     tokenId: BigInt(1),
     metadata: {
-      name: "Luxury Villa in Dubai",
-      description: "A stunning 5-bedroom villa with private pool and beach access",
+      name: "Luxury Apartment in El Salvador",
+      description: "A stunning 5-bedroom Apartment with private pool and beach access",
       image: "/properties/modern-villa.jpg"
     },
     cadastralNumber: "DXB-12345",
-    location: "Dubai, UAE",
-    valuation: parseEther("2500000"),
+    location: "El Salvador, El Salvador",
+    valuation: parseEther("18"),
     investmentDetails: {
       annualYield: "8.5%",
-      minInvestment: parseEther("10000"),
+      minInvestment: parseEther("0.01"),
       totalShares: 1000,
-      availableShares: 500,
-      monthlyRent: parseEther("17500"),
-      usdtValue: "2,750,000",
-      roi: "12.5%",
+      availableShares: 400,
+      monthlyRent: parseEther("0.01"),
+      usdtValue: "200,000",
+      roi: "9.5%",
       lockupPeriod: "12 months",
       propertyType: "Luxury Residential",
       amenities: ["Private Pool", "Beach Access", "Smart Home", "Gym", "Security"],
       projectedIncome: {
-        monthly: "17,500 USDT",
-        annual: "210,000 USDT",
-        fiveYear: "1,050,000 USDT"
+        monthly: "100 USDT",
+        annual: "1,200 USDT",
+        fiveYear: "6,000 USDT"
       },
       investmentOptions: {
         purchase: {
-          price: "2,750,000 USDT",
-          downPayment: "550,000 USDT",
+          price: "200,000 USDT",
+          downPayment: "40,000 USDT",
           mortgageRate: "4.5%",
           monthlyPayment: "11,250 USDT"
         },
         rent: {
-          monthly: "17,500 USDT",
-          securityDeposit: "35,000 USDT",
+          monthly: "100 USDT",
+          securityDeposit: "20 USDT",
           leaseTerm: "12 months",
-          maintenanceFee: "1,750 USDT/month"
+          maintenanceFee: "1 USDT/month"
         },
         fractional: {
-          sharePrice: "2,750 USDT",
-          minShares: 4,
+          sharePrice: "200 USDT",
+          minShares: 5,
           projectedAnnualReturn: "8.5%",
           managementFee: "1%"
         }
@@ -318,44 +318,44 @@ export const mockProperties: MockProperty[] = [
   {
     tokenId: BigInt(2),
     metadata: {
-      name: "Modern Apartment in New York",
-      description: "2-bedroom apartment in Manhattan with city views",
+      name: "Modern Apartment in Guatemala",
+      description: "2-bedroom apartment in Guatemala City with city views",
       image: "/properties/deluxe-Apartment.jpg"
     },
-    cadastralNumber: "NYC-67890",
-    location: "New York, USA",
-    valuation: parseEther("1500000"),
+    cadastralNumber: "GUA-67890",
+    location: "Guatemala, Guatemala",
+    valuation: parseEther("15"),
     investmentDetails: {
       annualYield: "6.2%",
-      minInvestment: parseEther("5000"),
+      minInvestment: parseEther("0.05"),
       totalShares: 1500,
       availableShares: 750,
-      monthlyRent: parseEther("7750"),
-      usdtValue: "1,650,000",
+      monthlyRent: parseEther("0.02"),
+      usdtValue: "250,000",
       roi: "9.8%",
       lockupPeriod: "6 months",
       propertyType: "Urban Residential",
       amenities: ["Doorman", "Gym", "Rooftop", "Concierge", "Parking"],
       projectedIncome: {
-        monthly: "7,750 USDT",
-        annual: "93,000 USDT",
-        fiveYear: "465,000 USDT"
+        monthly: "200 USDT",
+        annual: "2,400 USDT",
+        fiveYear: "12,000 USDT"
       },
       investmentOptions: {
         purchase: {
-          price: "1,650,000 USDT",
-          downPayment: "330,000 USDT",
+          price: "250,000 USDT",
+          downPayment: "50,000 USDT",
           mortgageRate: "4.8%",
-          monthlyPayment: "6,600 USDT"
+          monthlyPayment: "11,250 USDT"
         },
         rent: {
-          monthly: "7,750 USDT",
-          securityDeposit: "15,500 USDT",
+          monthly: "200 USDT",
+          securityDeposit: "40 USDT",
           leaseTerm: "12 months",
-          maintenanceFee: "775 USDT/month"
+          maintenanceFee: "1 USDT/month"
         },
         fractional: {
-          sharePrice: "1,100 USDT",
+          sharePrice: "250 USDT",
           minShares: 5,
           projectedAnnualReturn: "6.2%",
           managementFee: "1%"
@@ -366,47 +366,47 @@ export const mockProperties: MockProperty[] = [
   {
     tokenId: BigInt(3),
     metadata: {
-      name: "Commercial Complex in Singapore",
+      name: "Commercial Complex in Mexico",
       description: "Mixed-use development with retail and office spaces",
       image: "/properties/apartment-complex.jpg"
     },
-    cadastralNumber: "SGP-54321",
-    location: "Singapore",
-    valuation: parseEther("5000000"),
+    cadastralNumber: "MEX-54321",
+    location: "Mexico, Mexico",
+    valuation: parseEther("500"),
     investmentDetails: {
       annualYield: "10.2%",
-      minInvestment: parseEther("25000"),
-      totalShares: 2000,
-      availableShares: 1000,
-      monthlyRent: parseEther("42500"),
-      usdtValue: "5,500,000",
+      minInvestment: parseEther("10"),
+      totalShares: 200000,
+      availableShares: 30000,
+      monthlyRent: parseEther("2"),
+      usdtValue: "5,000,000",
       roi: "15.3%",
       lockupPeriod: "24 months",
-      propertyType: "Commercial",
+      propertyType: "Investment",
       amenities: ["Retail Spaces", "Office Suites", "Conference Rooms", "Parking", "Security"],
       projectedIncome: {
-        monthly: "42,500 USDT",
-        annual: "510,000 USDT",
-        fiveYear: "2,550,000 USDT"
+        monthly: "5000 USDT",
+        annual: "60,000 USDT",
+        fiveYear: "300,000 USDT"
       },
       investmentOptions: {
         purchase: {
-          price: "5,500,000 USDT",
-          downPayment: "1,100,000 USDT",
+          price: "5,000,000 USDT",
+          downPayment: "1,000,000 USDT",
           mortgageRate: "4.2%",
           monthlyPayment: "18,333 USDT"
         },
         rent: {
-          monthly: "42,500 USDT",
-          securityDeposit: "85,000 USDT",
+          monthly: "5000 USDT",
+          securityDeposit: "20 USDT",
           leaseTerm: "24 months",
-          maintenanceFee: "4,250 USDT/month"
+          maintenanceFee: "1000 USDT/month"
         },
         fractional: {
-          sharePrice: "2,750 USDT",
+          sharePrice: "500 USDT",
           minShares: 10,
           projectedAnnualReturn: "10.2%",
-          managementFee: "1.5%"
+          managementFee: "3%"
         }
       }
     }
@@ -414,47 +414,47 @@ export const mockProperties: MockProperty[] = [
   {
     tokenId: BigInt(4),
     metadata: {
-      name: "Luxury Resort in Bali",
+      name: "Luxury Resort in Panama",
       description: "5-star resort with private villas and beachfront access",
       image: "/properties/houses-complex.jpg"
     },
-    cadastralNumber: "BAL-98765",
-    location: "Bali, Indonesia",
-    valuation: parseEther("8000000"),
+    cadastralNumber: "PAN-98765",
+    location: "Panama, Panama",
+    valuation: parseEther("8"),
     investmentDetails: {
       annualYield: "12.5%",
-      minInvestment: parseEther("50000"),
+      minInvestment: parseEther("0.04"),
       totalShares: 1600,
       availableShares: 800,
-      monthlyRent: parseEther("100000"),
-      usdtValue: "8,800,000",
-      roi: "18.2%",
-      lockupPeriod: "36 months",
-      propertyType: "Hospitality",
+      monthlyRent: parseEther("0.03"),
+      usdtValue: "8,000,000",
+      roi: "7.2%",
+      lockupPeriod: "12 months",
+      propertyType: "Village",
       amenities: ["Private Beach", "Spa", "Restaurants", "Pools", "Golf Course"],
       projectedIncome: {
-        monthly: "100,000 USDT",
-        annual: "1,200,000 USDT",
-        fiveYear: "6,000,000 USDT"
+        monthly: "3000 USDT",
+        annual: "36,000 USDT",
+        fiveYear: "180,000 USDT"
       },
       investmentOptions: {
         purchase: {
-          price: "8,800,000 USDT",
-          downPayment: "1,760,000 USDT",
+          price: "450,000 USDT",
+          downPayment: "90,000 USDT",
           mortgageRate: "4.0%",
           monthlyPayment: "29,333 USDT"
         },
         rent: {
-          monthly: "100,000 USDT",
-          securityDeposit: "200,000 USDT",
-          leaseTerm: "36 months",
-          maintenanceFee: "10,000 USDT/month"
+          monthly: "3000 USDT",
+          securityDeposit: "20 USDT",
+          leaseTerm: "12 months",
+          maintenanceFee: "500 USDT/month"
         },
         fractional: {
-          sharePrice: "5,500 USDT",
+          sharePrice: "500 USDT",
           minShares: 10,
           projectedAnnualReturn: "12.5%",
-          managementFee: "2%"
+          managementFee: "5%"
         }
       }
     }
@@ -462,47 +462,47 @@ export const mockProperties: MockProperty[] = [
   {
     tokenId: BigInt(5),
     metadata: {
-      name: "Tech Hub in Berlin",
-      description: "Modern office building in Berlin's tech district",
+      name: "Tech Hub in El Salvador",
+      description: "Modern office building in El Salvador's tech district",
       image: "/properties/urban-apartments.jpg"
     },
-    cadastralNumber: "BER-24680",
-    location: "Berlin, Germany",
-    valuation: parseEther("3000000"),
+    cadastralNumber: "SAL-24680",
+    location: "El Salvador, El Salvador",
+    valuation: parseEther("10"),
     investmentDetails: {
       annualYield: "7.8%",
-      minInvestment: parseEther("15000"),
+      minInvestment: parseEther("1"),
       totalShares: 2000,
       availableShares: 1000,
-      monthlyRent: parseEther("19500"),
-      usdtValue: "3,300,000",
+      monthlyRent: parseEther("1"),
+      usdtValue: "300,000",
       roi: "11.2%",
       lockupPeriod: "18 months",
       propertyType: "Tech Office",
       amenities: ["High-Speed Internet", "Meeting Rooms", "Cafeteria", "Bike Storage", "EV Charging"],
       projectedIncome: {
-        monthly: "19,500 USDT",
-        annual: "234,000 USDT",
-        fiveYear: "1,170,000 USDT"
+        monthly: "1000 USDT",
+        annual: "12,000 USDT",
+        fiveYear: "60,000 USDT"
       },
       investmentOptions: {
         purchase: {
-          price: "3,300,000 USDT",
-          downPayment: "660,000 USDT",
+          price: "300,000 USDT",
+          downPayment: "60,000 USDT",
           mortgageRate: "4.6%",
           monthlyPayment: "11,000 USDT"
         },
         rent: {
-          monthly: "19,500 USDT",
-          securityDeposit: "39,000 USDT",
+          monthly: "1000 USDT",
+          securityDeposit: "20 USDT",
           leaseTerm: "18 months",
-          maintenanceFee: "1,950 USDT/month"
+          maintenanceFee: "100 USDT/month"
         },
         fractional: {
-          sharePrice: "1,650 USDT",
+          sharePrice: "150 USDT",
           minShares: 10,
           projectedAnnualReturn: "7.8%",
-          managementFee: "1.5%"
+          managementFee: "2.5%"
         }
       }
     }

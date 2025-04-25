@@ -2,16 +2,10 @@ import React from 'react';
 
 const EcosystemDiagram: React.FC = () => {
   return (
-    <div className="page-container">
-      <header className="text-center mb-10">
-        <div className="flex items-center justify-center">
-          <h1 className="text-2xl md:text-3xl font-bold text-white pb-1">KALI Real Estate</h1>
-          <span className="kali-logo-header">KALI</span>
-        </div>
-        <p className="text-md text-gray-400 mt-1">Ecosystem Interaction Flow</p>
-      </header>
+    <div className="page-container bg-white" style={{ backgroundColor: 'rgba(74, 74, 74, 0.8)' }}>
+      
 
-      <div className="diagram-grid">
+      <div className="diagram-grid bg-white">
         <div className="flow-node node-role" id="flow-seller">
           <span className="emoji-icon">🧑‍💼</span>
           <span className="node-text">Seller/Owner</span>
@@ -43,7 +37,7 @@ const EcosystemDiagram: React.FC = () => {
 
         <div className="flow-node node-platform" id="flow-kali-platform">
           <div className="logo-placeholder">KALI</div>
-          <span className="node-text">Kali Platform</span>
+          <span className="node-text">KALI</span>
         </div>
 
         <div className="flow-node node-token" id="flow-nft">
