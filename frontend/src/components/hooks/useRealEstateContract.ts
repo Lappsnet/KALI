@@ -11,8 +11,20 @@ import { CONTRACT_ADDRESSES } from "../../config/index.ts";
 
 // --- Type Definitions --- (Keep as before)
 export interface PropertyDetails {
-  cadastralNumber: string; location: string; valuation: bigint;
-  active: boolean; lastUpdated: bigint; metadataURI: string;
+  tokenId: bigint
+  owner: string | null
+  metadata: {
+    name: string
+    description: string
+    image: string
+  }
+  cadastralNumber: string
+  location: string
+  valuation: bigint
+  status: 'active' | 'inactive'
+  active: boolean
+  lastUpdated: bigint
+  metadataURI: string
 }
 export interface UseRealEstateContractReturn {
   contractAddress?: Address; isLoading: boolean; isReading: boolean;

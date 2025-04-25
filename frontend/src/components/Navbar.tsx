@@ -11,9 +11,9 @@ export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navItems = [
+    { name: "Launch", path: "/launch" },
     { name: "Dashboard", path: "/dashboard" },
     { name: "Marketplace", path: "/marketplace" },
-    { name: "Launch", path: "/launch" },
   ]
 
   const toggleMobileMenu = () => {

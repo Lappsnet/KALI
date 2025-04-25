@@ -1,7 +1,6 @@
 import type { LoanOption, LoanApplication, ActiveLoan } from '../types/loan'
 import type { LoanWithDetails } from "/home/jhonny/kali/frontend/src/components/hooks/useLendingProtocolContract"
-import { LoanStatus } from "/home/jhonny/kali/frontend/src/components/hooks/useLendingProtocolContract"
-import { parseEther } from 'viem';
+import { parseEther, formatEther } from "viem"
 
 // Helper function to convert days to timestamp
 const daysToTimestamp = (days: number) => {
@@ -111,13 +110,20 @@ export const mockLoanDetails: LoanWithDetails[] = [
   {
     loanId: 1n,
     borrower: "0x1234567890123456789012345678901234567890",
+    loanOfficer: "0x9876543210987654321098765432109876543210",
     propertyId: 1n,
     principal: 100n,
     term: BigInt(30),
     interestRate: BigInt(55),
+    originationFee: BigInt(10),
+    totalRepaid: BigInt(45),
+    remainingPrincipal: BigInt(955),
+    loanToValueRatio: BigInt(750),
+    liquidationThreshold: BigInt(800),
     startTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
     maturityTime: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000),
-    status: LoanStatus.Active,
+    lastInterestCalcTime: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+    status: 1,
     statusText: "Active",
     formattedPrincipal: "100",
     formattedRemainingPrincipal: "95.5",
@@ -125,13 +131,12 @@ export const mockLoanDetails: LoanWithDetails[] = [
     formattedOriginationFee: "1%",
     formattedTotalRepaid: "4.5",
     formattedLoanToValueRatio: "75%",
-    formattedTotalInterest: "5.5",
-    formattedTotalFees: "1",
-    formattedTotalRepayment: "106.5",
-    formattedRemainingTerm: "23 days",
-    formattedRemainingInterest: "5.0",
-    formattedRemainingFees: "0.5",
-    formattedRemainingRepayment: "101.0",
+    formattedLiquidationThreshold: "80%",
+    payoffAmount: "106.5",
+    payoffAmountRaw: BigInt(1065),
+    isOverdue: false,
+    daysRemaining: 23,
+    progressPercentage: 20,
     payments: [
       {
         loanId: 1n,
@@ -150,13 +155,20 @@ export const mockLoanDetails: LoanWithDetails[] = [
   {
     loanId: 2n,
     borrower: "0x2345678901234567890123456789012345678901",
+    loanOfficer: "0x9876543210987654321098765432109876543210",
     propertyId: 2n,
     principal: 150n,
     term: BigInt(60),
     interestRate: BigInt(60),
+    originationFee: BigInt(15),
+    totalRepaid: BigInt(75),
+    remainingPrincipal: BigInt(1425),
+    loanToValueRatio: BigInt(800),
+    liquidationThreshold: BigInt(850),
     startTime: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
     maturityTime: new Date(Date.now() + 150 * 24 * 60 * 60 * 1000),
-    status: LoanStatus.Active,
+    lastInterestCalcTime: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+    status: 1,
     statusText: "Active",
     formattedPrincipal: "150",
     formattedRemainingPrincipal: "142.5",
@@ -164,13 +176,12 @@ export const mockLoanDetails: LoanWithDetails[] = [
     formattedOriginationFee: "1%",
     formattedTotalRepaid: "7.5",
     formattedLoanToValueRatio: "80%",
-    formattedTotalInterest: "9.0",
-    formattedTotalFees: "1.5",
-    formattedTotalRepayment: "160.5",
-    formattedRemainingTerm: "15 days",
-    formattedRemainingInterest: "7.5",
-    formattedRemainingFees: "1.0",
-    formattedRemainingRepayment: "151.0",
+    formattedLiquidationThreshold: "85%",
+    payoffAmount: "160.5",
+    payoffAmountRaw: BigInt(1605),
+    isOverdue: false,
+    daysRemaining: 15,
+    progressPercentage: 25,
     payments: [
       {
         loanId: 2n,
@@ -188,82 +199,365 @@ export const mockLoanDetails: LoanWithDetails[] = [
   }
 ]
 
-export interface MockProperty {
-  tokenId: string;
+interface MockProperty {
+  tokenId: bigint
   metadata: {
-    name: string;
-    image: string;
-  };
-  cadastralNumber: string;
-  location: string;
-  valuation: string;
+    name: string
+    description: string
+    image: string
+  }
+  cadastralNumber: string
+  location: string
+  valuation: bigint
+  investmentDetails?: {
+    annualYield: string
+    minInvestment: bigint
+    totalShares: number
+    availableShares: number
+    monthlyRent: bigint
+    usdtValue: string
+    roi: string
+    lockupPeriod: string
+    propertyType: string
+    amenities: string[]
+    projectedIncome?: {
+      monthly: string
+      annual: string
+      fiveYear: string
+    }
+    investmentOptions?: {
+      purchase?: {
+        price: string
+        downPayment: string
+        mortgageRate: string
+        monthlyPayment: string
+      }
+      rent?: {
+        monthly: string
+        securityDeposit: string
+        leaseTerm: string
+        maintenanceFee: string
+      }
+      fractional?: {
+        sharePrice: string
+        minShares: number
+        projectedAnnualReturn: string
+        managementFee: string
+      }
+    }
+  }
+}
+
+interface MockLoan extends LoanWithDetails {
+  loanId: bigint
+  propertyId: bigint
+  borrower: `0x${string}`
+  lender: `0x${string}` | null
+  principal: bigint
+  interestRate: bigint
+  originationFee: bigint
+  term: bigint
+  totalRepaid: bigint
+  remainingPrincipal: bigint
+  loanOfficer: `0x${string}`
+  loanToValueRatio: bigint
+  liquidationThreshold: bigint
+  documentUri: string
+  statusText: string
 }
 
 export const mockProperties: MockProperty[] = [
   {
-    tokenId: "1",
+    tokenId: BigInt(1),
     metadata: {
-      name: "Luxury Apartment in Downtown",
-      image: "https://example.com/property1.jpg"
+      name: "Luxury Villa in Dubai",
+      description: "A stunning 5-bedroom villa with private pool and beach access",
+      image: "/properties/modern-villa.jpg"
     },
-    cadastralNumber: "123456789",
-    location: "123 Main St, New York, NY",
-    valuation: parseEther("100").toString() // 100 ETH
+    cadastralNumber: "DXB-12345",
+    location: "Dubai, UAE",
+    valuation: parseEther("2500000"),
+    investmentDetails: {
+      annualYield: "8.5%",
+      minInvestment: parseEther("10000"),
+      totalShares: 1000,
+      availableShares: 500,
+      monthlyRent: parseEther("17500"),
+      usdtValue: "2,750,000",
+      roi: "12.5%",
+      lockupPeriod: "12 months",
+      propertyType: "Luxury Residential",
+      amenities: ["Private Pool", "Beach Access", "Smart Home", "Gym", "Security"],
+      projectedIncome: {
+        monthly: "17,500 USDT",
+        annual: "210,000 USDT",
+        fiveYear: "1,050,000 USDT"
+      },
+      investmentOptions: {
+        purchase: {
+          price: "2,750,000 USDT",
+          downPayment: "550,000 USDT",
+          mortgageRate: "4.5%",
+          monthlyPayment: "11,250 USDT"
+        },
+        rent: {
+          monthly: "17,500 USDT",
+          securityDeposit: "35,000 USDT",
+          leaseTerm: "12 months",
+          maintenanceFee: "1,750 USDT/month"
+        },
+        fractional: {
+          sharePrice: "2,750 USDT",
+          minShares: 4,
+          projectedAnnualReturn: "8.5%",
+          managementFee: "1%"
+        }
+      }
+    }
   },
   {
-    tokenId: "2",
+    tokenId: BigInt(2),
     metadata: {
-      name: "Beachfront Villa",
-      image: "https://example.com/property2.jpg"
+      name: "Modern Apartment in New York",
+      description: "2-bedroom apartment in Manhattan with city views",
+      image: "/properties/deluxe-Apartment.jpg"
     },
-    cadastralNumber: "987654321",
-    location: "456 Ocean Dr, Miami, FL",
-    valuation: parseEther("200").toString() // 200 ETH
+    cadastralNumber: "NYC-67890",
+    location: "New York, USA",
+    valuation: parseEther("1500000"),
+    investmentDetails: {
+      annualYield: "6.2%",
+      minInvestment: parseEther("5000"),
+      totalShares: 1500,
+      availableShares: 750,
+      monthlyRent: parseEther("7750"),
+      usdtValue: "1,650,000",
+      roi: "9.8%",
+      lockupPeriod: "6 months",
+      propertyType: "Urban Residential",
+      amenities: ["Doorman", "Gym", "Rooftop", "Concierge", "Parking"],
+      projectedIncome: {
+        monthly: "7,750 USDT",
+        annual: "93,000 USDT",
+        fiveYear: "465,000 USDT"
+      },
+      investmentOptions: {
+        purchase: {
+          price: "1,650,000 USDT",
+          downPayment: "330,000 USDT",
+          mortgageRate: "4.8%",
+          monthlyPayment: "6,600 USDT"
+        },
+        rent: {
+          monthly: "7,750 USDT",
+          securityDeposit: "15,500 USDT",
+          leaseTerm: "12 months",
+          maintenanceFee: "775 USDT/month"
+        },
+        fractional: {
+          sharePrice: "1,100 USDT",
+          minShares: 5,
+          projectedAnnualReturn: "6.2%",
+          managementFee: "1%"
+        }
+      }
+    }
+  },
+  {
+    tokenId: BigInt(3),
+    metadata: {
+      name: "Commercial Complex in Singapore",
+      description: "Mixed-use development with retail and office spaces",
+      image: "/properties/apartment-complex.jpg"
+    },
+    cadastralNumber: "SGP-54321",
+    location: "Singapore",
+    valuation: parseEther("5000000"),
+    investmentDetails: {
+      annualYield: "10.2%",
+      minInvestment: parseEther("25000"),
+      totalShares: 2000,
+      availableShares: 1000,
+      monthlyRent: parseEther("42500"),
+      usdtValue: "5,500,000",
+      roi: "15.3%",
+      lockupPeriod: "24 months",
+      propertyType: "Commercial",
+      amenities: ["Retail Spaces", "Office Suites", "Conference Rooms", "Parking", "Security"],
+      projectedIncome: {
+        monthly: "42,500 USDT",
+        annual: "510,000 USDT",
+        fiveYear: "2,550,000 USDT"
+      },
+      investmentOptions: {
+        purchase: {
+          price: "5,500,000 USDT",
+          downPayment: "1,100,000 USDT",
+          mortgageRate: "4.2%",
+          monthlyPayment: "18,333 USDT"
+        },
+        rent: {
+          monthly: "42,500 USDT",
+          securityDeposit: "85,000 USDT",
+          leaseTerm: "24 months",
+          maintenanceFee: "4,250 USDT/month"
+        },
+        fractional: {
+          sharePrice: "2,750 USDT",
+          minShares: 10,
+          projectedAnnualReturn: "10.2%",
+          managementFee: "1.5%"
+        }
+      }
+    }
+  },
+  {
+    tokenId: BigInt(4),
+    metadata: {
+      name: "Luxury Resort in Bali",
+      description: "5-star resort with private villas and beachfront access",
+      image: "/properties/houses-complex.jpg"
+    },
+    cadastralNumber: "BAL-98765",
+    location: "Bali, Indonesia",
+    valuation: parseEther("8000000"),
+    investmentDetails: {
+      annualYield: "12.5%",
+      minInvestment: parseEther("50000"),
+      totalShares: 1600,
+      availableShares: 800,
+      monthlyRent: parseEther("100000"),
+      usdtValue: "8,800,000",
+      roi: "18.2%",
+      lockupPeriod: "36 months",
+      propertyType: "Hospitality",
+      amenities: ["Private Beach", "Spa", "Restaurants", "Pools", "Golf Course"],
+      projectedIncome: {
+        monthly: "100,000 USDT",
+        annual: "1,200,000 USDT",
+        fiveYear: "6,000,000 USDT"
+      },
+      investmentOptions: {
+        purchase: {
+          price: "8,800,000 USDT",
+          downPayment: "1,760,000 USDT",
+          mortgageRate: "4.0%",
+          monthlyPayment: "29,333 USDT"
+        },
+        rent: {
+          monthly: "100,000 USDT",
+          securityDeposit: "200,000 USDT",
+          leaseTerm: "36 months",
+          maintenanceFee: "10,000 USDT/month"
+        },
+        fractional: {
+          sharePrice: "5,500 USDT",
+          minShares: 10,
+          projectedAnnualReturn: "12.5%",
+          managementFee: "2%"
+        }
+      }
+    }
+  },
+  {
+    tokenId: BigInt(5),
+    metadata: {
+      name: "Tech Hub in Berlin",
+      description: "Modern office building in Berlin's tech district",
+      image: "/properties/urban-apartments.jpg"
+    },
+    cadastralNumber: "BER-24680",
+    location: "Berlin, Germany",
+    valuation: parseEther("3000000"),
+    investmentDetails: {
+      annualYield: "7.8%",
+      minInvestment: parseEther("15000"),
+      totalShares: 2000,
+      availableShares: 1000,
+      monthlyRent: parseEther("19500"),
+      usdtValue: "3,300,000",
+      roi: "11.2%",
+      lockupPeriod: "18 months",
+      propertyType: "Tech Office",
+      amenities: ["High-Speed Internet", "Meeting Rooms", "Cafeteria", "Bike Storage", "EV Charging"],
+      projectedIncome: {
+        monthly: "19,500 USDT",
+        annual: "234,000 USDT",
+        fiveYear: "1,170,000 USDT"
+      },
+      investmentOptions: {
+        purchase: {
+          price: "3,300,000 USDT",
+          downPayment: "660,000 USDT",
+          mortgageRate: "4.6%",
+          monthlyPayment: "11,000 USDT"
+        },
+        rent: {
+          monthly: "19,500 USDT",
+          securityDeposit: "39,000 USDT",
+          leaseTerm: "18 months",
+          maintenanceFee: "1,950 USDT/month"
+        },
+        fractional: {
+          sharePrice: "1,650 USDT",
+          minShares: 10,
+          projectedAnnualReturn: "7.8%",
+          managementFee: "1.5%"
+        }
+      }
+    }
   }
-];
+]
 
-export interface MockLoan {
-  loanId: string;
-  propertyId: string;
-  borrower: string;
-  lender: string;
-  amount: string;
-  interestRate: number;
-  durationMonths: number;
-  status: 'PENDING' | 'ACTIVE' | 'REPAID' | 'DEFAULTED';
-  startDate: number;
-  endDate: number;
-  documentUri: string;
+const mockLoans: MockLoan[] = [
+  {
+    loanId: BigInt(1),
+    propertyId: BigInt(1),
+    borrower: "0x1234567890123456789012345678901234567890" as `0x${string}`,
+    lender: "0x0987654321098765432109876543210987654321" as `0x${string}`,
+    principal: parseEther("1000000"),
+    interestRate: BigInt(500), // 5% in basis points
+    originationFee: parseEther("10000"),
+    term: BigInt(360), // 30 years in days
+    totalRepaid: parseEther("50000"),
+    remainingPrincipal: parseEther("950000"),
+    loanOfficer: "0x1111111111111111111111111111111111111111" as `0x${string}`,
+    loanToValueRatio: BigInt(4000), // 40% in basis points
+    liquidationThreshold: BigInt(8000), // 80% in basis points
+    documentUri: "https://example.com/loan1.pdf",
+    formattedPrincipal: formatEther(parseEther("1000000")),
+    formattedInterestRate: "5.00%",
+    formattedOriginationFee: formatEther(parseEther("10000")),
+    formattedTotalRepaid: formatEther(parseEther("50000")),
+    formattedRemainingPrincipal: formatEther(parseEther("950000")),
+    formattedLoanToValueRatio: "40.00%",
+    formattedLiquidationThreshold: "80.00%",
+    startTime: new Date(),
+    maturityTime: new Date(Date.now() + 360 * 24 * 60 * 60 * 1000),
+    lastInterestCalcTime: new Date(),
+    status: 1, // Active
+    statusText: "Active",
+    payments: [],
+    payoffAmount: formatEther(parseEther("950000")),
+    payoffAmountRaw: parseEther("950000"),
+    isOverdue: false,
+    daysRemaining: 360,
+    progressPercentage: 0
+  }
+]
+
+export function getMockPropertyDetails(tokenId: bigint): MockProperty | null {
+  return mockProperties.find(p => p.tokenId === tokenId) || null
 }
 
-export const mockLoans: MockLoan[] = [
-  {
-    loanId: "1",
-    propertyId: "1",
-    borrower: "0x1234...5678",
-    lender: "0x8765...4321",
-    amount: parseEther("50").toString(),
-    interestRate: 500, // 5%
-    durationMonths: 12,
-    status: 'ACTIVE',
-    startDate: Date.now(),
-    endDate: Date.now() + 31536000000, // 1 year from now
-    documentUri: "ipfs://QmExample1"
-  }
-];
+export function getMockLoanDetails(loanId: bigint): MockLoan | null {
+  return mockLoans.find(l => l.loanId === loanId) || null
+}
 
-export const getMockPropertyDetails = (propertyId: string): MockProperty | undefined => {
-  return mockProperties.find(p => p.tokenId === propertyId);
-};
+export function getMockLoansByBorrower(borrower: `0x${string}`): MockLoan[] {
+  return mockLoans.filter(l => l.borrower === borrower)
+}
 
-export const getMockLoansByBorrower = (address: string): MockLoan[] => {
-  return mockLoans.filter(loan => loan.borrower === address);
-};
-
-export const getMockLoansByLender = (address: string): MockLoan[] => {
-  return mockLoans.filter(loan => loan.lender === address);
-};
-
-export const getMockLoanDetails = (loanId: string): MockLoan | undefined => {
-  return mockLoans.find(loan => loan.loanId === loanId);
-}; 
+export function getMockLoansByLender(lender: `0x${string}`): MockLoan[] {
+  return mockLoans.filter(l => l.lender === lender)
+} 

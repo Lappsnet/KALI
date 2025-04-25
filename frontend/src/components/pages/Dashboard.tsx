@@ -1,9 +1,13 @@
 "use client"
 
+import React from 'react';
 import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react"
 import { useBalance } from "wagmi"
 import { Link } from "react-router-dom"
-import { Building, DollarSign, BarChart2, Wallet, TrendingUp, ChartPie, Activity } from "lucide-react"
+import { Building, DollarSign, BarChart2, Wallet, TrendingUp, ChartPie, Activity, Users } from "lucide-react"
+import { DashboardChart } from '../DashboardChart';
+import '../../styles/Dashboard.css';
+import '../../styles/DashboardChart.css';
 
 export const Dashboard = () => {
   const { address, isConnected } = useAppKitAccount()
@@ -46,174 +50,101 @@ export const Dashboard = () => {
     trendingTokens: { count: 3 },
   }
 
+  const stats = [
+    {
+      title: 'Total Portfolio Value',
+      value: `$${portfolioMetrics.totalValue.toLocaleString()}`,
+      change: `+${portfolioMetrics.dailyChangePercent}%`,
+      icon: <DollarSign size={24} className="stats-icon" />,
+      trend: 'up'
+    },
+    {
+      title: 'Properties Owned',
+      value: '3',
+      change: '+1',
+      icon: <Building size={24} className="stats-icon" />,
+      trend: 'up'
+    },
+    {
+      title: 'Monthly Rental Income',
+      value: `$${activityStats.activeBets.value.toLocaleString()}`,
+      change: `+${activityStats.activeBets.value.toLocaleString()}`,
+      icon: <TrendingUp size={24} className="stats-icon" />,
+      trend: 'up'
+    },
+    {
+      title: 'Active Tenants',
+      value: '5',
+      change: '+2',
+      icon: <Users size={24} className="stats-icon" />,
+      trend: 'up'
+    }
+  ];
+
   if (!isConnected) {
     return (
-      <div className="page-container">
-        <div className="hero-section">
-          <h1 className="hero-title">KALI</h1>
-          <p className="hero-subtitle">Real Estate Marketplace on the Pharos Network</p>
-          <div className="hero-actions">
-            <appkit-button />
-          </div>
-        </div>
+      <div className="connect-prompt">
+        <h2>Connect Your Wallet</h2>
+        <p>Please connect your wallet to view your dashboard</p>
+        <appkit-button />
       </div>
-    )
+    );
   }
 
   return (
-    <div className="page-container">
-      <div className="page-header">
-        <h1>Portfolio Snapshot</h1>
-        <p>Track your real estate investments</p>
-      </div>
-
-      <div className="metrics-grid">
-        <div className="glass-card metric-card">
-          <div className="metric-header">
-            <h3>Total Value</h3>
-            <Wallet className="metric-icon" />
-          </div>
-          <div className="metric-value">
-            ${portfolioMetrics.totalValue.toLocaleString()}
-            <span className="metric-change positive">+{portfolioMetrics.dailyChangePercent}%</span>
-          </div>
-        </div>
-
-        <div className="glass-card metric-card">
-          <div className="metric-header">
-            <h3>24h Change</h3>
-            <TrendingUp className="metric-icon" />
-          </div>
-          <div className="metric-value">
-            ${portfolioMetrics.dailyChange.toLocaleString()}
-            <span className="metric-change positive">+{portfolioMetrics.dailyChangePercent}%</span>
-          </div>
-        </div>
-
-        <div className="glass-card metric-card">
-          <div className="metric-header">
-            <h3>Total P/L</h3>
-            <DollarSign className="metric-icon" />
-          </div>
-          <div className="metric-value">
-            ${portfolioMetrics.totalProfitLoss.toLocaleString()}
-            <span className="metric-change positive">+{portfolioMetrics.plPercent}%</span>
-          </div>
-        </div>
-
-        <div className="glass-card metric-card">
-          <div className="metric-header">
-            <h3>Best Performer</h3>
-            <BarChart2 className="metric-icon" />
-          </div>
-          <div className="metric-value">
-            {portfolioMetrics.bestPerformer}
-            <span className="metric-change positive">+{portfolioMetrics.bestPerformerPercent}%</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="dashboard-grid">
-        <div className="glass-card chart-card">
-          <div className="card-header">
-            <h3>Portfolio Performance</h3>
-            <div className="chart-controls">
-              <select className="time-selector">
-                <option value="1M">1M</option>
-                <option value="3M">3M</option>
-                <option value="1Y">1Y</option>
-                <option value="ALL">ALL</option>
-              </select>
-            </div>
-          </div>
-          <div className="chart-container">
-            {/* Chart component will go here */}
-            <div className="placeholder-chart" />
-          </div>
-        </div>
-
-        <div className="dashboard-sidebar">
-          <div className="glass-card">
-            <div className="card-header">
-              <h3>Asset Allocation</h3>
-              <ChartPie size={20} />
-            </div>
-            <div className="allocation-list">
-              {assetAllocation.map((asset) => (
-                <div key={asset.name} className="allocation-item">
-                  <div className="allocation-label">
-                    <span className={`allocation-dot ${asset.name.toLowerCase().replace(' ', '-')}`} />
-                    <span>{asset.name}</span>
-                  </div>
-                  <span className="allocation-value">{asset.percentage}%</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="glass-card">
-            <div className="card-header">
-              <h3>Risk Metrics</h3>
-              <Activity size={20} />
-            </div>
-            <div className="risk-metrics">
-              <div className="risk-metric">
-                <span>Portfolio Beta</span>
-                <span className="metric-value">{riskMetrics.portfolioBeta}</span>
-              </div>
-              <div className="risk-metric">
-                <span>Sharpe Ratio</span>
-                <span className="metric-value">{riskMetrics.sharpeRatio}</span>
-              </div>
-              <div className="risk-metric">
-                <span>Volatility</span>
-                <span className="metric-value">{riskMetrics.volatility}%</span>
-              </div>
-              <div className="risk-metric">
-                <span>Max Drawdown</span>
-                <span className="metric-value">{riskMetrics.maxDrawdown}%</span>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="dashboard-container">
+      <div className="dashboard-header">
+        <h1>Dashboard</h1>
+        <p>Overview of your real estate portfolio</p>
       </div>
 
       <div className="stats-grid">
-        <div className="glass-card stat-section">
-          <h3>My Bets</h3>
-          <div className="stats-container">
-            <div className="stat-item">
-              <div className="stat-label">Active</div>
-              <div className="stat-value">{activityStats.activeBets.count}</div>
-              <div className="stat-subtext">Value: ${activityStats.activeBets.value}</div>
+        {stats.map((stat, index) => (
+          <div key={index} className="stat-card">
+            <div className="stat-header">
+              <span className="stat-title">{stat.title}</span>
+              {stat.icon}
             </div>
-            <div className="stat-item">
-              <div className="stat-label">Won</div>
-              <div className="stat-value">{activityStats.wonBets.count}</div>
-              <div className="stat-subtext">of {activityStats.wonBets.total} total</div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-label">Lost</div>
-              <div className="stat-value">{activityStats.lostBets.count}</div>
-              <div className="stat-subtext">Rate: {activityStats.lostBets.rate}%</div>
+            <div className="stat-value">{stat.value}</div>
+            <div className={`stat-change ${stat.trend}`}>
+              {stat.change}
             </div>
           </div>
-        </div>
+        ))}
+      </div>
 
-        <div className="glass-card stat-section">
-          <h3>Launched Tokens</h3>
-          <div className="stats-container">
-            <div className="stat-item">
-              <div className="stat-label">Total Launched</div>
-              <div className="stat-value">{activityStats.launchedTokens.count}</div>
+      <div className="dashboard-charts">
+        <div className="chart-section">
+          <h2>Portfolio Performance</h2>
+          <DashboardChart className="portfolio-chart" />
+        </div>
+      </div>
+
+      <div className="recent-activity">
+        <h2>Recent Activity</h2>
+        <div className="activity-list">
+          <div className="activity-item">
+            <div className="activity-icon">
+              <DollarSign size={16} />
             </div>
-            <div className="stat-item">
-              <div className="stat-label">Trending</div>
-              <div className="stat-value">{activityStats.trendingTokens.count}</div>
+            <div className="activity-details">
+              <span className="activity-title">Rent Payment Received</span>
+              <span className="activity-time">2 hours ago</span>
             </div>
+            <div className="activity-amount">+$2,500</div>
+          </div>
+          <div className="activity-item">
+            <div className="activity-icon">
+              <Building size={16} />
+            </div>
+            <div className="activity-details">
+              <span className="activity-title">New Property Listed</span>
+              <span className="activity-time">1 day ago</span>
+            </div>
+            <div className="activity-status">Listed</div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 } 

@@ -1,194 +1,232 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
-import { useAppKitAccount, useAppKitTheme } from "@reown/appkit/react"
-import { ActionButton } from "../ActionButton"
+import React, { useState } from 'react';
+import { useAppKitAccount } from '@reown/appkit/react';
 import { Sun, Moon, User, Bell, Shield, LogOut } from "lucide-react"
+import { ActionButton } from "../ActionButton"
 
-export const Settings = () => {
-  const { isConnected, address } = useAppKitAccount()
-  const { themeMode, setThemeMode } = useAppKitTheme()
+interface UserSettings {
+  notifications: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  };
+  preferences: {
+    language: string;
+    currency: string;
+    theme: string;
+  };
+  privacy: {
+    showProfile: boolean;
+    showActivity: boolean;
+    showHoldings: boolean;
+  };
+}
 
-  const [notifications, setNotifications] = useState({
-    transactions: true,
-    listings: true,
-    offers: true,
-    news: false,
-  })
+export const Settings: React.FC = () => {
+  const { isConnected } = useAppKitAccount();
+  const [settings, setSettings] = useState<UserSettings>({
+    notifications: {
+      email: true,
+      push: true,
+      sms: false,
+    },
+    preferences: {
+      language: 'en',
+      currency: 'USD',
+      theme: 'dark',
+    },
+    privacy: {
+      showProfile: true,
+      showActivity: true,
+      showHoldings: false,
+    },
+  });
 
-  const handleNotificationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target
-    setNotifications({
-      ...notifications,
-      [name]: checked,
-    })
-  }
+  const handleNotificationChange = (type: keyof UserSettings['notifications']) => {
+    setSettings(prev => ({
+      ...prev,
+      notifications: {
+        ...prev.notifications,
+        [type]: !prev.notifications[type],
+      },
+    }));
+  };
+
+  const handlePreferenceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setSettings(prev => ({
+      ...prev,
+      preferences: {
+        ...prev.preferences,
+        [name]: value,
+      },
+    }));
+  };
+
+  const handlePrivacyChange = (type: keyof UserSettings['privacy']) => {
+    setSettings(prev => ({
+      ...prev,
+      privacy: {
+        ...prev.privacy,
+        [type]: !prev.privacy[type],
+      },
+    }));
+  };
 
   if (!isConnected) {
     return (
-      <div className="page-container">
-        <div className="connect-prompt">
-          <h2>Connect Your Wallet</h2>
-          <p>Please connect your wallet to access settings</p>
-          <appkit-button />
+      <div className="main-content with-sidebar">
+        <div className="content-wrapper">
+          <div className="glass-card p-8 text-center">
+            <h2 className="text-2xl font-semibold mb-4">Connect Wallet</h2>
+            <p className="text-secondary mb-4">
+              Please connect your wallet to access settings.
+            </p>
+            <appkit-button />
+          </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="page-container">
-      <div className="page-header">
-        <h1>Settings</h1>
-        <p>Manage your account preferences</p>
-      </div>
+    <div className="main-content with-sidebar">
+      <div className="content-wrapper">
+        <div className="glass-card p-8">
+          <h1 className="text-3xl font-bold mb-6 text-gradient">Settings</h1>
 
-      <div className="settings-grid">
-        <div className="glass-card settings-card">
-          <div className="settings-header">
-            <User size={20} />
-            <h3>Account</h3>
-          </div>
-
-          <div className="settings-content">
-            <div className="settings-item">
-              <div className="settings-label">Wallet Address</div>
-              <div className="settings-value address">{address}</div>
-            </div>
-
-            <div className="settings-item">
-              <div className="settings-label">Connected Wallet</div>
-              <div className="settings-value">MetaMask</div>
-            </div>
-
-            <div className="settings-actions">
-              <ActionButton variant="outline" size="small">
-                <LogOut size={16} />
-                <span>Disconnect</span>
-              </ActionButton>
-            </div>
-          </div>
-        </div>
-
-        <div className="glass-card settings-card">
-          <div className="settings-header">
-            {themeMode === "dark" ? <Moon size={20} /> : <Sun size={20} />}
-            <h3>Appearance</h3>
-          </div>
-
-          <div className="settings-content">
-            <div className="settings-item">
-              <div className="settings-label">Theme</div>
-              <div className="theme-toggle-container">
-                <button
-                  className={`theme-option ${themeMode === "light" ? "active" : ""}`}
-                  onClick={() => setThemeMode("light")}
-                >
-                  <Sun size={16} />
-                  <span>Light</span>
-                </button>
-                <button
-                  className={`theme-option ${themeMode === "dark" ? "active" : ""}`}
-                  onClick={() => setThemeMode("dark")}
-                >
-                  <Moon size={16} />
-                  <span>Dark</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="glass-card settings-card">
-          <div className="settings-header">
-            <Bell size={20} />
-            <h3>Notifications</h3>
-          </div>
-
-          <div className="settings-content">
-            <div className="settings-item">
-              <div className="settings-label">Email Notifications</div>
-              <div className="settings-value">example@email.com</div>
-            </div>
-
-            <div className="notification-options">
-              <div className="notification-option">
-                <label className="checkbox-container">
+          <div className="space-y-8">
+            {/* Notifications Section */}
+            <section>
+              <h2 className="text-2xl font-semibold mb-4">Notifications</h2>
+              <div className="space-y-4">
+                <label className="flex items-center space-x-3">
                   <input
                     type="checkbox"
-                    name="transactions"
-                    checked={notifications.transactions}
-                    onChange={handleNotificationChange}
+                    checked={settings.notifications.email}
+                    onChange={() => handleNotificationChange('email')}
+                    className="form-checkbox"
                   />
-                  <span className="checkmark"></span>
-                  <span>Transaction Updates</span>
+                  <span>Email Notifications</span>
                 </label>
-              </div>
-
-              <div className="notification-option">
-                <label className="checkbox-container">
+                <label className="flex items-center space-x-3">
                   <input
                     type="checkbox"
-                    name="listings"
-                    checked={notifications.listings}
-                    onChange={handleNotificationChange}
+                    checked={settings.notifications.push}
+                    onChange={() => handleNotificationChange('push')}
+                    className="form-checkbox"
                   />
-                  <span className="checkmark"></span>
-                  <span>New Property Listings</span>
+                  <span>Push Notifications</span>
                 </label>
-              </div>
-
-              <div className="notification-option">
-                <label className="checkbox-container">
+                <label className="flex items-center space-x-3">
                   <input
                     type="checkbox"
-                    name="offers"
-                    checked={notifications.offers}
-                    onChange={handleNotificationChange}
+                    checked={settings.notifications.sms}
+                    onChange={() => handleNotificationChange('sms')}
+                    className="form-checkbox"
                   />
-                  <span className="checkmark"></span>
-                  <span>Offers on Your Properties</span>
+                  <span>SMS Notifications</span>
                 </label>
               </div>
+            </section>
 
-              <div className="notification-option">
-                <label className="checkbox-container">
-                  <input type="checkbox" name="news" checked={notifications.news} onChange={handleNotificationChange} />
-                  <span className="checkmark"></span>
-                  <span>Platform News & Updates</span>
+            {/* Preferences Section */}
+            <section>
+              <h2 className="text-2xl font-semibold mb-4">Preferences</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="form-group">
+                  <label htmlFor="language" className="form-label">Language</label>
+                  <select
+                    id="language"
+                    name="language"
+                    value={settings.preferences.language}
+                    onChange={handlePreferenceChange}
+                    className="futuristic-input"
+                  >
+                    <option value="en">English</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="currency" className="form-label">Currency</label>
+                  <select
+                    id="currency"
+                    name="currency"
+                    value={settings.preferences.currency}
+                    onChange={handlePreferenceChange}
+                    className="futuristic-input"
+                  >
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="theme" className="form-label">Theme</label>
+                  <select
+                    id="theme"
+                    name="theme"
+                    value={settings.preferences.theme}
+                    onChange={handlePreferenceChange}
+                    className="futuristic-input"
+                  >
+                    <option value="dark">Dark</option>
+                    <option value="light">Light</option>
+                    <option value="system">System</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            {/* Privacy Section */}
+            <section>
+              <h2 className="text-2xl font-semibold mb-4">Privacy</h2>
+              <div className="space-y-4">
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={settings.privacy.showProfile}
+                    onChange={() => handlePrivacyChange('showProfile')}
+                    className="form-checkbox"
+                  />
+                  <span>Show Public Profile</span>
+                </label>
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={settings.privacy.showActivity}
+                    onChange={() => handlePrivacyChange('showActivity')}
+                    className="form-checkbox"
+                  />
+                  <span>Show Activity History</span>
+                </label>
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={settings.privacy.showHoldings}
+                    onChange={() => handlePrivacyChange('showHoldings')}
+                    className="form-checkbox"
+                  />
+                  <span>Show Token Holdings</span>
                 </label>
               </div>
-            </div>
-          </div>
-        </div>
+            </section>
 
-        <div className="glass-card settings-card">
-          <div className="settings-header">
-            <Shield size={20} />
-            <h3>Security</h3>
-          </div>
-
-          <div className="settings-content">
-            <div className="settings-item">
-              <div className="settings-label">Transaction Signing</div>
-              <div className="settings-value">Enabled</div>
-            </div>
-
-            <div className="settings-item">
-              <div className="settings-label">Login Notifications</div>
-              <div className="settings-value">Enabled</div>
-            </div>
-
-            <div className="settings-actions">
-              <ActionButton variant="outline" size="small">
-                Manage Security Settings
-              </ActionButton>
+            <div className="flex justify-end space-x-4">
+              <button type="button" className="button button-secondary">
+                Cancel
+              </button>
+              <button type="submit" className="button button-primary">
+                Save Changes
+              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

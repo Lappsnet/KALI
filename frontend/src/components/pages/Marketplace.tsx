@@ -1,107 +1,138 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import { useAppKitAccount } from "@reown/appkit/react"
-import { PropertyCard } from "../PropertyCard"
-import { ActionButton } from "../ActionButton"
-import { Search, Filter, Loader } from "lucide-react"
-import { useRealEstateContract, type PropertyWithMetadata } from "../hooks/useRealEstateContract"
-import { useRealEstateSaleContract } from "../hooks/useRealEstateSaleContract"
-import { formatEther } from "viem"
-import { mockProperties } from "../../data/mockProperties"
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAccount } from 'wagmi'
+import { useRealEstateContract } from '../hooks/useRealEstateContract'
+import { PropertyCard } from '../../components/PropertyCard'
+import { mockProperties } from '../../mocks/loanData'
+import { formatEther, parseEther } from 'viem'
+import { Search, Building, DollarSign } from 'lucide-react'
+
+interface Property {
+  tokenId: bigint
+  owner: string | null
+  metadata: {
+    name: string
+    image: string
+  }
+  cadastralNumber: string
+  location: string
+  valuation: bigint
+  status: 'active' | 'inactive'
+  active: boolean
+  lastUpdated: bigint
+  metadataURI: string
+}
 
 export const Marketplace = () => {
   const navigate = useNavigate()
-  const { isConnected } = useAppKitAccount()
-  const { getAllProperties, isLoading: isLoadingProperties } = useRealEstateContract()
-  const { getActiveSaleForProperty, isLoading: isLoadingSales } = useRealEstateSaleContract()
+  const { address, isConnected } = useAccount()
+  const [properties, setProperties] = useState<Property[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedFilter, setSelectedFilter] = useState<'all' | 'sale' | 'rent' | 'fractional'>('all')
 
-  const [searchTerm, setSearchTerm] = useState("")
-  const [properties, setProperties] = useState<PropertyWithMetadata[]>([])
-  const [filteredProperties, setFilteredProperties] = useState<PropertyWithMetadata[]>([])
-  const [sortOrder, setSortOrder] = useState<"lowToHigh" | "highToLow" | "">("")
-  const [isLoadingData, setIsLoadingData] = useState(false)
+  const { getPropertyDetails, getOwnerOf } = useRealEstateContract()
 
   useEffect(() => {
-    if (isConnected) {
-      loadProperties()
+    const loadProperties = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        let loadedProperties: Property[] = []
+
+        if (isConnected) {
+          try {
+            // Load properties from contract
+            for (const mockProp of mockProperties) {
+              const tokenId = BigInt(mockProp.tokenId)
+              const propertyDetails = await getPropertyDetails(tokenId)
+              const owner = await getOwnerOf(tokenId)
+              
+              if (propertyDetails) {
+                loadedProperties.push({
+                  tokenId,
+                  owner: owner || null,
+                  metadata: {
+                    name: mockProp.metadata.name,
+                    image: mockProp.metadata.image
+                  },
+                  cadastralNumber: propertyDetails.cadastralNumber,
+                  location: propertyDetails.location,
+                  valuation: propertyDetails.valuation,
+                  status: propertyDetails.status,
+                  active: propertyDetails.active,
+                  lastUpdated: propertyDetails.lastUpdated,
+                  metadataURI: propertyDetails.metadataURI
+                })
+              }
+            }
+          } catch (err) {
+            console.error('Error loading properties from contract:', err)
+          }
+        }
+
+        // If no properties loaded from contract, use mock data
+        if (loadedProperties.length === 0) {
+          loadedProperties = mockProperties.map(mockProp => ({
+            tokenId: BigInt(mockProp.tokenId),
+            owner: null,
+            metadata: {
+              name: mockProp.metadata.name,
+              image: mockProp.metadata.image
+            },
+            cadastralNumber: mockProp.cadastralNumber,
+            location: mockProp.location,
+            valuation: BigInt(mockProp.valuation),
+            status: 'active',
+            active: true,
+            lastUpdated: BigInt(Date.now()),
+            metadataURI: ''
+          }))
+        }
+
+        setProperties(loadedProperties)
+      } catch (err) {
+        setError('Failed to load properties')
+        console.error('Error loading properties:', err)
+      } finally {
+        setLoading(false)
+      }
     }
+
+    loadProperties()
   }, [isConnected])
 
-  useEffect(() => {
-    // Filter properties based on search term
-    const filtered = properties.filter(
-      (property) =>
-        (property.metadata?.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.cadastralNumber.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
+  const filteredProperties = properties.filter(property => {
+    const matchesSearch = 
+      property.metadata.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      property.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      property.cadastralNumber.toLowerCase().includes(searchQuery.toLowerCase())
 
-    // Sort properties if needed
-    const sorted = [...filtered]
-    if (sortOrder === "lowToHigh") {
-      sorted.sort((a, b) => Number(a.valuationRaw - b.valuationRaw))
-    } else if (sortOrder === "highToLow") {
-      sorted.sort((a, b) => Number(b.valuationRaw - a.valuationRaw))
-    }
+    const matchesFilter = selectedFilter === 'all' || 
+      (selectedFilter === 'sale' && !property.owner) ||
+      (selectedFilter === 'rent' && property.owner) ||
+      (selectedFilter === 'fractional' && property.owner)
 
-    setFilteredProperties(sorted)
-  }, [properties, searchTerm, sortOrder])
+    return matchesSearch && matchesFilter
+  })
 
-  const loadProperties = async () => {
-    setIsLoadingData(true)
-    try {
-      const allProperties = await getAllProperties()
-
-      // Check which properties have active sales
-      const propertiesWithSaleStatus = await Promise.all(
-        allProperties.map(async (property) => {
-          const saleId = await getActiveSaleForProperty(property.tokenId)
-          return {
-            ...property,
-            hasActiveSale: saleId !== null && saleId > 0n,
-          }
-        }),
-      )
-
-      // Filter only properties with active sales for the marketplace
-      const activeProperties = propertiesWithSaleStatus.filter((p) => p.hasActiveSale)
-      
-      // If no properties from contract, use mock data
-      if (activeProperties.length === 0) {
-        setProperties(mockProperties)
-        setFilteredProperties(mockProperties)
-      } else {
-        setProperties(activeProperties)
-        setFilteredProperties(activeProperties)
-      }
-    } catch (error) {
-      console.error("Error loading properties:", error)
-      // Fallback to mock data on error
-      setProperties(mockProperties)
-      setFilteredProperties(mockProperties)
-    } finally {
-      setIsLoadingData(false)
-    }
-  }
-
-  const handleSort = (order: "lowToHigh" | "highToLow") => {
-    setSortOrder(order)
-  }
-
-  const handlePropertyClick = (property: PropertyWithMetadata) => {
-    navigate(`/property/${property.tokenId}`)
-  }
-
-  if (!isConnected) {
+  if (loading) {
     return (
-      <div className="page-container">
-        <div className="connect-prompt">
-          <h2>Connect Your Wallet</h2>
-          <p>Please connect your wallet to browse the marketplace</p>
-          <appkit-button />
-        </div>
+      <div className="loading-container">
+        <div className="animate-spin">Loading...</div>
+        <p>Loading properties...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="error">
+        <p>{error}</p>
       </div>
     )
   }
@@ -109,71 +140,63 @@ export const Marketplace = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Marketplace</h1>
-        <p>Browse and purchase tokenized properties</p>
+        <h1>Property Marketplace</h1>
+        <div className="search-filter">
+          <div className="search-box">
+            <Search size={20} />
+            <input
+              type="text"
+              placeholder="Search properties..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="filter-buttons">
+            <button 
+              className={`button ${selectedFilter === 'all' ? 'button-primary' : 'button-outline'}`}
+              onClick={() => setSelectedFilter('all')}
+            >
+              All
+            </button>
+            <button 
+              className={`button ${selectedFilter === 'sale' ? 'button-primary' : 'button-outline'}`}
+              onClick={() => setSelectedFilter('sale')}
+            >
+              For Sale
+            </button>
+            <button 
+              className={`button ${selectedFilter === 'rent' ? 'button-primary' : 'button-outline'}`}
+              onClick={() => setSelectedFilter('rent')}
+            >
+              For Rent
+            </button>
+            <button 
+              className={`button ${selectedFilter === 'fractional' ? 'button-primary' : 'button-outline'}`}
+              onClick={() => setSelectedFilter('fractional')}
+            >
+              Fractional Ownership
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="marketplace-filters">
-        <div className="search-container">
-          <Search size={20} className="search-icon" />
-          <input
-            type="text"
-            placeholder="Search properties..."
-            className="search-input"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="filter-buttons">
-          <ActionButton variant="outline" size="small">
-            <Filter size={16} />
-            <span>Filter</span>
-          </ActionButton>
-          <ActionButton
-            variant={sortOrder === "lowToHigh" ? "primary" : "outline"}
-            size="small"
-            onClick={() => handleSort("lowToHigh")}
-          >
-            Price: Low to High
-          </ActionButton>
-          <ActionButton
-            variant={sortOrder === "highToLow" ? "primary" : "outline"}
-            size="small"
-            onClick={() => handleSort("highToLow")}
-          >
-            Price: High to Low
-          </ActionButton>
-        </div>
-      </div>
-
-      {isLoadingData ? (
-        <div className="loading-container">
-          <Loader className="animate-spin" size={32} />
-          <p>Loading properties...</p>
-        </div>
-      ) : filteredProperties.length > 0 ? (
-        <div className="properties-grid">
-          {filteredProperties.map((property) => (
+      <div className="properties-grid">
+        {filteredProperties.map((property) => {
+          const mockProperty = mockProperties.find(p => p.tokenId === property.tokenId)
+          return (
             <PropertyCard
               key={property.tokenId.toString()}
-              title={property.metadata?.name || property.cadastralNumber}
+              tokenId={property.tokenId}
+              title={property.metadata.name}
               address={property.location}
-              price={`${property.valuation} ETH`}
-              image={property.metadata?.image || "/suburban-house-exterior.png"}
-              status="For Sale"
-              onClick={() => handlePropertyClick(property)}
+              price={`${formatEther(property.valuation)} ETH`}
+              image={property.metadata.image}
+              status={property.owner ? 'Owned' : 'For Sale'}
+              investmentDetails={mockProperty?.investmentDetails}
             />
-          ))}
-        </div>
-      ) : (
-        <div className="no-results">
-          {searchTerm ? (
-            <p>No properties found matching your search criteria.</p>
-          ) : (
-            <p>No properties are currently listed for sale.</p>
-          )}
-        </div>
-      )}
+          )
+        })}
+      </div>
     </div>
   )
 }

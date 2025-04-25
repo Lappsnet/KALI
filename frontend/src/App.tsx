@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAppKit } from "@reown/appkit";
@@ -32,6 +32,7 @@ import { AccessControl } from "./components/pages/AccessControl";
 import { UserRegistry } from "./components/pages/UserRegistry";
 import { Security } from "./components/pages/Security";
 import { Profile } from "./components/pages/Profile";
+import { ListProperty } from "./components/pages/ListProperty";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
 import "./styles/App.css"; // Adjust path if needed
@@ -46,17 +47,13 @@ createAppKit({
 });
 
 function AppContent() {
-  useEffect(() => {
-    console.log('AppContent mounted');
-  }, []);
-
   return (
     <Layout>
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Launch />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/marketplace" element={<Marketplace />} />
-          <Route path="/launch" element={<Launch />} />
+          <Route path="/list-property" element={<ListProperty />} />
           <Route path="/dashboard/mint-properties" element={
             <ErrorBoundary>
               <MintProperties />
@@ -68,7 +65,7 @@ function AppContent() {
           <Route path="/dashboard/listings" element={<ActiveListings />} />
           <Route path="/dashboard/sales-history" element={<SaleHistory />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/property/:id" element={<PropertyDetails />} />
+          <Route path="/property/:propertyId" element={<PropertyDetails />} />
           <Route path="/dashboard/request-loan" element={<LoanRequest />} />
           <Route path="/loans" element={<MyLoans />} />
           <Route path="/loan/:id" element={<LoanDetails />} />

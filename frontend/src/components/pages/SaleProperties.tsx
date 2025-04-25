@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useAppKitAccount } from "@reown/appkit/react"
-import { PropertyCard } from "../PropertyCard"
+import { PropertyCard } from "../../components/PropertyCard"
 import { ActionButton } from "../ActionButton"
 import { DollarSign, Plus, Loader, FileText } from "lucide-react"
 import { useRealEstateContract, type PropertyWithMetadata } from "../hooks/useRealEstateContract"
