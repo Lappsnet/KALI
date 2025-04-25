@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAppKitAccount } from '@reown/appkit/react';
 import { useNavigate } from 'react-router-dom';
-import { useRealEstateContract } from '../../hooks/useRealEstateContract';
+import { useRealEstateContract } from '../hooks/useRealEstateContract';
 import { BigNumber } from '@ethersproject/bignumber';
 
 interface PropertyFormData {
@@ -18,7 +18,7 @@ interface PropertyFormData {
 }
 
 export const ListProperty: React.FC = () => {
-  const { isConnected } = useAppKitAccount();
+  const { isConnected, address } = useAppKitAccount();
   const navigate = useNavigate();
   const { mintProperty } = useRealEstateContract();
   const [formData, setFormData] = useState<PropertyFormData>({
@@ -84,6 +84,33 @@ export const ListProperty: React.FC = () => {
         throw new Error('Please connect your wallet first');
       }
 
+      // Check for Pinata JWT
+      const pinataJwt = import.meta.env.VITE_PINATA_JWT;
+      if (!pinataJwt) {
+        throw new Error('Pinata JWT not found in environment variables');
+      }
+
+      // Upload images to IPFS first
+      const imageUploadPromises = Array.from(formData.images || []).map(async (file) => {
+        const imageFormData = new FormData();
+        imageFormData.append('file', file);
+        imageFormData.append('pinataMetadata', JSON.stringify({ 
+          name: `PropertyImage_${formData.title}_${Date.now()}` 
+        }));
+
+        const imgRes = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${pinataJwt}` },
+          body: imageFormData,
+        });
+
+        if (!imgRes.ok) throw new Error(`Image upload failed: ${imgRes.statusText}`);
+        const imgData = await imgRes.json();
+        return `ipfs://${imgData.IpfsHash}`;
+      });
+
+      const imageIpfsUris = await Promise.all(imageUploadPromises);
+
       // Create metadata object
       const metadata = {
         name: formData.title,
@@ -94,16 +121,41 @@ export const ListProperty: React.FC = () => {
         bathrooms: parseInt(formData.bathrooms) || 0,
         area: parseInt(formData.area) || 0,
         amenities: formData.amenities,
-        price: BigNumber.from(formData.price).mul(BigNumber.from(10).pow(18)), // Convert to wei
-        images: formData.images ? Array.from(formData.images).map(file => URL.createObjectURL(file)) : [],
+        price: formData.price,
+        images: imageIpfsUris,
       };
 
-      // Call the contract to mint the property
-      const tx = await mintProperty(metadata);
-      await tx.wait();
+      // Upload metadata to IPFS
+      const metadataFile = new File([JSON.stringify(metadata)], 'metadata.json', { type: 'application/json' });
+      const metadataFormData = new FormData();
+      metadataFormData.append('file', metadataFile);
+      metadataFormData.append('pinataMetadata', JSON.stringify({ 
+        name: `PropertyMetadata_${formData.title}_${Date.now()}.json` 
+      }));
 
-      // Redirect to the marketplace after successful listing
-      navigate('/marketplace');
+      const metaRes = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${pinataJwt}` },
+        body: metadataFormData,
+      });
+
+      if (!metaRes.ok) throw new Error(`Metadata upload failed: ${metaRes.statusText}`);
+      const metaData = await metaRes.json();
+      const metadataIpfsUri = `ipfs://${metaData.IpfsHash}`;
+
+      // Call the contract to mint the property
+      const hash = await mintProperty(
+        address as `0x${string}`,
+        formData.title,
+        formData.location,
+        BigInt(formData.price),
+        metadataIpfsUri
+      );
+
+      if (hash) {
+        // Redirect to the marketplace after successful listing
+        navigate('/marketplace');
+      }
     } catch (err) {
       console.error('Error listing property:', err);
       setError(err instanceof Error ? err.message : 'Failed to list property');

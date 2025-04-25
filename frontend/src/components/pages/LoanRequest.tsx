@@ -42,7 +42,13 @@ const LoanRequest: React.FC = () => {
         // For now, just use the first mock property
         const mockProperty = mockProperties[0];
         if (mockProperty) {
-          setProperty(mockProperty);
+          setProperty({
+            tokenId: mockProperty.tokenId.toString(),
+            metadata: mockProperty.metadata,
+            cadastralNumber: mockProperty.cadastralNumber.toString(),
+            location: mockProperty.location,
+            valuation: mockProperty.valuation.toString()
+          });
         } else {
           setError('No properties available');
         }
@@ -69,9 +75,9 @@ const LoanRequest: React.FC = () => {
     try {
       const result = await requestLoan(
         BigInt(property.tokenId),
-        parseEther(loanAmount),
-        BigInt(Math.floor(parseFloat(interestRate) * 100)), // Convert to basis points
-        BigInt(parseInt(durationMonths) * 30 * 24 * 60 * 60) // Convert months to seconds
+        loanAmount,
+        Math.floor(parseFloat(interestRate) * 100), // Convert to basis points
+        parseInt(durationMonths) * 30 // Convert months to days
       );
 
       if (result) {

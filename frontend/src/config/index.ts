@@ -1,8 +1,6 @@
 import { http, parseGwei } from 'viem';
 import { defineChain } from '@reown/appkit/networks';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
-// Removed mainnetBase and sepoliaBase imports as they are no longer needed
-// import { mainnet as mainnetBase, sepolia as sepoliaBase } from 'wagmi/chains';
 
 // Define the Pharos network
 export const pharos = defineChain({
@@ -26,10 +24,6 @@ export const pharos = defineChain({
   },
 });
 
-// Removed mainnet definition
-// Removed sepolia definition (already commented out)
-
-// WalletConnect Project ID (ensure VITE_ prefix matches your build tool - Vite/NextJS etc.)
 export const projectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID;
 
 if (!projectId) {
@@ -53,12 +47,7 @@ export const wagmiAdapter = new WagmiAdapter({
   projectId,
   transports: {
     // Only include transport for pharos
-    [pharos.id]: http(pharos.rpcUrls.default.http[0], {
-      // Optional: Keep gas overrides if needed specifically for pharos devnet
-      maxFeePerGas: parseGwei('30'),
-      maxPriorityFeePerGas: parseGwei('1.5'),
-    }),
-    // Removed mainnet and sepolia transports
+    [pharos.id]: http(pharos.rpcUrls.default.http[0]),
   }
 });
 

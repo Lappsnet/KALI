@@ -11,7 +11,7 @@ export const Launch: React.FC = () => {
   const { isConnected } = useAppKitAccount()
 
   return (
-    <div className="main-content with-sidebar">
+    <div className="">
       <div className="content-wrapper">
         <div className="page-container text-center">
           <div className="new-badge mb-4">NEW</div>

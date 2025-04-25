@@ -2,7 +2,7 @@ import React from 'react';
 
 const EcosystemDiagram: React.FC = () => {
   return (
-    <div className="ecosystem-container">
+    <div className="page-container">
       <header className="text-center mb-10">
         <div className="flex items-center justify-center">
           <h1 className="text-2xl md:text-3xl font-bold text-white pb-1">KALI Real Estate</h1>

@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAppKit } from "@reown/appkit";
 import { WagmiProvider } from 'wagmi';
 
-import { projectId, metadata, chains, wagmiAdapter } from "./config/index.ts"; // Adjust path if needed
+import { projectId, metadata, wagmiAdapter, pharos } from "./config/index.ts";
 
 import { Layout } from "./components/Layout";
 import { Dashboard } from "./components/pages/Dashboard";
@@ -42,7 +42,7 @@ const queryClient = new QueryClient();
 createAppKit({
   projectId,
   metadata,
-  networks: chains,
+  networks: [pharos],
   adapters: [wagmiAdapter]
 });
 
