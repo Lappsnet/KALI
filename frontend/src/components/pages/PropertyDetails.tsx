@@ -5,9 +5,10 @@ import { useParams, useNavigate } from "react-router-dom"
 import { useAppKitAccount } from "@reown/appkit/react"
 import { ActionButton } from "../ActionButton"
 import { DollarSign, Check, X, Loader, CreditCard } from "lucide-react"
-import { useRealEstateContract, type PropertyWithMetadata } from "../hooks/useRealEstateContract"
+import { useRealEstateContract } from "../hooks/useRealEstateContract"
 import { useRealEstateSaleContract, type SaleWithDetails, SaleStatus } from "../hooks/useRealEstateSaleContract"
 import { useLendingProtocolContract } from "../hooks/useLendingProtocolContract"
+import { Property } from "../../types/property"
 
 export const PropertyDetails = () => {
   const { id } = useParams<{ id: string }>()
@@ -23,11 +24,11 @@ export const PropertyDetails = () => {
   } = useRealEstateSaleContract()
   const { getActiveLoanForProperty, isLoading: isLoadingLoan } = useLendingProtocolContract()
 
-  const [property, setProperty] = useState<PropertyWithMetadata | null>(null)
+  const [property, setProperty] = useState<Property | null>(null)
   const [sale, setSale] = useState<SaleWithDetails | null>(null)
-  const [hasActiveLoan, setHasActiveLoan] = useState(false)
-  const [isInterested, setIsInterested] = useState(false)
-  const [escrowAmount, setEscrowAmount] = useState("")
+  const [hasActiveLoan, setHasActiveLoan] = useState<boolean>(false)
+  const [isInterested, setIsInterested] = useState<boolean>(false)
+  const [escrowAmount, setEscrowAmount] = useState<string>("")
   const [showEscrowModal, setShowEscrowModal] = useState(false)
 
   const isLoading = isLoadingProperty || isLoadingSale || isLoadingLoan
@@ -45,7 +46,16 @@ export const PropertyDetails = () => {
       // Load property details
       const propertyId = BigInt(id)
       const propertyDetails = await getPropertyDetails(propertyId)
-      setProperty(propertyDetails)
+      if (propertyDetails) {
+        setProperty({
+          id: propertyId,
+          tokenId: propertyId,
+          status: propertyDetails.status,
+          owner: propertyDetails.owner,
+          imageUrl: propertyDetails.imageUrl,
+          ...propertyDetails
+        })
+      }
 
       // Check if there's an active sale for this property
       const activeSaleId = await getActiveSaleForProperty(propertyId)
@@ -138,7 +148,7 @@ export const PropertyDetails = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>{property.metadata?.name || property.cadastralNumber}</h1>
+        <h1>{property.cadastralNumber}</h1>
         <p>{property.location}</p>
       </div>
 
@@ -146,8 +156,8 @@ export const PropertyDetails = () => {
         <div className="property-details-container">
           <div className="property-image-container">
             <img
-              src={property.metadata?.image || "/suburban-house-exterior.png"}
-              alt={property.metadata?.name || property.cadastralNumber}
+              src={property.image || "/suburban-house-exterior.png"}
+              alt={property.name || property.cadastralNumber}
             />
           </div>
 

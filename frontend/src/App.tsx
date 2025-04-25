@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAppKit } from "@reown/appkit";
@@ -16,7 +16,7 @@ import { MintProperties } from "./components/pages/MintProperties";
 import { SaleProperties } from "./components/pages/SaleProperties";
 import { Settings } from "./components/pages/Settings";
 import { PropertyDetails } from "./components/pages/PropertyDetails";
-import { LoanRequest } from "./components/pages/LoanRequest";
+import LoanRequest from "./components/pages/LoanRequest";
 import { MyLoans } from "./components/pages/MyLoans";
 import { LoanDetails } from "./components/pages/LoanDetails";
 import RentableToken from "./components/pages/RentableToken";
@@ -52,7 +52,6 @@ function AppContent() {
 
   return (
     <Layout>
-      <Suspense fallback={<div className="page-loading-fallback">Loading Page...</div>}>
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
@@ -84,7 +83,6 @@ function AppContent() {
           <Route path="/dashboard/profile" element={<Profile />} />
           {/* <Route path="*" element={<NotFound />} /> */}
         </Routes>
-      </Suspense>
     </Layout>
   );
 }
@@ -105,9 +103,7 @@ export function App() {
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <Router>
-          <Suspense fallback={<div className="app-loading-fallback">Loading App...</div>}>
             <AppContent />
-          </Suspense>
         </Router>
       </QueryClientProvider>
     </WagmiProvider>
