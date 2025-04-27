@@ -59,7 +59,6 @@ export const Sidebar: React.FC = () => {
 
   const settingsItems = [
     { path: '/dashboard/profile', label: 'Profile', icon: <User size={20} /> },
-    { path: '/dashboard/security', label: 'Security', icon: <Shield size={20} /> },
     { path: '/settings', label: 'Settings', icon: <Settings size={20} /> },
   ];
 

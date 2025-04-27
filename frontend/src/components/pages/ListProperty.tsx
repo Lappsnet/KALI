@@ -194,8 +194,9 @@ export const ListProperty: React.FC = () => {
     <div className="main-content with-siebar">
       <div className="">
         <div className="glass-card p-8">
-          <h1 className="text-3xl font-bold mb-6 text-gradient">List Property</h1>
-          
+          <h3 className="text-3xl font-bold mb-6 text-gradient">To mint a property, you need to fill in the following details</h3>
+          <br />
+          <br />
           {error && (
             <div className="error-message mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-md text-red-500 animate-fade-in">
               {error}
@@ -315,7 +316,8 @@ export const ListProperty: React.FC = () => {
                 />
               </div>
             </div>
-
+            <br />
+            <br />
             <div className="form-group">
               <label className="form-label">Amenities</label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -332,7 +334,8 @@ export const ListProperty: React.FC = () => {
                 ))}
               </div>
             </div>
-
+            <br />
+            <br />
             <div className="form-group">
               <label htmlFor="images" className="form-label">Property Images</label>
               <div className="relative">

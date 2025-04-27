@@ -94,8 +94,8 @@ export const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h1>Dashboard</h1>
-        <p>Overview of your real estate portfolio</p>
+        <h1>Overview of RWA portfolio</h1>
+        <p>Track your properties, tenants, and earnings</p>
       </div>
 
       <div className="stats-grid">
@@ -115,7 +115,7 @@ export const Dashboard = () => {
 
       <div className="dashboard-charts">
         <div className="chart-section">
-          <h2>Portfolio Performance</h2>
+          <h2>RWA Performance</h2>
           <DashboardChart className="portfolio-chart" />
         </div>
       </div>

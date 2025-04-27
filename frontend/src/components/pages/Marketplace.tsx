@@ -140,7 +140,11 @@ export const Marketplace = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Property Marketplace</h1>
+        <h1>RWA Marketplace</h1>
+        <p>Browse and manage your RWA listings</p>
+        <br /> <br />
+
+        <div className="marketplace-actions"></div>
         <div className="search-filter">
           <div className="search-box">
             <Search size={20} />

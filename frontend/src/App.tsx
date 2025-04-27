@@ -29,7 +29,6 @@ import { SaleHistory } from "./components/pages/SaleHistory";
 import { NotaryPanel } from "./components/pages/NotaryPanel";
 import { AccessControl } from "./components/pages/AccessControl";
 import { UserRegistry } from "./components/pages/UserRegistry";
-import { Security } from "./components/pages/Security";
 import { Profile } from "./components/pages/Profile";
 import { ListProperty } from "./components/pages/ListProperty";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -70,7 +69,6 @@ function AppContent() {
           <Route path="/dashboard/notary" element={<NotaryPanel />} />
           <Route path="/dashboard/access" element={<AccessControl />} />
           <Route path="/dashboard/users" element={<UserRegistry />} />
-          <Route path="/dashboard/security" element={<Security />} />
           <Route path="/dashboard/profile" element={<Profile />} />
           {/* <Route path="*" element={<NotFound />} /> */}
         </Routes>

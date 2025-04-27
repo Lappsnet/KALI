@@ -15,7 +15,16 @@ import {
   Eye,
   EyeOff,
   Save,
-  XCircle
+  XCircle,
+  Settings as SettingsIcon,
+  User,
+  Key,
+  ShieldCheck,
+  Smartphone,
+  Globe2,
+  MailCheck,
+  BellRing,
+  MessageSquare
 } from 'lucide-react';
 import './Settings.css';
 
@@ -23,19 +32,60 @@ interface NotificationSettings {
   email: boolean;
   push: boolean;
   sms: boolean;
+  marketing: boolean;
+  updates: boolean;
 }
 
 interface SecuritySettings {
   twoFactor: boolean;
   biometric: boolean;
   autoLock: boolean;
+  sessionTimeout: number;
+  passwordExpiry: number;
 }
 
 interface PrivacySettings {
   profileVisibility: 'public' | 'private';
   showEmail: boolean;
   showPhone: boolean;
+  showActivity: boolean;
+  showHoldings: boolean;
 }
+
+interface LanguagePreference {
+  language: string;
+  timezone: string;
+  dateFormat: string;
+}
+
+const mockSettings = {
+  notifications: {
+    email: true,
+    push: true,
+    sms: false,
+    marketing: true,
+    updates: true
+  },
+  security: {
+    twoFactor: false,
+    biometric: true,
+    autoLock: true,
+    sessionTimeout: 30,
+    passwordExpiry: 90
+  },
+  privacy: {
+    profileVisibility: 'public',
+    showEmail: false,
+    showPhone: false,
+    showActivity: true,
+    showHoldings: false
+  },
+  language: {
+    language: 'en',
+    timezone: 'UTC',
+    dateFormat: 'MM/DD/YYYY'
+  }
+};
 
 export const Settings: React.FC = () => {
   const { address, isConnected } = useAppKitAccount();
@@ -45,23 +95,10 @@ export const Settings: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [updateStatus, setUpdateStatus] = useState<'idle' | 'updating' | 'success' | 'error'>('idle');
 
-  const [notifications, setNotifications] = useState<NotificationSettings>({
-    email: true,
-    push: true,
-    sms: false
-  });
-
-  const [security, setSecurity] = useState<SecuritySettings>({
-    twoFactor: false,
-    biometric: true,
-    autoLock: true
-  });
-
-  const [privacy, setPrivacy] = useState<PrivacySettings>({
-    profileVisibility: 'public',
-    showEmail: false,
-    showPhone: false
-  });
+  const [notifications, setNotifications] = useState<NotificationSettings>(mockSettings.notifications);
+  const [security, setSecurity] = useState<SecuritySettings>(mockSettings.security);
+  const [privacy, setPrivacy] = useState<PrivacySettings>(mockSettings.privacy);
+  const [language, setLanguage] = useState<LanguagePreference>(mockSettings.language);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -69,8 +106,8 @@ export const Settings: React.FC = () => {
 
       setLoading(true);
       try {
-        // TODO: Replace with actual contract calls
-        // const settings = await contract.getUserSettings(address);
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1000));
         setLoading(false);
       } catch (err) {
         console.error('Error fetching settings:', err);
@@ -87,8 +124,8 @@ export const Settings: React.FC = () => {
 
     setUpdateStatus('updating');
     try {
-      // TODO: Replace with actual contract call
-      // await contract.updateUserSettings(address, { notifications, security, privacy });
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
       setUpdateStatus('success');
       setTimeout(() => setUpdateStatus('idle'), 3000);
     } catch (err) {
@@ -151,7 +188,7 @@ export const Settings: React.FC = () => {
           <div className="setting-card">
             <div className="card-header">
               <div className="card-icon">
-                <Bell size={24} />
+                <BellRing size={24} />
               </div>
               <div className="card-title">
                 <h2>Notifications</h2>
@@ -201,13 +238,27 @@ export const Settings: React.FC = () => {
                   <span className="toggle-slider"></span>
                 </label>
               </div>
+              <div className="setting-item">
+                <div className="setting-info">
+                  <div className="setting-label">Marketing Updates</div>
+                  <div className="setting-description">Receive promotional content</div>
+                </div>
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={notifications.marketing}
+                    onChange={(e) => setNotifications({ ...notifications, marketing: e.target.checked })}
+                  />
+                  <span className="toggle-slider"></span>
+                </label>
+              </div>
             </div>
           </div>
 
           <div className="setting-card">
             <div className="card-header">
               <div className="card-icon">
-                <Lock size={24} />
+                <ShieldCheck size={24} />
               </div>
               <div className="card-title">
                 <h2>Security</h2>
@@ -257,13 +308,29 @@ export const Settings: React.FC = () => {
                   <span className="toggle-slider"></span>
                 </label>
               </div>
+              <div className="setting-item">
+                <div className="setting-info">
+                  <div className="setting-label">Session Timeout</div>
+                  <div className="setting-description">Minutes until auto-logout</div>
+                </div>
+                <select
+                  value={security.sessionTimeout}
+                  onChange={(e) => setSecurity({ ...security, sessionTimeout: Number(e.target.value) })}
+                  className="toggle-switch"
+                >
+                  <option value="15">15 minutes</option>
+                  <option value="30">30 minutes</option>
+                  <option value="60">1 hour</option>
+                  <option value="120">2 hours</option>
+                </select>
+              </div>
             </div>
           </div>
 
           <div className="setting-card">
             <div className="card-header">
               <div className="card-icon">
-                <Globe size={24} />
+                <Globe2 size={24} />
               </div>
               <div className="card-title">
                 <h2>Privacy</h2>
@@ -312,6 +379,81 @@ export const Settings: React.FC = () => {
                   />
                   <span className="toggle-slider"></span>
                 </label>
+              </div>
+              <div className="setting-item">
+                <div className="setting-info">
+                  <div className="setting-label">Show Activity</div>
+                  <div className="setting-description">Display your recent activity</div>
+                </div>
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={privacy.showActivity}
+                    onChange={(e) => setPrivacy({ ...privacy, showActivity: e.target.checked })}
+                  />
+                  <span className="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="setting-card">
+            <div className="card-header">
+              <div className="card-icon">
+                <SettingsIcon size={24} />
+              </div>
+              <div className="card-title">
+                <h2>Preferences</h2>
+                <p>Customize your experience</p>
+              </div>
+            </div>
+            <div className="setting-group">
+              <div className="setting-item">
+                <div className="setting-info">
+                  <div className="setting-label">Language</div>
+                  <div className="setting-description">Select your preferred language</div>
+                </div>
+                <select
+                  value={language.language}
+                  onChange={(e) => setLanguage({ ...language, language: e.target.value })}
+                  className="toggle-switch"
+                >
+                  <option value="en">English</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                  <option value="de">German</option>
+                </select>
+              </div>
+              <div className="setting-item">
+                <div className="setting-info">
+                  <div className="setting-label">Timezone</div>
+                  <div className="setting-description">Set your local timezone</div>
+                </div>
+                <select
+                  value={language.timezone}
+                  onChange={(e) => setLanguage({ ...language, timezone: e.target.value })}
+                  className="toggle-switch"
+                >
+                  <option value="UTC">UTC</option>
+                  <option value="EST">Eastern Time</option>
+                  <option value="PST">Pacific Time</option>
+                  <option value="GMT">Greenwich Mean Time</option>
+                </select>
+              </div>
+              <div className="setting-item">
+                <div className="setting-info">
+                  <div className="setting-label">Date Format</div>
+                  <div className="setting-description">Choose your date display format</div>
+                </div>
+                <select
+                  value={language.dateFormat}
+                  onChange={(e) => setLanguage({ ...language, dateFormat: e.target.value })}
+                  className="toggle-switch"
+                >
+                  <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                  <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                  <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                </select>
               </div>
             </div>
           </div>
