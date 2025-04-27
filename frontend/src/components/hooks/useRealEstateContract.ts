@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useEffect, useMemo } from "react"; // Added useMemo
+import { useCallback, useState, useEffect, useMemo } from "react";
 import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react";
 import {useWriteContract, useWaitForTransactionReceipt, useConfig, type Config,} from "wagmi";
 import { readContract } from "@wagmi/core";
@@ -9,7 +9,6 @@ import { type Address, formatEther, parseEther, decodeEventLog, type Hex, AbiSta
 import RealEstateERC721ABI from "../abis/RealEstateERC721.abi.json";
 import { CONTRACT_ADDRESSES } from "../../config/index.ts";
 
-// --- Type Definitions --- (Keep as before)
 export interface PropertyDetails {
   tokenId: bigint
   owner: string | null
@@ -51,7 +50,6 @@ export interface UseRealEstateContractReturn {
   ) => Promise<void>;
 }
 
-// --- Hook Implementation ---
 export function useRealEstateContract(): UseRealEstateContractReturn {
   const { address: account, isConnected } = useAppKitAccount();
   const { chainId } = useAppKitNetwork();
@@ -110,12 +108,10 @@ export function useRealEstateContract(): UseRealEstateContractReturn {
   const getAllTokenIds = useCallback(() => readWrapper<readonly bigint[]>("getAllTokenIds", []), [readWrapper]);
   const isAdministrator = useCallback(async (addr: Address): Promise<boolean | null> => {
       const owner = await readWrapper<Address>("owner");
-      if (owner === null) return null; // Read failed
-      if (owner === addr) return true; // Owner is always admin
-      // Add check for administrators mapping if readable via ABI, otherwise fallback
-      // const isAdmin = await readWrapper<boolean>("administrators", [addr]);
-      // return isAdmin;
-      return false;
+      if (owner === null) return null;
+      if (owner === addr) return true;
+      const isAdmin = await readWrapper<boolean>("administrators", [addr]);
+      return isAdmin;
   }, [readWrapper]);
 
 
@@ -125,7 +121,6 @@ export function useRealEstateContract(): UseRealEstateContractReturn {
       valuation: bigint, metadataURI: string,
       callbacks?: { onSuccess?: (hash: Hex) => void; onError?: (error: Error) => void }
     ): Promise<Hex | null> => {
-      // --- Start Debug Logging ---
       console.log("[Mint Property Check]");
       console.log("  isConnected:", isConnected);
       console.log("  Account:", account);
@@ -134,9 +129,8 @@ export function useRealEstateContract(): UseRealEstateContractReturn {
       console.log("  Recipient (to):", to);
       console.log("  Cadastral:", cadastralNumber);
       console.log("  Location:", location);
-      console.log("  Valuation:", valuation?.toString()); // Log bigint as string
+      console.log("  Valuation:", valuation?.toString());
       console.log("  Metadata URI:", metadataURI);
-      // --- End Debug Logging ---
 
       if (!isConnected || !account) { const e = new Error("Wallet not connected."); setInternalError(e.message); callbacks?.onError?.(e); return null; }
       if (!contractAddress) { const e = new Error("Contract address not found for this chain."); setInternalError(e.message); callbacks?.onError?.(e); return null; }
@@ -150,11 +144,7 @@ export function useRealEstateContract(): UseRealEstateContractReturn {
           abi: RealEstateERC721ABI,
           functionName: "mintProperty",
           args: [to, cadastralNumber, location, valuation, metadataURI],
-          // --- Optional: Manual Gas Override (Use only as last resort if estimation fails) ---
-          // gas: 300000n, // Example: Set a manual gas limit (use estimate from successful forge script run)
-          // maxFeePerGas: parseGwei('20'), // Example override
-          // maxPriorityFeePerGas: parseGwei('1'), // Example override
-          // ------------------------------------------------------------------------------------
+          
         });
         console.log("Transaction submitted via hook with hash:", hash);
         setLastTxHash(hash);
@@ -162,7 +152,7 @@ export function useRealEstateContract(): UseRealEstateContractReturn {
         return hash;
       } catch (err: any) {
         console.error("Mint Property Hook Error during submission:", err);
-        // Log the full error structure if helpful
+      
         console.error("Full Error Object:", err);
         const error = err instanceof Error ? err : new Error("Failed to send mint transaction.");
         setInternalError(error.message);
@@ -173,7 +163,7 @@ export function useRealEstateContract(): UseRealEstateContractReturn {
     [contractAddress, account, isConnected, writeContractAsync]
   );
 
-  const writeWrapper = useCallback( /* ... as before ... */
+  const writeWrapper = useCallback(
        async (
         functionName: string, args: any[],
         callbacks?: { onSuccess?: (hash: Hex) => void; onError?: (error: Error) => void }
@@ -193,11 +183,8 @@ export function useRealEstateContract(): UseRealEstateContractReturn {
   const transferToken = useCallback((from: Address, to: Address, tokenId: bigint, callbacks?: { onSuccess?: (hash: Hex) => void; onError?: (error: Error) => void }) =>
       writeWrapper("transferFrom", [from, to, tokenId], callbacks), [writeWrapper] );
 
-  // Return statement (keep as before)
   return { contractAddress, isLoading, isReading, isConfirming, isConfirmed,
            error, txHash: lastTxHash, receipt, getPropertyDetails, getBalanceOf,
            getOwnerOf, getTokenURI, getAllTokenIds, isAdministrator, mintProperty,
            updatePropertyValuation, transferToken };
 }
-
-/* Component Reminder moved to response text */

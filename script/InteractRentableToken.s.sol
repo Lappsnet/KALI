@@ -2,30 +2,19 @@
 pragma solidity ^0.8.20;
 
 import {Script, console} from "forge-std/Script.sol";
-// Adjust import path if needed
 import {RentableToken} from "../src/RentableToken.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol"; // For token recovery
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title InteractRentableToken Script
- * @notice Interacts with a deployed RentableToken contract.
- * @dev Required Env Vars: MY_PK, MY_ADDRESS, RPC_URL.
- * @dev Other env vars depend on action: AMOUNT_WEI, STAKE_AMOUNT, STAKE_PERIOD, STAKE_INDEX, TARGET_ADDRESS, TOKEN_ADDRESS.
- * @dev Run ONE action per execution with the correct PK/Role/Prerequisites.
  */
 contract InteractRentableToken is Script {
 
-    // <<< --- Configuration: Set Deployed Contract Address --- >>>
-    address constant RENTABLE_TOKEN_ADDRESS = 0x407b230D1439A83Ed81577009e2118e7a4d50694; // <--- Verify/Replace if needed
+    address constant RENTABLE_TOKEN_ADDRESS = vm.envAddress("RENTABLE_TOKEN_ADDRESS");
 
-    // --- *** CORRECTED INSTANCE CREATION *** ---
-    // Get contract instance - Cast address to payable because contract has receive() external payable
     RentableToken public rentableToken = RentableToken(payable(RENTABLE_TOKEN_ADDRESS));
-    // --- *** END CORRECTION *** ---
 
-    // --- Main Execution Function ---
     function run() external {
-        // Load required environment variables
         address callerAddress = vm.envAddress("MY_ADDRESS");
         require(callerAddress != address(0), "MY_ADDRESS env var not set.");
         string memory pk = vm.envString("MY_PK");
@@ -33,34 +22,30 @@ contract InteractRentableToken is Script {
         string memory rpcUrl = vm.envString("RPC_URL");
         require(bytes(rpcUrl).length > 0, "RPC_URL env var not set.");
 
-        // Optional environment variables for specific actions
-        uint256 amountWei = vm.envUint("AMOUNT_WEI"); // For purchaseTokens (msg.value)
-        uint256 stakeAmount = vm.envUint("STAKE_AMOUNT"); // For stakeTokens (token amount)
-        uint256 stakePeriod = vm.envUint("STAKE_PERIOD"); // For stakeTokens (seconds)
-        uint256 stakeIndex = vm.envUint("STAKE_INDEX");   // For unstakeTokens
-        address targetAddress = vm.envAddress("TARGET_ADDRESS"); // For role grants, exemptions, recovery
-        address tokenAddress = vm.envAddress("TOKEN_ADDRESS"); // For ERC20 recovery
-        uint256 burnAmount = vm.envUint("BURN_AMOUNT"); // For burn
+        uint256 amountWei = vm.envUint("AMOUNT_WEI");
+        uint256 stakeAmount = vm.envUint("STAKE_AMOUNT");
+        uint256 stakePeriod = vm.envUint("STAKE_PERIOD");
+        uint256 stakeIndex = vm.envUint("STAKE_INDEX");
+        address targetAddress = vm.envAddress("TARGET_ADDRESS");
+        address tokenAddress = vm.envAddress("TOKEN_ADDRESS");
+        uint256 burnAmount = vm.envUint("BURN_AMOUNT");
 
         console.log("--- Script Start: Interact RentableToken ---");
         console.log("Target Contract:"); console.logAddress(RENTABLE_TOKEN_ADDRESS);
         console.log("Executing as Address:"); console.logAddress(callerAddress);
 
-        // --- Choose ONE Action ---
-        // Uncomment the desired read or write action.
 
-        // == Read Operations Examples (No Broadcast Needed) ==
+        // == Read Operations ==
         getContractInfo();
         getHolderInfo(callerAddress);
         checkRole(callerAddress, rentableToken.ADMIN_ROLE());
 
 
-        // == Write Operations Examples (Uncomment ONE action inside broadcast block) ==
-        // ** Uncomment this block ONLY if performing a write transaction **
-        
-        vm.startBroadcast(); // Use PK matching the required role for the action below
+        // == Write Operations ==
+        vm.startBroadcast();
 
-        // --- CHOOSE ONE ACTION TO UNCOMMENT ---
+        // --- Admin Role Actions ---
+        exampleSetTokenPrice(0.001 ether);
 
         // --- Admin Role Actions ---
         //exampleSetTokenPrice(0.001 ether); // Set price to 0.01 ETH
@@ -92,8 +77,6 @@ contract InteractRentableToken is Script {
 
         console.log("--- Script Finished ---");
     }
-
-    // --- Helper Functions ---
 
     // == Reads ==
     function getContractInfo() public view {

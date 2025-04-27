@@ -2,34 +2,25 @@
 pragma solidity ^0.8.20;
 
 import {Script, console} from "forge-std/Script.sol";
-// Adjust import paths if needed
 import {RealEstateSale} from "../src/RealEstateSale.sol";
 import {RealEstateERC721} from "../src/RealEstateERC721.sol";
 import {RentableToken} from "../src/RentableToken.sol";
 
 /**
- * @title InteractRealEstateSale Script
- * @notice Interacts with a deployed RealEstateSale contract.
- * @dev Required Env Vars: MY_PK, MY_ADDRESS, RPC_URL.
- * @dev Other env vars depend on action: PROPERTY_ID, SALE_ID, PRICE_WEI, BUYER_ADDRESS, NOTARY_ADDRESS, RENTABLE_AMOUNT etc.
- * @dev Run ONE action per execution with the correct PK/Role/Prerequisites.
+ * @title InteractRealEstateSale Script.
  */
+
 contract InteractRealEstateSale is Script {
 
-    // <<< --- Configuration: Set Deployed Contract Addresses --- >>>
-    address constant SALE_CONTRACT_ADDRESS = 0x43B69480Cf9308F10781fB3eEab20770c14ee73D; // <--- Verify/Replace if needed (Using address from previous context)
-    address constant NFT_CONTRACT_ADDRESS = 0xD95d1FF6618AEE41e431C6A2cfa3D5e8ff3d5f33; // <--- Verify/Replace if needed
-    address constant RENTABLE_TOKEN_ADDRESS = 0x407b230D1439A83Ed81577009e2118e7a4d50694; // <--- Verify/Replace if needed
+    address constant SALE_CONTRACT_ADDRESS = vm.envAddress("REAL_ESTATE_SALE_ADDRESS");
+    address constant NFT_CONTRACT_ADDRESS = vm.envAddress("REAL_ESTATE_TOKEN_ADDRESS");
+    address constant RENTABLE_TOKEN_ADDRESS = vm.envAddress("RENTABLE_TOKEN_ADDRESS");
 
-    // Get contract instances
-    RealEstateSale public saleContract = RealEstateSale(payable(SALE_CONTRACT_ADDRESS)); // Assume payable for safety, adjust if no receive/fallback
+    RealEstateSale public saleContract = RealEstateSale(payable(SALE_CONTRACT_ADDRESS));
     RealEstateERC721 public propertyToken = RealEstateERC721(NFT_CONTRACT_ADDRESS);
-    // Cast RentableToken to payable if it has receive() or payable fallback
     RentableToken public rentableToken = RentableToken(payable(RENTABLE_TOKEN_ADDRESS));
 
-    // --- Main Execution Function ---
     function run() external {
-        // Load required environment variables
         address callerAddress = vm.envAddress("MY_ADDRESS");
         require(callerAddress != address(0), "MY_ADDRESS env var not set.");
         string memory pk = vm.envString("MY_PK");
@@ -37,7 +28,6 @@ contract InteractRealEstateSale is Script {
         string memory rpcUrl = vm.envString("RPC_URL");
         require(bytes(rpcUrl).length > 0, "RPC_URL env var not set.");
 
-        // Optional environment variables for specific actions
         uint256 propertyId = vm.envUint("PROPERTY_ID"); // e.g., export PROPERTY_ID=5
         uint256 saleId = vm.envUint("SALE_ID");         // e.g., export SALE_ID=1
         uint256 priceWei = vm.envUint("PRICE_WEI");     // e.g., export PRICE_WEI=1000000000000000000 (1 ETH)
@@ -50,21 +40,14 @@ contract InteractRealEstateSale is Script {
         console.log("Target Sale Contract:"); console.logAddress(SALE_CONTRACT_ADDRESS);
         console.log("Executing as Address:"); console.logAddress(callerAddress);
 
-        // --- Choose ONE Action ---
-        // Uncomment the desired read or write action.
-
-        // == Read Operations Examples (No Broadcast Needed) ==
+        // --- Action ---
         //if (saleId > 0) { getSaleInfo(saleId); }
         //if (propertyId > 0) { getActiveSaleForProperty(propertyId); }
         //if (targetAddress != address(0)) { isNotaryCheck(targetAddress); }
 
+        vm.startBroadcast();
 
-        // == Write Operations Examples (Uncomment ONE action inside broadcast block) ==
-        // ** Uncomment this block ONLY if performing a write transaction **
-        
-        vm.startBroadcast(); // Use PK matching the required role for the action below
-
-        // --- CHOOSE ONE ACTION TO UNCOMMENT ---
+        // --- ACTION ---
 
         // --- Owner Role Actions (MY_PK = Owner) ---
         // if (targetAddress != address(0)) { exampleAuthorizeNotary(targetAddress); }
@@ -112,8 +95,6 @@ contract InteractRealEstateSale is Script {
         console.log("--- Script Finished ---");
     }
 
-    // --- Helper Functions ---
-
     // == Reads ==
     function getSaleInfo(uint256 saleId) public view {
         console.log("Querying sale info for ID:"); console.logUint(saleId);
@@ -132,7 +113,6 @@ contract InteractRealEstateSale is Script {
              console.log("  Rentable Tokens Included:"); console.log(sale.rentableTokensIncluded);
              console.log("  Rentable Token Amount:"); console.logUint(sale.rentableTokenAmount);
              console.log("  ---------------------");
-             // Check escrow separately
              uint256 escrow = saleContract.getEscrowBalance(saleId);
              console.log("  Escrow Balance (Wei):"); console.logUint(escrow);
         } catch Error(string memory reason) { console.log(" Error getting sale:", reason); }
@@ -176,11 +156,9 @@ contract InteractRealEstateSale is Script {
     }
 
     // = Seller Role =
-    // IMPORTANT: Run this BEFORE createSale using the Property Owner's PK
     function exampleApproveNFTSale(uint256 propertyId) internal {
          console.log("--> Sending approve tx to RealEstate contract for property ID:"); console.logUint(propertyId);
          console.log("    Approving Sale Contract:"); console.logAddress(SALE_CONTRACT_ADDRESS);
-         // Calls approve on the NFT contract instance
          propertyToken.approve(SALE_CONTRACT_ADDRESS, propertyId);
          console.log("    Approval transaction sent (wait for confirmation).");
     }
@@ -191,7 +169,6 @@ contract InteractRealEstateSale is Script {
         console.log("    Document URI:"); console.log(docUri);
         saleContract.createSale(propertyId, price, docUri);
         console.log("    createSale transaction sent.");
-        // Note: Sale ID needs to be retrieved from event log.
     }
     function exampleUpdateSalePrice(uint256 saleId, uint256 newPrice) internal {
         require(newPrice > 0, "New price must be positive.");
@@ -221,13 +198,12 @@ contract InteractRealEstateSale is Script {
         console.log("    expressInterest transaction sent.");
     }
     function exampleDepositEscrow(uint256 saleId) internal {
-        // Fetch the required price from the contract state
         RealEstateSale.Sale memory sale = saleContract.getSale(saleId);
         uint256 requiredPrice = sale.price;
         require(requiredPrice > 0, "Could not determine sale price for escrow.");
         console.log("--> Sending depositEscrow tx for sale ID:"); console.logUint(saleId);
         console.log("    Required Escrow (msg.value):"); console.logUint(requiredPrice);
-        // Send the required price with the transaction
+
         saleContract.depositEscrow{value: requiredPrice}(saleId);
         console.log("    depositEscrow transaction sent.");
     }
@@ -249,4 +225,4 @@ contract InteractRealEstateSale is Script {
         console.log("    completeSale transaction sent.");
     }
 
-} // End of contract InteractRealEstateSale
+}

@@ -9,24 +9,18 @@ import {RealEstateERC721} from "../src/RealEstateERC721.sol";
 /**
  * @title InteractLendingProtocol Script
  * @notice Interacts with a deployed LendingProtocol contract.
- * @dev Requires environment variables: MY_PK, MY_ADDRESS, RPC_URL.
  * @dev Other env vars may be needed depending on actions (e.g., LOAN_ID, PROPERTY_ID, AMOUNT).
  */
 contract InteractLendingProtocol is Script {
 
-    // <<< --- Configuration: Set Deployed Contract Addresses --- >>>
-    address constant LENDING_PROTOCOL_ADDRESS = 0x6B2C23cf212011beBF015FDF05E0E5414754701c; // <--- REPLACE THIS!
-    address constant REAL_ESTATE_ADDRESS = 0xD95d1FF6618AEE41e431C6A2cfa3D5e8ff3d5f33; // <--- REPLACE (Needed for property context)
+    address constant LENDING_PROTOCOL_ADDRESS = vm.envAddress("LENDING_PROTOCOL_ADDRESS");
+    address constant REAL_ESTATE_ADDRESS = vm.envAddress("REAL_ESTATE_ADDRESS");
 
-    // Get instance of the LendingProtocol contract
     LendingProtocol public lendingProtocol = LendingProtocol(payable(LENDING_PROTOCOL_ADDRESS));
-    // Get instance of the RealEstateERC721 contract (needed for property info sometimes)
     RealEstateERC721 public propertyToken = RealEstateERC721(REAL_ESTATE_ADDRESS);
 
 
-    // --- Main Execution Function ---
     function run() external {
-        // Load required environment variables
         address callerAddress = vm.envAddress("MY_ADDRESS");
         require(callerAddress != address(0), "MY_ADDRESS env var not set.");
         string memory pk = vm.envString("MY_PK");
@@ -34,55 +28,52 @@ contract InteractLendingProtocol is Script {
         string memory rpcUrl = vm.envString("RPC_URL");
         require(bytes(rpcUrl).length > 0, "RPC_URL env var not set.");
 
-        // Optional environment variables for specific actions
-        uint256 targetLoanId = vm.envUint("LOAN_ID");       // e.g., export LOAN_ID=1
-        uint256 targetPropertyId = vm.envUint("PROPERTY_ID"); // e.g., export PROPERTY_ID=1
-        uint256 amount = vm.envUint("AMOUNT");             // Amount in WEI, e.g., export AMOUNT=1000000000000000000
+        uint256 targetLoanId = vm.envUint("LOAN_ID");
+        uint256 targetPropertyId = vm.envUint("PROPERTY_ID");
+        uint256 amount = vm.envUint("AMOUNT");
 
         console.log("--- Script Start ---");
         console.log("Target Lending Contract:", LENDING_PROTOCOL_ADDRESS);
         console.log("Caller Address:", callerAddress);
 
-        // --- Choose Actions ---
-        // Uncomment and modify the functions you want to execute below.
+        // --- Action ---
 
         // == Read Operations ==
         getContractInfo();
         if (targetLoanId > 2) { getLoanInfo(targetLoanId); }
         if (targetPropertyId > 2) { getPropertyLoanInfo(targetPropertyId); }
-        isLoanOfficerCheck(callerAddress); // Check if caller is officer
+        isLoanOfficerCheck(callerAddress);
 
 
         // == Write Operations ==
-        // ** Uncomment the entire block below to execute state-changing transactions. **
         vm.startBroadcast();
 
-        // --- Admin Actions (Requires MY_PK to be owner) ---
-        //addLoanOfficer(0x8155c2F6F4F40340eD085a6cBCB3d5C7DEE0DfA5);
+        // --- Admin Actions ---
+        addLoanOfficer(0x8155c2F6F4F40340eD085a6cBCB3d5C7DEE0DfA5);
         updateFeeCollector(0x8155c2F6F4F40340eD085a6cBCB3d5C7DEE0DfA5);
 
-        // --- Loan Officer Actions (Requires MY_PK to be an officer) ---
+        // --- Loan Officer Actions ---
         if (targetLoanId > 2) {
             approveLoan(targetLoanId);
-            fundLoan(targetLoanId); // This requires msg.value, see helper function notes
+            fundLoan(targetLoanId);
             markAsDefaulted(targetLoanId);
-            startAuction(targetLoanId, 7 days); // 7 days duration example
+            startAuction(targetLoanId, 7 days);
             finalizeAuction(targetLoanId);
         }
 
 
-        // --- Borrower Actions (Requires MY_PK to be borrower/property owner) ---
+        // --- Borrower Actions ---
         if (targetPropertyId > 2 && amount > 2) {
-           requestLoan(targetPropertyId, amount, 500, 30 days); // 5% rate, 30 day term example
+           requestLoan(targetPropertyId, amount, 500, 30 days);
         }
         if (targetLoanId > 2) {
-            makeRepayment(targetLoanId); // Requires msg.value, see helper notes
+            makeRepayment(targetLoanId);
         }
 
 
         // --- General User Actions ---
         if (targetLoanId > 2) {
-            placeBid(targetLoanId); // Requires msg.value, see helper notes
+            placeBid(targetLoanId);
         }
 
         vm.stopBroadcast();
@@ -122,7 +113,6 @@ contract InteractLendingProtocol is Script {
        // Also get payments
        try lendingProtocol.getLoanPayments(loanId) returns (LendingProtocol.Payment[] memory payments) {
             console.log("  Payment Count:", payments.length);
-            // Log details of last few payments if needed
        } catch { console.log(" Error retrieving loan payments."); }
     }
 
@@ -131,7 +121,6 @@ contract InteractLendingProtocol is Script {
         console.log("Active Loan ID for Property", propertyId, ":", activeLoanId);
         if (activeLoanId > 0) {
             getLoanInfo(activeLoanId);
-            // Check for auction too
             try lendingProtocol.getAuction(activeLoanId) returns (LendingProtocol.Auction memory auction) {
                 if (auction.startTime > 0) {
                     console.log("  --- Auction Info ---");
@@ -192,13 +181,11 @@ contract InteractLendingProtocol is Script {
 
     // = Borrower / User =
     function requestLoan(uint256 propertyId, uint256 loanAmount, uint256 interestRateBps, uint256 termSeconds) internal {
-         // Optional: Check property owner matches callerAddress before sending
         // require(propertyToken.ownerOf(propertyId) == vm.envAddress("MY_ADDRESS"), "Caller does not own property");
         console.log("Sending requestLoan tx for property ID:", propertyId);
         lendingProtocol.requestLoan(propertyId, loanAmount, interestRateBps, termSeconds);
     }
     function makeRepayment(uint256 loanId) internal {
-        // IMPORTANT: Requires value to be sent!
         // Determine repayment amount (e.g., full payoff or partial). Use vm.envUint("AMOUNT").
         // Call directly within broadcast: lendingProtocol.makeRepayment{value: repaymentAmount}(loanId);
         uint256 repaymentAmount = vm.envUint("AMOUNT");
@@ -207,12 +194,10 @@ contract InteractLendingProtocol is Script {
         lendingProtocol.makeRepayment{value: repaymentAmount}(loanId);
     }
     function placeBid(uint256 loanId) internal {
-        // IMPORTANT: Requires value (bid amount) to be sent! Use vm.envUint("AMOUNT").
         uint256 bidAmount = vm.envUint("AMOUNT");
         require(bidAmount > 0, "Bid amount (AMOUNT env var) not set or zero.");
-         // Optional: Check auction exists and bid is high enough before sending
         console.log("Sending placeBid tx for loan auction ID:", loanId, "Value:", bidAmount);
         lendingProtocol.placeBid{value: bidAmount}(loanId);
     }
 
-} // End of contract InteractLendingProtocol
+}

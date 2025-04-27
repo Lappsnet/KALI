@@ -6,6 +6,7 @@ import { Building, Globe, TrendingUp, Shield, Zap, ChevronRight, Key } from "luc
 import EcosystemDiagram from '../EcosystemDiagram';
 import '../../styles/EcosystemDiagram.css';
 import { useNavigate } from 'react-router-dom';
+import ChatAgent from '../ChatAgent';
 
 export const Launch: React.FC = () => {
   const { isConnected } = useAppKitAccount();
@@ -88,7 +89,7 @@ export const Launch: React.FC = () => {
                 onClick={() => navigate('/learn')}
                 className="cta-button secondary"
               >
-                GitHub
+                GitHub Repo
                 <ChevronRight className="button-icon" />
               </button>
             </div>
@@ -120,6 +121,9 @@ export const Launch: React.FC = () => {
           </div>
         </div>
       </div>
+      <ChatAgent />
     </div>
   );
 };
+
+export default Launch;

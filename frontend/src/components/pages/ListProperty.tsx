@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAppKitAccount } from '@reown/appkit/react';
 import { useNavigate } from 'react-router-dom';
 import { useRealEstateContract } from '../hooks/useRealEstateContract';
@@ -35,6 +35,8 @@ export const ListProperty: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const propertyTypes = [
     { value: 'residential', label: 'Residential' },
@@ -71,7 +73,15 @@ export const ListProperty: React.FC = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setFormData(prev => ({ ...prev, images: e.target.files }));
+      
+      // Create preview URLs for selected images
+      const previewUrls = Array.from(e.target.files).map(file => URL.createObjectURL(file));
+      setPreviewImages(previewUrls);
     }
+  };
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -166,7 +176,7 @@ export const ListProperty: React.FC = () => {
 
   if (!isConnected) {
     return (
-      <div className="main-content with-sidebar">
+      <div className="main-content with-">
         <div className="content-wrapper">
           <div className="glass-card p-8 text-center">
             <h2 className="text-2xl font-semibold mb-4">Connect Wallet</h2>
@@ -181,13 +191,13 @@ export const ListProperty: React.FC = () => {
   }
 
   return (
-    <div className="main-content with-sidebar">
-      <div className="content-wrapper">
+    <div className="main-content with-siebar">
+      <div className="">
         <div className="glass-card p-8">
-          <h1 className="text-3xl font-bold mb-6 text-gradient">List Your Property</h1>
+          <h1 className="text-3xl font-bold mb-6 text-gradient">List Property</h1>
           
           {error && (
-            <div className="error-message mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-md text-red-500">
+            <div className="error-message mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-md text-red-500 animate-fade-in">
               {error}
             </div>
           )}
@@ -201,19 +211,19 @@ export const ListProperty: React.FC = () => {
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                className="futuristic-input"
+                className="futuristic-input transition-all duration-300 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
                 required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="description" className="form-label">Description</label>
+              <label htmlFor="description" className="form-label">Cadastral Details</label>
               <textarea
                 id="description"
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                className="futuristic-input min-h-[120px]"
+                className="futuristic-input min-h-[120px] transition-all duration-300 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
                 required
               />
             </div>
@@ -227,7 +237,7 @@ export const ListProperty: React.FC = () => {
                   name="location"
                   value={formData.location}
                   onChange={handleInputChange}
-                  className="futuristic-input"
+                  className="futuristic-input transition-all duration-300 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
                   required
                 />
               </div>
@@ -240,7 +250,7 @@ export const ListProperty: React.FC = () => {
                   name="price"
                   value={formData.price}
                   onChange={handleInputChange}
-                  className="futuristic-input"
+                  className="futuristic-input transition-all duration-300 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
                   required
                 />
               </div>
@@ -254,7 +264,7 @@ export const ListProperty: React.FC = () => {
                   name="propertyType"
                   value={formData.propertyType}
                   onChange={handleInputChange}
-                  className="futuristic-input"
+                  className="futuristic-input transition-all duration-300 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
                   required
                 >
                   {propertyTypes.map(type => (
@@ -273,7 +283,7 @@ export const ListProperty: React.FC = () => {
                   name="bedrooms"
                   value={formData.bedrooms}
                   onChange={handleInputChange}
-                  className="futuristic-input"
+                  className="futuristic-input transition-all duration-300 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
                   min="0"
                 />
               </div>
@@ -286,7 +296,7 @@ export const ListProperty: React.FC = () => {
                   name="bathrooms"
                   value={formData.bathrooms}
                   onChange={handleInputChange}
-                  className="futuristic-input"
+                  className="futuristic-input transition-all duration-300 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
                   min="0"
                 />
               </div>
@@ -299,7 +309,7 @@ export const ListProperty: React.FC = () => {
                   name="area"
                   value={formData.area}
                   onChange={handleInputChange}
-                  className="futuristic-input"
+                  className="futuristic-input transition-all duration-300 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
                   min="0"
                   required
                 />
@@ -310,14 +320,14 @@ export const ListProperty: React.FC = () => {
               <label className="form-label">Amenities</label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {amenitiesList.map(amenity => (
-                  <label key={amenity} className="flex items-center space-x-2 cursor-pointer">
+                  <label key={amenity} className="flex items-center space-x-2 cursor-pointer group">
                     <input
                       type="checkbox"
                       checked={formData.amenities.includes(amenity)}
                       onChange={() => handleAmenityToggle(amenity)}
-                      className="form-checkbox"
+                      className="form-checkbox transition-all duration-300 group-hover:border-primary"
                     />
-                    <span>{amenity}</span>
+                    <span className="group-hover:text-primary transition-colors duration-300">{amenity}</span>
                   </label>
                 ))}
               </div>
@@ -325,22 +335,54 @@ export const ListProperty: React.FC = () => {
 
             <div className="form-group">
               <label htmlFor="images" className="form-label">Property Images</label>
-              <input
-                type="file"
-                id="images"
-                name="images"
-                onChange={handleImageChange}
-                className="futuristic-input"
-                accept="image/*"
-                multiple
-                required
-              />
+              <div className="relative">
+                <div 
+                  className="image-upload-container cursor-pointer transition-all duration-300 hover:border-primary"
+                  onClick={handleImageClick}
+                >
+                  {previewImages.length > 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
+                      {previewImages.map((url, index) => (
+                        <div key={index} className="relative group">
+                          <img 
+                            src={url} 
+                            alt={`Preview ${index + 1}`}
+                            className="w-full h-32 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
+                            <span className="text-white text-sm">Click to change</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="upload-placeholder">
+                      <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-primary">Click to upload images</span>
+                      <span className="text-sm text-secondary">or drag and drop</span>
+                    </div>
+                  )}
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  id="images"
+                  name="images"
+                  onChange={handleImageChange}
+                  className="hidden"
+                  accept="image/*"
+                  multiple
+                  required
+                />
+              </div>
             </div>
 
             <div className="flex justify-end space-x-4">
               <button 
                 type="button" 
-                className="button button-secondary"
+                className="button button-secondary transition-all duration-300 hover:bg-secondary/20"
                 onClick={() => navigate('/marketplace')}
                 disabled={isLoading}
               >
@@ -348,10 +390,18 @@ export const ListProperty: React.FC = () => {
               </button>
               <button 
                 type="submit" 
-                className="button button-primary"
+                className="button button-primary transition-all duration-300 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isLoading}
               >
-                {isLoading ? 'Listing Property...' : 'List Property'}
+                {isLoading ? (
+                  <span className="flex items-center space-x-2">
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span>Listing Property...</span>
+                  </span>
+                ) : 'List Property'}
               </button>
             </div>
           </form>

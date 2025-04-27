@@ -1,20 +1,19 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { useAppKitAccount } from "@reown/appkit/react"; // Use Appkit hook
-import { useRealEstateContract, type PropertyDetails } from "./hooks/useRealEstateContract"; // Adjust path
-import { PropertyCard } from "./PropertyCard"; // Assuming PropertyCard is updated/adapted
-import { Button } from "./common/Button"; // Assuming common components exist
-import { LoadingSpinner } from "./common/LoadingSpinner"; // Assuming common components exist
-import { ErrorMessage } from "./common/ErrorMessage"; // Assuming common components exist
-import { MintProperties } from "./pages/MintProperties"; // *** USE MintProperties INSTEAD ***
+import { useAppKitAccount } from "@reown/appkit/react";
+import { useRealEstateContract, type PropertyDetails } from "./hooks/useRealEstateContract";
+import { PropertyCard } from "./PropertyCard";
+import { Button } from "./common/Button";
+import { LoadingSpinner } from "./common/LoadingSpinner";
+import { ErrorMessage } from "./common/ErrorMessage";
+import { MintProperties } from "./pages/MintProperties";
 import { type Address } from "viem";
 
-// Define structure for properties state
 interface DisplayProperty {
   tokenId: bigint;
-  owner: Address | null; // Owner might fail to fetch temporarily
-  details: PropertyDetails | null; // Details might fail to fetch
+  owner: Address | null;
+  details: PropertyDetails | null;
 }
 
 export const PropertyList = () => {
@@ -23,17 +22,16 @@ export const PropertyList = () => {
     getAllTokenIds,
     getPropertyDetails,
     getOwnerOf,
-    isReading, // Use the specific reading state
-    error: hookError // Use the hook's error state
+    isReading,
+    error: hookError
   } = useRealEstateContract();
 
   const [properties, setProperties] = useState<DisplayProperty[]>([]);
   const [viewMode, setViewMode] = useState<"all" | "my">("all");
-  const [showCreateModal, setShowCreateModal] = useState(false); // Use modal state
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string>("");
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  // Callback function to fetch properties
   const fetchProperties = useCallback(async () => {
     if (!isConnected) {
         setProperties([]);
@@ -41,7 +39,7 @@ export const PropertyList = () => {
     }
     setLoadingMessage("Fetching token IDs...");
     setFetchError(null);
-    setProperties([]); // Clear previous properties
+    setProperties([]);
 
     const allIds = await getAllTokenIds();
     if (!allIds) {
@@ -59,7 +57,6 @@ export const PropertyList = () => {
     const propertiesData: DisplayProperty[] = [];
     let fetchedCount = 0;
 
-    // --- Inefficient Fetching - Recommend using an Indexer/Subgraph for production ---
     for (const tokenId of allIds) {
       try {
         const owner = await getOwnerOf(tokenId);
@@ -79,31 +76,26 @@ export const PropertyList = () => {
         }
       } catch (err) {
          console.error(`Failed to fetch data for token ${tokenId}:`, err);
-         // Optionally add placeholder for failed tokens
-         // propertiesData.push({ tokenId, owner: null, details: null });
          setFetchError(`Failed to load some property details. Please refresh. Error: ${err instanceof Error ? err.message : 'Unknown'}`);
       }
     }
-    // --- End Inefficient Fetching ---
 
     setProperties(propertiesData);
-    setLoadingMessage(""); // Clear loading message
+    setLoadingMessage("");
      if (propertiesData.length === 0 && allIds.length > 0) {
          setLoadingMessage(viewMode === 'my' ? "You don't own any properties." : "No properties match the filter.");
      }
 
-  }, [viewMode, getAllTokenIds, getPropertyDetails, getOwnerOf, address, isConnected, hookError]); // Added dependencies
+  }, [viewMode, getAllTokenIds, getPropertyDetails, getOwnerOf, address, isConnected, hookError]);
 
-  // Fetch properties when viewMode or address changes
   useEffect(() => {
     fetchProperties();
-  }, [fetchProperties]); // useEffect depends on the memoized fetchProperties
+  }, [fetchProperties]);
 
   const handleMintSuccess = () => {
     setShowCreateModal(false);
-    // Refresh the list after a short delay to allow blockchain update
     setLoadingMessage("Mint successful! Refreshing list...");
-    setTimeout(() => fetchProperties(), 2000); // Simple refresh, might need better strategy
+    setTimeout(() => fetchProperties(), 2000);
   };
 
   return (

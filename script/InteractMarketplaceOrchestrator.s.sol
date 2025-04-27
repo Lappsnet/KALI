@@ -2,31 +2,21 @@
 pragma solidity ^0.8.20;
 
 import {Script, console} from "forge-std/Script.sol";
-// Adjust import path if needed
 import {MarketplaceOrchestrator} from "../src/MarketplaceOrchestrator.sol";
-// Import interfaces or full contracts if needed for typecasting or direct calls (optional here)
 import {RealEstateERC721} from "../src/RealEstateERC721.sol";
 
 /**
  * @title InteractMarketplaceOrchestrator Script
  * @notice Interacts with a deployed MarketplaceOrchestrator contract.
- * @dev Required Env Vars: MY_PK, MY_ADDRESS, RPC_URL.
  * @dev Other env vars depend on action: PROPERTY_ID, SALE_PRICE, RENT_PRICE, TARGET_ADDRESS, DOC_URI etc.
- * @dev Run ONE action per execution with the correct PK/Role/Prerequisites.
  */
 contract InteractMarketplaceOrchestrator is Script {
 
-    // <<< --- Configuration: Set Deployed Contract Address --- >>>
-    // Replace with the actual deployed address of your MarketplaceOrchestrator
-    address constant ORCHESTRATOR_ADDRESS = 0xD2DD7e9d3aDF3D1AdFed1eA5A2771ECf507885e5; // <--- Verify/Replace if needed (Using address from previous context)
+    address constant ORCHESTRATOR_ADDRESS = 0xD2DD7e9d3aDF3D1AdFed1eA5A2771ECf507885e5;
 
-    // Get contract instance
-    // Note: Orchestrator itself doesn't seem payable, so no payable cast needed here.
     MarketplaceOrchestrator public orchestrator = MarketplaceOrchestrator(ORCHESTRATOR_ADDRESS);
 
-    // --- Main Execution Function ---
     function run() external {
-        // Load required environment variables
         address callerAddress = vm.envAddress("MY_ADDRESS");
         require(callerAddress != address(0), "MY_ADDRESS env var not set.");
         string memory pk = vm.envString("MY_PK");
@@ -34,7 +24,6 @@ contract InteractMarketplaceOrchestrator is Script {
         string memory rpcUrl = vm.envString("RPC_URL");
         require(bytes(rpcUrl).length > 0, "RPC_URL env var not set.");
 
-        // Optional environment variables for specific actions
         uint256 propertyId = vm.envUint("PROPERTY_ID");         // e.g., export PROPERTY_ID=5
         uint256 salePriceWei = vm.envUint("SALE_PRICE_WEI");   // e.g., export SALE_PRICE_WEI=2 ether
         uint256 rentPriceWei = vm.envUint("RENT_PRICE_WEI");   // e.g., export RENT_PRICE_WEI=500000000000000000 (0.5 ETH)
@@ -46,10 +35,9 @@ contract InteractMarketplaceOrchestrator is Script {
         console.log("Target Orchestrator Contract:"); console.logAddress(ORCHESTRATOR_ADDRESS);
         console.log("Executing as Address:"); console.logAddress(callerAddress);
 
-        // --- Choose ONE Action ---
-        // Uncomment the desired read or write action.
+        // ---Action ---
 
-        // == Read Operations Examples (No Broadcast Needed) ==
+        // == Read Operations ==
         //if (propertyId > 0) { getListingInfo(propertyId); }
         //getAllListings();
         //getSaleListings();
@@ -57,12 +45,10 @@ contract InteractMarketplaceOrchestrator is Script {
         //if (targetAddress != address(0)) { checkRole(targetAddress, orchestrator.OPERATOR_ROLE()); }
 
 
-        // == Write Operations Examples (Uncomment ONE action inside broadcast block) ==
-        // ** Uncomment this block ONLY if performing a write transaction **
+        // == Write Operations ==
         
-        vm.startBroadcast(); // Use PK matching the required role for the action below
+        vm.startBroadcast();
 
-        // --- CHOOSE ONE ACTION TO UNCOMMENT ---
 
         // --- Property Owner Actions (MY_PK = Owner of PROPERTY_ID) ---
         // List Property (Requires PROPERTY_ID, SALE_PRICE_WEI, RENT_PRICE_WEI env vars)
@@ -93,7 +79,7 @@ contract InteractMarketplaceOrchestrator is Script {
         }
 
 
-        // --- Admin Role Actions (MY_PK = DEFAULT_ADMIN_ROLE) ---
+        // --- Admin Role Actions ---
         if (targetAddress != address(0)) { exampleGrantOperatorRole(targetAddress); }
         if (targetAddress != address(0)) { exampleRevokeOperatorRole(targetAddress); }
 
@@ -104,7 +90,6 @@ contract InteractMarketplaceOrchestrator is Script {
         console.log("--- Script Finished ---");
     }
 
-    // --- Helper Functions ---
 
     // == Reads ==
     function getListingInfo(uint256 propertyId) public view {
@@ -163,8 +148,6 @@ contract InteractMarketplaceOrchestrator is Script {
     }
 
 
-    // == Writes ==
-
     // = Property Owner =
     function exampleListProperty(uint256 propertyId, bool forSale, bool forRent, uint256 salePrice, uint256 monthlyRent) internal {
         console.log("--> Sending listProperty tx for Property ID:"); console.logUint(propertyId);
@@ -190,17 +173,14 @@ contract InteractMarketplaceOrchestrator is Script {
 
     // = Initiating Actions on Other Contracts (Caller role varies) =
     function exampleInitiateSale(uint256 propertyId, string memory saleDocUri) internal {
-        // Caller should be Property Owner. NFT must be approved for Sale Contract.
         require(bytes(saleDocUri).length > 0, "Document URI needed.");
         console.log("--> Sending initiateSaleFromListing tx for Property ID:"); console.logUint(propertyId);
         console.log("    Document URI:", saleDocUri);
         orchestrator.initiateSaleFromListing(propertyId, saleDocUri);
         console.log("    initiateSaleFromListing transaction sent.");
-        // Note: Sale ID needs to be retrieved from event log emitted by Sale Contract.
     }
 
     function exampleInitiateRental(uint256 propertyId, address tenant, uint256 securityDeposit, uint256 durationMonths, string memory agreementUri) internal {
-        // Caller should be Tenant (paying deposit). Property must be approved for Rental Contract by Landlord.
         require(tenant != address(0), "Tenant address needed.");
         require(securityDeposit > 0, "Security deposit needed.");
         require(durationMonths > 0, "Duration needed.");
@@ -208,15 +188,13 @@ contract InteractMarketplaceOrchestrator is Script {
         console.log("--> Sending initiateRentalFromListing tx for Property ID:"); console.logUint(propertyId);
         console.log("    Tenant:"); console.logAddress(tenant);
         console.log("    Security Deposit (msg.value):"); console.logUint(securityDeposit);
-        // Sends the security deposit with the call
         orchestrator.initiateRentalFromListing{value: securityDeposit}(
             propertyId, tenant, securityDeposit, durationMonths, agreementUri
         );
         console.log("    initiateRentalFromListing transaction sent.");
-         // Note: Rental ID needs to be retrieved from event log emitted by Rental Contract.
     }
 
-    // = Admin Role (DEFAULT_ADMIN_ROLE) =
+    // = Admin Role =
     function exampleGrantOperatorRole(address operator) internal {
         console.log("--> Sending grantRole(OPERATOR_ROLE) tx for:"); console.logAddress(operator);
         orchestrator.grantRole(orchestrator.OPERATOR_ROLE(), operator);

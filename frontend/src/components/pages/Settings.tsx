@@ -1,88 +1,111 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppKitAccount } from '@reown/appkit/react';
-import { Sun, Moon, User, Bell, Shield, LogOut } from "lucide-react"
-import { ActionButton } from "../ActionButton"
+import { useLendingProtocolContract } from '../hooks/useLendingProtocolContract';
+import { 
+  Shield, 
+  Loader, 
+  AlertTriangle, 
+  CheckCircle,
+  Bell,
+  Mail,
+  Lock,
+  Globe,
+  Eye,
+  EyeOff,
+  Save,
+  XCircle
+} from 'lucide-react';
+import './Settings.css';
 
-interface UserSettings {
-  notifications: {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-  };
-  preferences: {
-    language: string;
-    currency: string;
-    theme: string;
-  };
-  privacy: {
-    showProfile: boolean;
-    showActivity: boolean;
-    showHoldings: boolean;
-  };
+interface NotificationSettings {
+  email: boolean;
+  push: boolean;
+  sms: boolean;
+}
+
+interface SecuritySettings {
+  twoFactor: boolean;
+  biometric: boolean;
+  autoLock: boolean;
+}
+
+interface PrivacySettings {
+  profileVisibility: 'public' | 'private';
+  showEmail: boolean;
+  showPhone: boolean;
 }
 
 export const Settings: React.FC = () => {
-  const { isConnected } = useAppKitAccount();
-  const [settings, setSettings] = useState<UserSettings>({
-    notifications: {
-      email: true,
-      push: true,
-      sms: false,
-    },
-    preferences: {
-      language: 'en',
-      currency: 'USD',
-      theme: 'dark',
-    },
-    privacy: {
-      showProfile: true,
-      showActivity: true,
-      showHoldings: false,
-    },
+  const { address, isConnected } = useAppKitAccount();
+  const { contractAddress, isLoading: isLoadingContract } = useLendingProtocolContract();
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [updateStatus, setUpdateStatus] = useState<'idle' | 'updating' | 'success' | 'error'>('idle');
+
+  const [notifications, setNotifications] = useState<NotificationSettings>({
+    email: true,
+    push: true,
+    sms: false
   });
 
-  const handleNotificationChange = (type: keyof UserSettings['notifications']) => {
-    setSettings(prev => ({
-      ...prev,
-      notifications: {
-        ...prev.notifications,
-        [type]: !prev.notifications[type],
-      },
-    }));
-  };
+  const [security, setSecurity] = useState<SecuritySettings>({
+    twoFactor: false,
+    biometric: true,
+    autoLock: true
+  });
 
-  const handlePreferenceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setSettings(prev => ({
-      ...prev,
-      preferences: {
-        ...prev.preferences,
-        [name]: value,
-      },
-    }));
-  };
+  const [privacy, setPrivacy] = useState<PrivacySettings>({
+    profileVisibility: 'public',
+    showEmail: false,
+    showPhone: false
+  });
 
-  const handlePrivacyChange = (type: keyof UserSettings['privacy']) => {
-    setSettings(prev => ({
-      ...prev,
-      privacy: {
-        ...prev.privacy,
-        [type]: !prev.privacy[type],
-      },
-    }));
+  useEffect(() => {
+    const fetchSettings = async () => {
+      if (!isConnected || !address || !contractAddress) return;
+
+      setLoading(true);
+      try {
+        // TODO: Replace with actual contract calls
+        // const settings = await contract.getUserSettings(address);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching settings:', err);
+        setError('Failed to fetch settings');
+        setLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, [isConnected, address, contractAddress]);
+
+  const handleSave = async () => {
+    if (!contractAddress || !address) return;
+
+    setUpdateStatus('updating');
+    try {
+      // TODO: Replace with actual contract call
+      // await contract.updateUserSettings(address, { notifications, security, privacy });
+      setUpdateStatus('success');
+      setTimeout(() => setUpdateStatus('idle'), 3000);
+    } catch (err) {
+      console.error('Error updating settings:', err);
+      setUpdateStatus('error');
+      setTimeout(() => setUpdateStatus('idle'), 3000);
+    }
   };
 
   if (!isConnected) {
     return (
-      <div className="main-content with-sidebar">
-        <div className="content-wrapper">
-          <div className="glass-card p-8 text-center">
-            <h2 className="text-2xl font-semibold mb-4">Connect Wallet</h2>
-            <p className="text-secondary mb-4">
-              Please connect your wallet to access settings.
-            </p>
+      <div className="page-container">
+        <div className="main-content">
+          <div className="connect-prompt">
+            <Shield size={48} className="icon" />
+            <h2>Connect Your Wallet</h2>
+            <p>Please connect your wallet to access settings</p>
             <appkit-button />
           </div>
         </div>
@@ -90,142 +113,247 @@ export const Settings: React.FC = () => {
     );
   }
 
+  if (loading || isLoadingContract) {
+    return (
+      <div className="page-container">
+        <div className="main-content">
+          <div className="loading-container">
+            <Loader className="animate-spin" size={32} />
+            <p>Loading settings...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-container">
+        <div className="main-content">
+          <div className="error-container">
+            <AlertTriangle size={32} />
+            <p>{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="main-content with-sidebar">
-      <div className="content-wrapper">
-        <div className="glass-card p-8">
-          <h1 className="text-3xl font-bold mb-6 text-gradient">Settings</h1>
+    <div className="page-container">
+      <div className="main-content">
+        <div className="page-header">
+          <h1>Settings</h1>
+          <p>Manage your account preferences and security settings</p>
+        </div>
 
-          <div className="space-y-8">
-            {/* Notifications Section */}
-            <section>
-              <h2 className="text-2xl font-semibold mb-4">Notifications</h2>
-              <div className="space-y-4">
-                <label className="flex items-center space-x-3">
+        <div className="settings-grid">
+          <div className="setting-card">
+            <div className="card-header">
+              <div className="card-icon">
+                <Bell size={24} />
+              </div>
+              <div className="card-title">
+                <h2>Notifications</h2>
+                <p>Manage how you receive updates and alerts</p>
+              </div>
+            </div>
+            <div className="setting-group">
+              <div className="setting-item">
+                <div className="setting-info">
+                  <div className="setting-label">Email Notifications</div>
+                  <div className="setting-description">Receive updates via email</div>
+                </div>
+                <label className="toggle-switch">
                   <input
                     type="checkbox"
-                    checked={settings.notifications.email}
-                    onChange={() => handleNotificationChange('email')}
-                    className="form-checkbox"
+                    checked={notifications.email}
+                    onChange={(e) => setNotifications({ ...notifications, email: e.target.checked })}
                   />
-                  <span>Email Notifications</span>
-                </label>
-                <label className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    checked={settings.notifications.push}
-                    onChange={() => handleNotificationChange('push')}
-                    className="form-checkbox"
-                  />
-                  <span>Push Notifications</span>
-                </label>
-                <label className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    checked={settings.notifications.sms}
-                    onChange={() => handleNotificationChange('sms')}
-                    className="form-checkbox"
-                  />
-                  <span>SMS Notifications</span>
+                  <span className="toggle-slider"></span>
                 </label>
               </div>
-            </section>
-
-            {/* Preferences Section */}
-            <section>
-              <h2 className="text-2xl font-semibold mb-4">Preferences</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="form-group">
-                  <label htmlFor="language" className="form-label">Language</label>
-                  <select
-                    id="language"
-                    name="language"
-                    value={settings.preferences.language}
-                    onChange={handlePreferenceChange}
-                    className="futuristic-input"
-                  >
-                    <option value="en">English</option>
-                    <option value="es">Spanish</option>
-                    <option value="fr">French</option>
-                  </select>
+              <div className="setting-item">
+                <div className="setting-info">
+                  <div className="setting-label">Push Notifications</div>
+                  <div className="setting-description">Receive browser notifications</div>
                 </div>
-
-                <div className="form-group">
-                  <label htmlFor="currency" className="form-label">Currency</label>
-                  <select
-                    id="currency"
-                    name="currency"
-                    value={settings.preferences.currency}
-                    onChange={handlePreferenceChange}
-                    className="futuristic-input"
-                  >
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                    <option value="GBP">GBP</option>
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="theme" className="form-label">Theme</label>
-                  <select
-                    id="theme"
-                    name="theme"
-                    value={settings.preferences.theme}
-                    onChange={handlePreferenceChange}
-                    className="futuristic-input"
-                  >
-                    <option value="dark">Dark</option>
-                    <option value="light">Light</option>
-                    <option value="system">System</option>
-                  </select>
-                </div>
-              </div>
-            </section>
-
-            {/* Privacy Section */}
-            <section>
-              <h2 className="text-2xl font-semibold mb-4">Privacy</h2>
-              <div className="space-y-4">
-                <label className="flex items-center space-x-3">
+                <label className="toggle-switch">
                   <input
                     type="checkbox"
-                    checked={settings.privacy.showProfile}
-                    onChange={() => handlePrivacyChange('showProfile')}
-                    className="form-checkbox"
+                    checked={notifications.push}
+                    onChange={(e) => setNotifications({ ...notifications, push: e.target.checked })}
                   />
-                  <span>Show Public Profile</span>
-                </label>
-                <label className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    checked={settings.privacy.showActivity}
-                    onChange={() => handlePrivacyChange('showActivity')}
-                    className="form-checkbox"
-                  />
-                  <span>Show Activity History</span>
-                </label>
-                <label className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    checked={settings.privacy.showHoldings}
-                    onChange={() => handlePrivacyChange('showHoldings')}
-                    className="form-checkbox"
-                  />
-                  <span>Show Token Holdings</span>
+                  <span className="toggle-slider"></span>
                 </label>
               </div>
-            </section>
+              <div className="setting-item">
+                <div className="setting-info">
+                  <div className="setting-label">SMS Notifications</div>
+                  <div className="setting-description">Receive text message alerts</div>
+                </div>
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={notifications.sms}
+                    onChange={(e) => setNotifications({ ...notifications, sms: e.target.checked })}
+                  />
+                  <span className="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
 
-            <div className="flex justify-end space-x-4">
-              <button type="button" className="button button-secondary">
-                Cancel
-              </button>
-              <button type="submit" className="button button-primary">
-                Save Changes
-              </button>
+          <div className="setting-card">
+            <div className="card-header">
+              <div className="card-icon">
+                <Lock size={24} />
+              </div>
+              <div className="card-title">
+                <h2>Security</h2>
+                <p>Manage your account security settings</p>
+              </div>
+            </div>
+            <div className="setting-group">
+              <div className="setting-item">
+                <div className="setting-info">
+                  <div className="setting-label">Two-Factor Authentication</div>
+                  <div className="setting-description">Add an extra layer of security</div>
+                </div>
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={security.twoFactor}
+                    onChange={(e) => setSecurity({ ...security, twoFactor: e.target.checked })}
+                  />
+                  <span className="toggle-slider"></span>
+                </label>
+              </div>
+              <div className="setting-item">
+                <div className="setting-info">
+                  <div className="setting-label">Biometric Authentication</div>
+                  <div className="setting-description">Use fingerprint or face ID</div>
+                </div>
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={security.biometric}
+                    onChange={(e) => setSecurity({ ...security, biometric: e.target.checked })}
+                  />
+                  <span className="toggle-slider"></span>
+                </label>
+              </div>
+              <div className="setting-item">
+                <div className="setting-info">
+                  <div className="setting-label">Auto-Lock</div>
+                  <div className="setting-description">Lock after inactivity</div>
+                </div>
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={security.autoLock}
+                    onChange={(e) => setSecurity({ ...security, autoLock: e.target.checked })}
+                  />
+                  <span className="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="setting-card">
+            <div className="card-header">
+              <div className="card-icon">
+                <Globe size={24} />
+              </div>
+              <div className="card-title">
+                <h2>Privacy</h2>
+                <p>Control your profile visibility</p>
+              </div>
+            </div>
+            <div className="setting-group">
+              <div className="setting-item">
+                <div className="setting-info">
+                  <div className="setting-label">Profile Visibility</div>
+                  <div className="setting-description">Make your profile public or private</div>
+                </div>
+                <select
+                  value={privacy.profileVisibility}
+                  onChange={(e) => setPrivacy({ ...privacy, profileVisibility: e.target.value as 'public' | 'private' })}
+                  className="toggle-switch"
+                >
+                  <option value="public">Public</option>
+                  <option value="private">Private</option>
+                </select>
+              </div>
+              <div className="setting-item">
+                <div className="setting-info">
+                  <div className="setting-label">Show Email</div>
+                  <div className="setting-description">Display your email on profile</div>
+                </div>
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={privacy.showEmail}
+                    onChange={(e) => setPrivacy({ ...privacy, showEmail: e.target.checked })}
+                  />
+                  <span className="toggle-slider"></span>
+                </label>
+              </div>
+              <div className="setting-item">
+                <div className="setting-info">
+                  <div className="setting-label">Show Phone</div>
+                  <div className="setting-description">Display your phone on profile</div>
+                </div>
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={privacy.showPhone}
+                    onChange={(e) => setPrivacy({ ...privacy, showPhone: e.target.checked })}
+                  />
+                  <span className="toggle-slider"></span>
+                </label>
+              </div>
             </div>
           </div>
         </div>
+
+        <div className="setting-card">
+          <div className="card-header">
+            <div className="card-icon">
+              <Save size={24} />
+            </div>
+            <div className="card-title">
+              <h2>Save Changes</h2>
+              <p>Apply your settings changes</p>
+            </div>
+          </div>
+          <div className="setting-group">
+            <button
+              className="setting-item"
+              onClick={handleSave}
+              disabled={updateStatus === 'updating'}
+            >
+              <div className="setting-info">
+                <div className="setting-label">Save All Settings</div>
+                <div className="setting-description">Apply all changes to your account</div>
+              </div>
+              <Save size={20} />
+            </button>
+          </div>
+        </div>
+
+        {updateStatus === 'success' && (
+          <div className="notification success">
+            <CheckCircle size={20} />
+            Settings updated successfully
+          </div>
+        )}
+        {updateStatus === 'error' && (
+          <div className="notification error">
+            <AlertTriangle size={20} />
+            Failed to update settings
+          </div>
+        )}
       </div>
     </div>
   );

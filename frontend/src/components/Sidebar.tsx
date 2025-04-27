@@ -16,7 +16,10 @@ import {
   BarChart,
   FileText,
   Users,
-  BookOpen
+  BookOpen,
+  DollarSign,
+  Percent,
+  History
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -30,31 +33,34 @@ export const Sidebar: React.FC = () => {
 
   const propertyItems = [
     { path: '/list-property', label: 'List Property', icon: <PlusSquare size={20} /> },
-    { path: '/my-properties', label: 'My Properties', icon: <Building size={20} /> },
+    { path: '/dashboard/properties', label: 'My Properties', icon: <Building size={20} /> },
+    { path: '/dashboard/sale-properties', label: 'Sale Properties', icon: <DollarSign size={20} /> },
   ];
 
   const financeItems = [
     { path: '/my-tokens', label: 'My Tokens', icon: <Coins size={20} /> },
-    { path: '/my-loans', label: 'My Loans', icon: <Wallet size={20} /> },
+    { path: '/loans', label: 'My Loans', icon: <Wallet size={20} /> },
+    { path: '/dashboard/request-loan', label: 'Request Loan', icon: <Wallet size={20} /> },
+    { path: '/token-market', label: 'Loans Market', icon: <BarChart size={20} /> },
+    { path: '/yield', label: 'Yield', icon: <Percent size={20} /> },
   ];
 
-  const notaryItems = [
-    { path: '/notary/dashboard', label: 'Notary Dashboard', icon: <FileText size={20} /> },
-    { path: '/notary/requests', label: 'Verification Requests', icon: <List size={20} /> },
-    { path: '/notary/documents', label: 'Documents', icon: <BookOpen size={20} /> },
+  const documentsItems = [
+    { path: '/dashboard/documents', label: 'Property Documents', icon: <FileText size={20} /> },
+    { path: '/dashboard/listings', label: 'Active Listings', icon: <List size={20} /> },
+    { path: '/dashboard/sales-history', label: 'Sale History', icon: <History size={20} /> },
   ];
 
   const adminItems = [
-    { path: '/admin/dashboard', label: 'Admin Panel', icon: <Shield size={20} /> },
-    { path: '/admin/users', label: 'User Management', icon: <Users size={20} /> },
-    { path: '/admin/properties', label: 'Property Management', icon: <Building size={20} /> },
+    { path: '/dashboard/notary', label: 'Notary Panel', icon: <Shield size={20} /> },
+    { path: '/dashboard/access', label: 'Access Control', icon: <Key size={20} /> },
+    { path: '/dashboard/users', label: 'User Registry', icon: <Users size={20} /> },
   ];
 
   const settingsItems = [
-    { path: '/wallet', label: 'Wallet', icon: <Wallet size={20} /> },
+    { path: '/dashboard/profile', label: 'Profile', icon: <User size={20} /> },
+    { path: '/dashboard/security', label: 'Security', icon: <Shield size={20} /> },
     { path: '/settings', label: 'Settings', icon: <Settings size={20} /> },
-    { path: '/security', label: 'Security', icon: <Shield size={20} /> },
-    { path: '/profile', label: 'Profile', icon: <User size={20} /> },
   ];
 
   const renderNavSection = (items: any[], title?: string) => (
@@ -84,7 +90,7 @@ export const Sidebar: React.FC = () => {
         {renderNavSection(mainNavItems)}
         {renderNavSection(propertyItems, 'Property Management')}
         {renderNavSection(financeItems, 'Finance')}
-        {renderNavSection(notaryItems, 'Notary Services')}
+        {renderNavSection(documentsItems, 'Documents')}
         {renderNavSection(adminItems, 'Administration')}
         {renderNavSection(settingsItems, 'Account')}
       </nav>

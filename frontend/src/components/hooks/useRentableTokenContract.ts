@@ -7,7 +7,6 @@ import { type UseReadContractReturnType } from 'wagmi';
 import { CONTRACT_ADDRESSES } from "../../config/index.ts";
 import RentableTokenABI from "../../components/abis/RentableToken.abi.json";
 
-// Define the StakingPosition struct type based on the ABI
 interface StakingPosition {
     amount: bigint;
     startTime: bigint;
@@ -38,9 +37,7 @@ export function useRentableTokenContract() {
     hash: writeTxHash,
   });
 
-  // --- View Functions (Read Operations) ---
 
-    // Get ADMIN_ROLE bytes32
     const getAdminRole = useCallback(async (): Promise<string | null> => {
         if (!contractAddress || !isConnected) return null;
         try {
@@ -51,7 +48,6 @@ export function useRentableTokenContract() {
         } catch (err) { console.error("Error getting ADMIN_ROLE:", err); setError("Failed to get ADMIN_ROLE"); return null; } finally { setIsLoading(false); }
     }, [contractAddress, isConnected]);
 
-    // Get DEFAULT_ADMIN_ROLE bytes32
     const getDefaultAdminRole = useCallback(async (): Promise<string | null> => {
         if (!contractAddress || !isConnected) return null;
         try {
@@ -62,7 +58,6 @@ export function useRentableTokenContract() {
         } catch (err) { console.error("Error getting DEFAULT_ADMIN_ROLE:", err); setError("Failed to get DEFAULT_ADMIN_ROLE"); return null; } finally { setIsLoading(false); }
     }, [contractAddress, isConnected]);
 
-    // Get EMERGENCY_ROLE bytes32
     const getEmergencyRole = useCallback(async (): Promise<string | null> => {
         if (!contractAddress || !isConnected) return null;
         try {
@@ -73,7 +68,6 @@ export function useRentableTokenContract() {
         } catch (err) { console.error("Error getting EMERGENCY_ROLE:", err); setError("Failed to get EMERGENCY_ROLE"); return null; } finally { setIsLoading(false); }
     }, [contractAddress, isConnected]);
 
-    // Get YIELD_MANAGER_ROLE bytes32
     const getYieldManagerRole = useCallback(async (): Promise<string | null> => {
         if (!contractAddress || !isConnected) return null;
         try {
@@ -84,7 +78,6 @@ export function useRentableTokenContract() {
         } catch (err) { console.error("Error getting YIELD_MANAGER_ROLE:", err); setError("Failed to get YIELD_MANAGER_ROLE"); return null; } finally { setIsLoading(false); }
     }, [contractAddress, isConnected]);
 
-    // Get allowance for spender
     const getAllowance = useCallback(async (owner: `0x${string}`, spender: `0x${string}`): Promise<bigint | null> => {
         if (!contractAddress || !isConnected) return null;
         try {
@@ -282,7 +275,6 @@ export function useRentableTokenContract() {
         } catch (err) { console.error("Error getting total supply:", err); setError("Failed to get total supply"); return null; } finally { setIsLoading(false); }
     }, [contractAddress, isConnected]);
 
-    // Get transfer limit exempt status for an account
     const isTransferLimitExempt = useCallback(async (account: `0x${string}`): Promise<boolean | null> => {
         if (!contractAddress || !isConnected) return null;
         try {
@@ -504,7 +496,6 @@ export function useRentableTokenContract() {
     }, [contractAddress, isConnected, writeContract]);
 
 
-  // --- Combined Loading/Status ---
   const overallLoading = isLoading || isWritePending || isWaitingForWriteReceipt;
   const overallSuccess = isWriteSuccess;
   const overallError = error;
@@ -518,7 +509,6 @@ export function useRentableTokenContract() {
     writeTxHash,
     writeReceipt,
 
-    // View Functions
     getAdminRole,
     getDefaultAdminRole,
     getEmergencyRole,

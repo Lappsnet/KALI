@@ -1,10 +1,8 @@
-/* Loans Container */
 .loans-container {
   display: grid;
   gap: 2rem;
 }
 
-/* Loan Card */
 .loan-card {
   background: var(--glass-bg);
   border-radius: 1rem;
@@ -32,7 +30,6 @@
   box-shadow: 0 0 20px rgba(0, 198, 255, 0.7);
 }
 
-/* Loan Header */
 .loan-header {
   display: flex;
   justify-content: space-between;
@@ -89,7 +86,6 @@
   box-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
 }
 
-/* Loan Details */
 .loan-details {
   display: grid;
   gap: 1.5rem;
@@ -141,7 +137,6 @@
   text-shadow: var(--text-glow);
 }
 
-/* Loan Progress */
 .loan-progress {
   margin-top: 1.5rem;
 }
@@ -168,7 +163,6 @@
   letter-spacing: 0.5px;
 }
 
-/* Loan Repayment */
 .loan-repayment {
   display: flex;
   justify-content: space-between;
@@ -197,7 +191,6 @@
   text-shadow: var(--text-glow);
 }
 
-/* Loan Alerts */
 .loan-alert,
 .loan-pending,
 .loan-approved,
@@ -243,14 +236,12 @@
   box-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
 }
 
-/* Loan Actions */
 .loan-actions {
   display: flex;
   justify-content: flex-end;
   margin-top: 1.5rem;
 }
 
-/* No Loans */
 .no-loans {
   text-align: center;
   padding: 4rem;
@@ -271,7 +262,6 @@
   letter-spacing: 0.5px;
 }
 
-/* Responsive Adjustments */
 @media (max-width: 768px) {
   .loan-info {
     grid-template-columns: 1fr;

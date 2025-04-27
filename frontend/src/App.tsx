@@ -12,7 +12,6 @@ import { Layout } from "./components/Layout";
 import { Dashboard } from "./components/pages/Dashboard";
 import { Marketplace } from "./components/pages/Marketplace";
 import { Launch } from "./components/pages/Launch";
-import { MintProperties } from "./components/pages/MintProperties";
 import { SaleProperties } from "./components/pages/SaleProperties";
 import { Settings } from "./components/pages/Settings";
 import { PropertyDetails } from "./components/pages/PropertyDetails";
@@ -35,7 +34,7 @@ import { Profile } from "./components/pages/Profile";
 import { ListProperty } from "./components/pages/ListProperty";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
-import "./styles/App.css"; // Adjust path if needed
+import "./styles/App.css";
 
 const queryClient = new QueryClient();
 
@@ -54,11 +53,6 @@ function AppContent() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/list-property" element={<ListProperty />} />
-          <Route path="/dashboard/mint-properties" element={
-            <ErrorBoundary>
-              <MintProperties />
-            </ErrorBoundary>
-          } />
           <Route path="/dashboard/sale-properties" element={<SaleProperties />} />
           <Route path="/dashboard/properties" element={<MyProperties />} />
           <Route path="/dashboard/documents" element={<PropertyDocuments />} />

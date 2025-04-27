@@ -32,7 +32,6 @@ export interface Sale {
   rentableTokenAmount: bigint
 }
 
-// Extended sale type with formatted values
 export interface SaleWithDetails extends Omit<Sale, "createdAt" | "updatedAt" | "completedAt"> {
   saleId: bigint
   formattedPrice: string
@@ -51,20 +50,16 @@ export function useRealEstateSaleContract() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Get contract address based on current chain
   const contractAddress = chainId
     ? CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES]?.realEstateSale
     : undefined
 
-  // Write contract hook
   const { writeContract, isPending, isSuccess, data: txHash } = useWriteContract()
 
-  // Wait for transaction receipt
   const { data: receipt, isLoading: isWaitingForReceipt } = useWaitForTransactionReceipt({
     hash: txHash,
   })
 
-  // Helper function to get status text
   const getStatusText = (status: number): string => {
     switch (status) {
       case 0:
@@ -84,7 +79,6 @@ export function useRealEstateSaleContract() {
     }
   }
 
-  // Get sale by ID
   const getSale = useCallback(
     async (saleId: bigint): Promise<SaleWithDetails | null> => {
       if (!contractAddress || !isConnected) return null
@@ -93,7 +87,6 @@ export function useRealEstateSaleContract() {
         setIsLoading(true)
         setError(null)
 
-        // Get sale details from contract
         const sale = (await readContract({
           address: contractAddress,
           abi: RealEstateSaleABI,
@@ -114,7 +107,6 @@ export function useRealEstateSaleContract() {
           rentableTokenAmount: bigint;
         }
 
-        // Get escrow balance
         const escrowBalance = await readContract({
           address: contractAddress,
           abi: RealEstateSaleABI,
@@ -122,7 +114,6 @@ export function useRealEstateSaleContract() {
           args: [saleId],
         })
 
-        // Fetch sale document if available
         let saleDocument = null
         if (sale.saleDocumentURI) {
           try {
@@ -131,7 +122,6 @@ export function useRealEstateSaleContract() {
             saleDocument = await response.json()
           } catch (err) {
             console.error("Error fetching sale document:", err)
-            // Use default document if fetch fails
             saleDocument = DEFAULT_SALE_DOCUMENT
           }
         }
@@ -167,7 +157,6 @@ export function useRealEstateSaleContract() {
     [contractAddress, isConnected],
   )
 
-  // Get active sale for a property
   const getActiveSaleForProperty = useCallback(
     async (propertyId: bigint): Promise<bigint | null> => {
       if (!contractAddress || !isConnected) return null
@@ -195,7 +184,6 @@ export function useRealEstateSaleContract() {
     [contractAddress, isConnected],
   )
 
-  // Create a new sale
   const createSale = useCallback(
     async (
       propertyId: bigint,
@@ -236,7 +224,6 @@ export function useRealEstateSaleContract() {
     [contractAddress, isConnected, address, writeContract],
   )
 
-  // Express interest in a property
   const expressInterest = useCallback(
     async (saleId: bigint) => {
       if (!contractAddress || !isConnected) {
@@ -423,7 +410,6 @@ export function useRealEstateSaleContract() {
     [contractAddress, isConnected, writeContract],
   )
 
-  // Update sale price
   const updateSalePrice = useCallback(
     async (saleId: bigint, newPrice: string) => {
       if (!contractAddress || !isConnected) {
@@ -454,7 +440,6 @@ export function useRealEstateSaleContract() {
     [contractAddress, isConnected, writeContract],
   )
 
-  // Helper function for read contract calls
   const readContract = useReadContract
 
   return {

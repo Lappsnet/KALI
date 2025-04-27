@@ -7,16 +7,11 @@ import {RealEstateERC721} from "../src/RealEstateERC721.sol";
 
 /**
  * @title InteractRentalAgreement Script
- * @notice Interacts with a deployed RentalAgreement contract.
- * @dev WARNING: Multiple write calls are uncommented below. This is for demonstration ONLY.
- * @dev Run ONE action per execution with the correct PK/Role/Prerequisites.
- * @dev Required Env Vars: MY_PK, MY_ADDRESS, RPC_URL. Others depend on uncommented action.
  */
 contract InteractRentalAgreement is Script {
 
-    // <<< --- Set Deployed Contract Addresses --- >>>
-    address constant RENTAL_AGREEMENT_ADDRESS = 0x60B5cC9C3A6bb42A293Cd445d67DE23CcdA442c3; // <--- Verify/Replace
-    address constant REAL_ESTATE_ADDRESS = 0xD95d1FF6618AEE41e431C6A2cfa3D5e8ff3d5f33; // <--- Verify/Replace
+    address constant RENTAL_AGREEMENT_ADDRESS = vm.envAddress("RENTAL_AGREEMENT_ADDRESS");
+    address constant REAL_ESTATE_ADDRESS = vm.envAddress("REAL_ESTATE_ADDRESS");
 
     RentalAgreement public rentalAgreement = RentalAgreement(payable(RENTAL_AGREEMENT_ADDRESS));
     RealEstateERC721 public propertyToken = RealEstateERC721(REAL_ESTATE_ADDRESS);
@@ -32,58 +27,49 @@ contract InteractRentalAgreement is Script {
         uint256 propertyId = vm.envUint("PROPERTY_ID");
         uint256 rentalId = vm.envUint("RENTAL_ID");
         address tenantAddress = vm.envAddress("TENANT_ADDRESS");
-        uint256 amountWei = vm.envUint("AMOUNT_WEI"); // Used only if payRent condition changes
+        uint256 amountWei = vm.envUint("AMOUNT_WEI");
 
         console.log("--- Script Start ---");
         console.log("Target Rental Contract:"); console.logAddress(RENTAL_AGREEMENT_ADDRESS);
         console.log("Executing as Address:"); console.logAddress(callerAddress);
 
-        // == Read Operations (Optional - Uncomment if needed) ==
+        // == Read Operations ==
         // if (rentalId > 0) { getRentalInfo(rentalId); }
         // checkRole(callerAddress, rentalAgreement.RENTAL_MANAGER_ROLE());
         // getPropertyTokenAddress();
 
         // == Write Operations ==
-        // WARNING: Running all these sequentially will likely fail due to role/dependency issues.
-        console.log("--- Broadcasting Transactions (Multiple Actions Uncommented - Likely to Fail!) ---");
-        vm.startBroadcast(); // Use PK matching the FIRST uncommented action's required role
+        console.log("--- Broadcasting Transactions ---");
+        vm.startBroadcast();
 
-        // --- Admin Actions (Requires OWNER PK) ---
-        grantManagerRole(0x251d8803f71a8402dD96893E0709588e99F6267c); // Example: Grant role
+        // --- Admin Actions ---
+        grantManagerRole(0x251d8803f71a8402dD96893E0709588e99F6267c);
 
-        // --- Landlord Actions (Requires LANDLORD PK for propertyId) ---
-        if (propertyId > 0) { approvePropertyForRental(propertyId); } // Must succeed before createRental
+        // --- Landlord Actions ---
+        if (propertyId > 0) { approvePropertyForRental(propertyId); }
 
-        // --- Manager/Landlord/Tenant Actions (Requires specific PKs/States) ---
-        // Create requires TENANT PK (usually), property approved, tenant funds >= 0.1 ETH + Gas
+        // --- Manager/Landlord/Tenant Actions ---
         if (propertyId > 0 && tenantAddress != address(0)) {
             createRentalExample(propertyId, tenantAddress);
         }
-        // Expire requires MANAGER PK, rental exists and time passed
         if (rentalId > 0) { expireRental(rentalId); }
-        // Terminate requires MANAGER PK, rental exists
         if (rentalId > 0) { terminateRental(rentalId, "Lease violation - Test"); }
-        // Return Deposit requires MANAGER PK, rental terminated/expired
+        if (rentalId > 0) { returnSecurityDepositExample(rentalId, 0); }
         if (rentalId > 0) { returnSecurityDepositExample(rentalId, 0); } // 0 deductions
 
-        // --- Tenant Actions (Requires TENANT PK for rentalId) ---
-        // Pay Rent requires TENANT PK, rental exists, tenant funds >= 0.1 ETH + Gas
-        if (rentalId > 0) { // Check only if rentalId is set
-             payRent(rentalId); // Uses hardcoded 0.1 ETH now
-        }
+        // --- Tenant Actions ---
+        if (rentalId > 0) { payRent(rentalId); }
 
         vm.stopBroadcast();
 
         console.log("--- Script Finished ---");
     }
 
-    // --- Helper Functions ---
-
     // == Reads ==
-    function getRentalInfo(uint256 rentalId) public view { /* ... as before ... */ }
-    function checkRentOverdue(uint256 rentalId) public view { /* ... as before ... */ }
-    function checkRole(address account, bytes32 role) public view { /* ... as before ... */ }
-    function getPropertyTokenAddress() public view { /* ... as before ... */ }
+    function getRentalInfo(uint256 rentalId) public view { }
+    function checkRentOverdue(uint256 rentalId) public view { }
+    function checkRole(address account, bytes32 role) public view { }
+    function getPropertyTokenAddress() public view { }
 
     // == Writes ==
     function grantManagerRole(address manager) internal {
@@ -101,7 +87,7 @@ contract InteractRentalAgreement is Script {
 
     function createRentalExample(uint256 propertyId, address tenant) internal {
          uint256 monthlyRentWei = 0.5 ether;
-         uint256 securityDepositWei = 0.1 ether; // Using 0.1 ETH deposit
+         uint256 securityDepositWei = 0.1 ether;
          uint256 durationMonths = 12;
          string memory agreementIpfsUri = "ipfs://bafkreierpf7nj3z6nyzk2ift5hsdppcxxdqbmzbhv2xjkagvkpibxp2yga";
 
@@ -136,15 +122,13 @@ contract InteractRentalAgreement is Script {
          console.log("    returnSecurityDeposit transaction sent.");
      }
 
-     function payRent(uint256 rentalId) internal { // Removed amount argument
-         // --- *** UPDATED RENT AMOUNT *** ---
-         uint256 rentAmountWei = 0.1 ether; // Hardcoded to 0.1 ETH
-         // --- *** END UPDATE *** ---
-         require(rentAmountWei > 0, "Rent amount must be positive."); // Keep check
+     function payRent(uint256 rentalId) internal {
+         uint256 rentAmountWei = 0.1 ether;
+         require(rentAmountWei > 0, "Rent amount must be positive.");
 
          console.log("--> Sending payRent tx for rental ID:"); console.logUint(rentalId);
-         console.log("    Amount (Wei):"); console.logUint(rentAmountWei); // Log the hardcoded amount
-         rentalAgreement.payRent{value: rentAmountWei}(rentalId); // Send the hardcoded amount
+         console.log("    Amount (Wei):"); console.logUint(rentAmountWei);
+         rentalAgreement.payRent{value: rentAmountWei}(rentalId);
          console.log("    payRent transaction sent.");
      }
 

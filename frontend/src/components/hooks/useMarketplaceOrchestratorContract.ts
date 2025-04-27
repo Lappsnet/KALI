@@ -25,9 +25,6 @@ export function useMarketplaceOrchestratorContract() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Get contract address based on current chain
-  // Ensure CONTRACT_ADDRESSES is correctly imported and structured
-  // Example: CONTRACT_ADDRESSES[chainId]?.marketplaceOrchestrator
   const contractAddress = chainId
     ? (CONTRACT_ADDRESSES as any)[chainId]?.marketplaceOrchestrator // Replace (CONTRACT_ADDRESSES as any)[chainId]?.marketplaceOrchestrator with your actual way to get the address
     : undefined;
@@ -47,8 +44,6 @@ export function useMarketplaceOrchestratorContract() {
   } = useWaitForTransactionReceipt({
     hash: writeTxHash,
   });
-
-  // --- View Functions (Read Operations) ---
 
     // Get DEFAULT_ADMIN_ROLE bytes32
     const getDefaultAdminRole = useCallback(async (): Promise<string | null> => {
@@ -91,7 +86,6 @@ export function useMarketplaceOrchestratorContract() {
           const result = await useReadContract({ address: contractAddress, abi: MarketplaceOrchestratorABI, functionName: "getListing", args: [propertyId] }) as UseReadContractReturnType<typeof MarketplaceOrchestratorABI, "getListing">;
           if (!result || !result.data) throw new Error("Failed to get listing");
 
-          // Cast the tuple result to the PropertyListing interface
           const listingData = result.data as unknown as PropertyListing;
 
           return listingData;
@@ -208,9 +202,6 @@ export function useMarketplaceOrchestratorContract() {
           return result.data as boolean;
         } catch (err) { console.error("Error checking supported interface:", err); setError("Failed to check supported interface"); return null; } finally { setIsLoading(false); }
     }, [contractAddress, isConnected]);
-
-
-  // --- Write Functions (Transaction Operations) ---
 
     // Grant a role
     const grantRole = useCallback(async (role: string, account: `0x${string}`) => {
@@ -350,7 +341,6 @@ export function useMarketplaceOrchestratorContract() {
     writeTxHash,
     writeReceipt,
 
-    // View Functions
     getDefaultAdminRole,
     getOperatorRole,
     getAllListedProperties,
@@ -366,7 +356,6 @@ export function useMarketplaceOrchestratorContract() {
     getSaleContractAddress,
     checkSupportsInterface,
 
-    // Write Functions
     grantRole,
     initiateRentalFromListing,
     initiateSaleFromListing,

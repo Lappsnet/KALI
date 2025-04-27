@@ -20,12 +20,10 @@ export function useFractionalOwnershipContract() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Get contract address based on current chain
   const contractAddress = chainId
     ? (CONTRACT_ADDRESSES as any)[chainId]?.fractionalOwnership
     : undefined;
 
-  // Write contract hook
   const {
     writeContract,
     isPending: isWritePending,
