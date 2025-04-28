@@ -91,7 +91,7 @@ export const UserRegistry = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>User Registry</h1>
+        <h1></h1>
         <p>Manage user profiles and information</p>
       </div>
 

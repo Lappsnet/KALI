@@ -189,14 +189,14 @@ export const NotaryPanel: React.FC = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Notary Panel</h1>
+        <h1></h1>
         <p>Verify and manage property documents</p>
       </div>
 
       <div className="stats-section">
         <div className="glass-card">
           <div className="section-header">
-            <h2>Verification Overview</h2>
+            <h2>Overview</h2>
             <BarChart2 className="section-icon" />
           </div>
           <div className="stats-grid">
@@ -295,7 +295,7 @@ export const NotaryPanel: React.FC = () => {
                   )}
                   {doc.transactionHash && (
                     <a
-                      href={`https://pharosscan.com/tx/${doc.transactionHash}`}
+                      href={`https://pharosscan.xyz/tx/${doc.transactionHash}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="transaction-link"

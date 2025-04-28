@@ -68,8 +68,6 @@ This project utilizes the **Foundry** framework.
     MY_PK=0xYourPrivateKeyForTestingRole # e.g., Owner, Seller, Buyer, Tenant...
     MY_ADDRESS=0xPublicKeyCorrespondingToPK
 
-    # Optional for contract verification
-    # ETHERSCAN_API_KEY=YourApiKey
 
     # --- Variables for Specific Interaction Scripts ---
     # PROPERTY_ID=5

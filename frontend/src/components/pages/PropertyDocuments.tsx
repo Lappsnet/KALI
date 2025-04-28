@@ -243,8 +243,8 @@ export const PropertyDocuments: React.FC = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Property Documents</h1>
-        <p>Manage and verify property documentation</p>
+        <h1></h1>
+        <p>Upload and verify property documents to ensure the authenticity of your property.</p>
       </div>
 
       <div className="documents-section">
@@ -289,7 +289,7 @@ export const PropertyDocuments: React.FC = () => {
               <div>
                 <p>Document uploaded successfully!</p>
                 <a
-                  href={`https://pharosscan.com/tx/${transactionHash}`}
+                  href={`https://pharosscan.xyz/tx/${transactionHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transaction-link"

@@ -76,8 +76,8 @@ export const PropertyMarketplace = () => {
   return (
     <div className="marketplace-container">
       <div className="marketplace-header">
-        <h1>RWA Marketplace</h1>
-        <p>Browse and manage your RWA listings</p>
+        <h1>Property Marketplace</h1>
+        <p>Browse and manage your property listings</p>
       </div>
 
       <div className="marketplace-actions">

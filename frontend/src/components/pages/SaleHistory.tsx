@@ -25,14 +25,13 @@ interface PriceTrend {
   price: number;
 }
 
-// Mock data for sales history
 const mockSales: Sale[] = [
   {
     id: '1',
     propertyId: 'prop5',
     seller: '0x1234...5678',
     buyer: '0x5678...1234',
-    price: '2500000000000000000000', // 2,500 ETH in wei
+    price: '2500000000000000000000',
     date: '2024-03-15',
     status: 'completed',
     transactionHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
@@ -42,7 +41,7 @@ const mockSales: Sale[] = [
     propertyId: 'prop5',
     seller: '0x5678...1234',
     buyer: '0x1234...5678',
-    price: '2000000000000000000000', // 2,000 ETH in wei
+    price: '2000000000000000000000',
     date: '2024-02-10',
     status: 'completed',
     transactionHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890'
@@ -52,7 +51,7 @@ const mockSales: Sale[] = [
     propertyId: 'prop5',
     seller: '0x1234...5678',
     buyer: '0x5678...1234',
-    price: '1800000000000000000000', // 1,800 ETH in wei
+    price: '1800000000000000000000',
     date: '2024-01-05',
     status: 'completed',
     transactionHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
@@ -62,7 +61,7 @@ const mockSales: Sale[] = [
     propertyId: 'prop5',
     seller: '0x5678...1234',
     buyer: '0x1234...5678',
-    price: '2200000000000000000000', // 2,200 ETH in wei
+    price: '2200000000000000000000',
     date: '2023-12-20',
     status: 'completed',
     transactionHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890'
@@ -72,7 +71,7 @@ const mockSales: Sale[] = [
     propertyId: 'prop5',
     seller: '0x1234...5678',
     buyer: '0x5678...1234',
-    price: '1900000000000000000000', // 1,900 ETH in wei
+    price: '1900000000000000000000',
     date: '2023-11-15',
     status: 'completed',
     transactionHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
@@ -160,7 +159,7 @@ export const SaleHistory: React.FC = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Sale History</h1>
+        <h1></h1>
         <p>Track property sales and transactions</p>
       </div>
 
@@ -219,7 +218,7 @@ export const SaleHistory: React.FC = () => {
 
         <div className="glass-card">
           <div className="section-header">
-            <h2>Sales Timeline</h2>
+            <h2>Sales History</h2>
             <History className="section-icon" />
           </div>
 
@@ -250,7 +249,7 @@ export const SaleHistory: React.FC = () => {
                     {sale.status}
                   </span>
                   <a
-                    href={`https://pharosscan.com/tx/${sale.transactionHash}`}
+                    href={`https://pharosscan.xyz/tx/${sale.transactionHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="transaction-link"

@@ -120,7 +120,7 @@ export const MyLoans = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>My Loans</h1>
+        <h1></h1>
         <p>Manage your property-backed loans</p>
       </div>
 

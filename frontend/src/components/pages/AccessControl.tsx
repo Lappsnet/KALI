@@ -81,7 +81,7 @@ export const AccessControl = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Access Control</h1>
+        <h1></h1>
         <p>Manage user roles and permissions</p>
       </div>
 

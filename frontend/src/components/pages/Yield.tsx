@@ -225,7 +225,7 @@ export const Yield: React.FC = () => {
               <div>
                 <p>Yield claimed successfully!</p>
                 <a
-                  href={`https://etherscan.io/tx/${transactionHash}`}
+                  href={`https://pharosscan.xyz/tx/${transactionHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transaction-link"
@@ -279,7 +279,7 @@ export const Yield: React.FC = () => {
                 </div>
                 {item.transactionHash && (
                   <a
-                    href={`https://etherscan.io/tx/${item.transactionHash}`}
+                    href={`https://pharosscan.xyz/tx/${item.transactionHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="history-link"

@@ -29,9 +29,9 @@ import {
 import './Settings.css';
 
 interface NotificationSettings {
-  email: boolean;
-  push: boolean;
-  sms: boolean;
+    email: boolean;
+    push: boolean;
+    sms: boolean;
   marketing: boolean;
   updates: boolean;
 }
@@ -48,8 +48,8 @@ interface PrivacySettings {
   profileVisibility: 'public' | 'private';
   showEmail: boolean;
   showPhone: boolean;
-  showActivity: boolean;
-  showHoldings: boolean;
+    showActivity: boolean;
+    showHoldings: boolean;
 }
 
 interface LanguagePreference {
@@ -59,10 +59,10 @@ interface LanguagePreference {
 }
 
 const mockSettings = {
-  notifications: {
-    email: true,
-    push: true,
-    sms: false,
+    notifications: {
+      email: true,
+      push: true,
+      sms: false,
     marketing: true,
     updates: true
   },
@@ -72,12 +72,12 @@ const mockSettings = {
     autoLock: true,
     sessionTimeout: 30,
     passwordExpiry: 90
-  },
-  privacy: {
+    },
+    privacy: {
     profileVisibility: 'public',
     showEmail: false,
     showPhone: false,
-    showActivity: true,
+      showActivity: true,
     showHoldings: false
   },
   language: {
@@ -180,7 +180,7 @@ export const Settings: React.FC = () => {
     <div className="page-container">
       <div className="main-content">
         <div className="page-header">
-          <h1>Settings</h1>
+          <h1></h1>
           <p>Manage your account preferences and security settings</p>
         </div>
 
@@ -313,16 +313,16 @@ export const Settings: React.FC = () => {
                   <div className="setting-label">Session Timeout</div>
                   <div className="setting-description">Minutes until auto-logout</div>
                 </div>
-                <select
+                  <select
                   value={security.sessionTimeout}
                   onChange={(e) => setSecurity({ ...security, sessionTimeout: Number(e.target.value) })}
                   className="toggle-switch"
-                >
+                  >
                   <option value="15">15 minutes</option>
                   <option value="30">30 minutes</option>
                   <option value="60">1 hour</option>
                   <option value="120">2 hours</option>
-                </select>
+                  </select>
               </div>
             </div>
           </div>

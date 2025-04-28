@@ -25,11 +25,11 @@ const mockProperty: PropertyDetails = {
   tokenId: "1",
   metadata: {
     name: "Modern Downtown Apartment",
-    image: "/suburban-house-exterior.png"
+    image: "/src/assets/images/apartment.png"
   },
-  cadastralNumber: "123456789",
-  location: "123 Main St, New York, NY",
-  valuation: "50000000000000000000" // 50 ETH in wei
+  cadastralNumber: "SL-123456789",
+  location: "South Street, San Salvador, El Salvador",
+  valuation: "30000000000000000000"
 };
 
 const LoanRequest: React.FC = () => {
@@ -129,7 +129,6 @@ const LoanRequest: React.FC = () => {
       if (result) {
         setTransactionStatus('success');
         setTransactionHash(result.toString());
-        // Reset form
         setLoanAmount('');
         setInterestRate('');
         setDurationMonths('');
@@ -179,7 +178,7 @@ const LoanRequest: React.FC = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Request Loan</h1>
+        <h1></h1>
         <p>Use your property as collateral to secure a loan</p>
       </div>
 
@@ -187,11 +186,11 @@ const LoanRequest: React.FC = () => {
         <div className="glass-card property-details">
           <div className="section-header">
             <Building size={24} />
-            <h3>Collateral Property</h3>
+            <h3>Collateral</h3>
           </div>
           <div className="property-info">
             <img
-              src={property.metadata?.image || "/suburban-house-exterior.png"}
+              src={property.metadata?.image || "/assets/images/apartment.png"}
               alt={property.metadata?.name || property.cadastralNumber}
               className="property-image"
             />
@@ -213,7 +212,7 @@ const LoanRequest: React.FC = () => {
         <div className="glass-card loan-form-container">
           <div className="section-header">
             <Calculator size={24} />
-            <h3>Loan Details</h3>
+            <h3>Details</h3>
           </div>
           <form onSubmit={handleSubmit} className="loan-form">
             <div className="form-group">
@@ -311,7 +310,7 @@ const LoanRequest: React.FC = () => {
                 <div>
                   <p>Loan request submitted successfully!</p>
                   <a
-                    href={`https://etherscan.io/tx/${transactionHash}`}
+                    href={`https://pharosscan.xyz/tx/${transactionHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="transaction-link"

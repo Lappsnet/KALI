@@ -185,7 +185,7 @@ export const Profile: React.FC = () => {
     <div className="page-container">
       <div className="main-content">
         <div className="page-header">
-          <h1>Profile</h1>
+          <h1></h1>
           <p>Manage your account and properties</p>
         </div>
 

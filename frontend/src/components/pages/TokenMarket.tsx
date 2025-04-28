@@ -134,7 +134,7 @@ export const TokenMarket = () => {
   return (
     <div className="token-market-container">
       <div className="market-header">
-        <h1>Token Market</h1>
+        <h1>DEFI Market</h1>
         <div className="search-filter">
           <div className="search-box">
             <Search size={20} />

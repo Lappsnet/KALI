@@ -11,9 +11,10 @@ export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navItems = [
-    { name: "Launch", path: "/launch" },
+    { name: "Home", path: "/" },
     { name: "Dashboard", path: "/dashboard" },
     { name: "Marketplace", path: "/marketplace" },
+    { name: "Pitch Deck", path: "https://kali-pitch-deck.netlify.app/" },
   ]
 
   const toggleMobileMenu = () => {

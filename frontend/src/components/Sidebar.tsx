@@ -26,7 +26,7 @@ export const Sidebar: React.FC = () => {
   const location = useLocation();
 
   const mainNavItems = [
-    { path: '/launch', label: 'Launch', icon: <Home size={20} /> },
+    { path: '/', label: 'Home', icon: <Home size={20} /> },
     { path: '/dashboard', label: 'Dashboard', icon: <BarChart size={20} /> },
     { path: '/marketplace', label: 'Marketplace', icon: <Building size={20} /> },
   ];
@@ -81,8 +81,6 @@ export const Sidebar: React.FC = () => {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <h1 className="sidebar-title">KALI</h1>
-        <p className="sidebar-subtitle">Decentralized Real Estate Platform</p>
       </div>
 
       <nav className="sidebar-nav">

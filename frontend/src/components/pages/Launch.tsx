@@ -86,7 +86,7 @@ export const Launch: React.FC = () => {
               </button>
               
               <button 
-                onClick={() => navigate('/learn')}
+                onClick={() => window.open('https://github.com/Lappsnet/KALI.git', '_blank')}
                 className="cta-button secondary"
               >
                 GitHub Repo

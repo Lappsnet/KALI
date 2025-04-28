@@ -87,7 +87,7 @@ export const SaleProperties = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Sale Properties</h1>
+        <h1></h1>
         <p>Manage your property listings</p>
       </div>
 
