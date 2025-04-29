@@ -1,8 +1,8 @@
 "use client"
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronDown, ChevronUp, DollarSign, Percent, Clock, Building, Users, Lock } from 'lucide-react'
+import { ChevronDown, ChevronUp, DollarSign, Percent, Clock, Building, Users } from 'lucide-react'
 import { formatEther } from 'viem'
 import '../styles/PropertyCard.css'
 

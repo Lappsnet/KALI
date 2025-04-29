@@ -1,13 +1,12 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
 import { useRealEstateContract } from '../hooks/useRealEstateContract'
 import { PropertyCard } from '../../components/PropertyCard'
 import { mockProperties } from '../../mocks/loanData'
-import { formatEther, parseEther } from 'viem'
-import { Search, Building, DollarSign } from 'lucide-react'
+import { formatEther } from 'viem'
+import { Search } from 'lucide-react'
 
 interface Property {
   tokenId: bigint
@@ -26,8 +25,7 @@ interface Property {
 }
 
 export const Marketplace = () => {
-  const navigate = useNavigate()
-  const { address, isConnected } = useAccount()
+  const { isConnected } = useAccount()
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -46,7 +44,7 @@ export const Marketplace = () => {
 
         if (isConnected) {
           try {
-            // Load properties from contract
+
             for (const mockProp of mockProperties) {
               const tokenId = BigInt(mockProp.tokenId)
               const propertyDetails = await getPropertyDetails(tokenId)
@@ -75,7 +73,6 @@ export const Marketplace = () => {
           }
         }
 
-        // If no properties loaded from contract, use mock data
         if (loadedProperties.length === 0) {
           loadedProperties = mockProperties.map(mockProp => ({
             tokenId: BigInt(mockProp.tokenId),
@@ -124,7 +121,6 @@ export const Marketplace = () => {
     return (
       <div className="loading-container">
         <div className="animate-spin">Loading...</div>
-        <p>Loading properties...</p>
       </div>
     )
   }

@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import ChatAgent from '../ChatAgent';
 
 export const Launch: React.FC = () => {
-  const { isConnected } = useAppKitAccount();
+  useAppKitAccount();
   const navigate = useNavigate();
 
   const features = [

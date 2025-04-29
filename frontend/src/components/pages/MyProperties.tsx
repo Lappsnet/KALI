@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useAppKitAccount } from "@reown/appkit/react"
-import { Building, DollarSign, MapPin, Calendar } from "lucide-react"
+import { DollarSign, MapPin, Calendar } from "lucide-react"
 import { useRealEstateContract } from "../hooks/useRealEstateContract"
 import { formatEther } from "viem"
 

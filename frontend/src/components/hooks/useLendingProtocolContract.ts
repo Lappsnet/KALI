@@ -121,17 +121,9 @@ type ContractLoanData = {
   liquidationThreshold: bigint;
 }
 
-type ContractPaymentData = {
-  loanId: bigint;
-  amount: bigint;
-  principalPortion: bigint;
-  interestPortion: bigint;
-  feePortion: bigint;
-  timestamp: bigint;
-}
 
 export function useLendingProtocolContract() {
-  const { address, isConnected } = useAppKitAccount()
+  const { isConnected } = useAppKitAccount()
   const { chainId } = useAppKitNetwork()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -467,9 +459,8 @@ export function useLendingProtocolContract() {
       loanAmount: string,
       interestRate: number,
       term: number,
-      onSuccess?: (loanId: bigint) => void,
     ) => {
-      if (!contractAddress || !isConnected || !address) {
+      if (!contractAddress || !isConnected) {
         setError("Wallet not connected")
         return null
       }
@@ -482,8 +473,7 @@ export function useLendingProtocolContract() {
           address: contractAddress,
           abi: LendingProtocolABI,
           functionName: "requestLoan",
-          args: [propertyId, parseEther(loanAmount), BigInt(interestRate), BigInt(term * 24 * 60 * 60)], // Convert term from days to seconds
-
+          args: [propertyId, parseEther(loanAmount), BigInt(interestRate), BigInt(term * 24 * 60 * 60)],
 
         })
 
@@ -496,7 +486,7 @@ export function useLendingProtocolContract() {
         setIsLoading(false)
       }
     },
-    [contractAddress, isConnected, address, writeContract],
+    [contractAddress, isConnected, writeContract],
   )
 
   // Approve a loan (as loan officer)
@@ -721,9 +711,6 @@ export function useLendingProtocolContract() {
     },
     [contractAddress, isConnected, writeContract],
   )
-
-  // Helper function for read contract calls
-  const readContract = useReadContract
 
   return {
     contractAddress,

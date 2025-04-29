@@ -7,7 +7,7 @@ import { Menu } from "lucide-react"
 
 export const Navbar = () => {
   const location = useLocation()
-  const { isConnected } = useAppKitAccount()
+  useAppKitAccount()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navItems = [

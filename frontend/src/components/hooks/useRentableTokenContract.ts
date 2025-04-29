@@ -16,7 +16,7 @@ interface StakingPosition {
 
 
 export function useRentableTokenContract() {
-  const { address, isConnected } = useAppKitAccount();
+  const { isConnected } = useAppKitAccount();
   const { chainId } = useAppKitNetwork();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

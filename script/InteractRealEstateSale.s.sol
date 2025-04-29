@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Script, console} from "forge-std/Script.sol";
 import {RealEstateSale} from "../src/RealEstateSale.sol";
 import {RealEstateERC721} from "../src/RealEstateERC721.sol";
 import {RentableToken} from "../src/RentableToken.sol";
@@ -90,7 +89,6 @@ contract InteractRealEstateSale is Script {
 
 
         vm.stopBroadcast();
-        */
 
         console.log("--- Script Finished ---");
     }

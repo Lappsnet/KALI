@@ -22,8 +22,6 @@ Our platform is built on a suite of specialized, interconnected smart contracts:
 6.  **`FractionalOwnership` (Investment Democratization):** Enables owners to divide high-value properties into smaller, tradable ERC20 shares (FRETs), lowering the barrier to real estate investment.
 7.  **`RentableToken` (Utility/Yield - Optional):** An ERC20 token designed for potential platform utility, yield distribution from rental income, or staking rewards within the KALI ecosystem.
 
-*(This modular design ensures flexibility, security, and upgradeability.)*
-
 ---
 
 ## Target Network: Pharos
@@ -53,11 +51,13 @@ This project utilizes the **Foundry** framework.
 
 * **Foundry:** Install via `curl -L https://foundry.paradigm.xyz | bash` then `foundryup`. (See [Foundry Book](https://book.getfoundry.sh/))
 * **Git:** To clone the repository.
-* **Wallet & Funds:** A wallet (like MetaMask) configured for the Pharos Network and funded with its native gas token (Pharos ETH). Use separate addresses/keys for testing different roles.
+* **Wallet & Funds:** A wallet (like MetaMask) configured for the Pharos Network and funded with its native gas token (Pharos Token).  
+
+**WARNING** Use separate addresses/keys for testing different roles.
 
 ### Configuration
 
-1.  **Clone:** `git clone <your-repository-url> && cd <your-repository-name>`
+1.  **Clone:** `git clone <https://github.com/Lappsnet/KALI.git> && cd <KALI>`
 2.  **Install Dependencies:** `forge install` (if applicable)
 3.  **Compile:** `forge build`
 4.  **Environment Variables:** Create/populate a `.env` file (add to `.gitignore`!) in the project root:
@@ -73,18 +73,18 @@ This project utilizes the **Foundry** framework.
     # PROPERTY_ID=5
     # SALE_ID=1
     # RENTAL_ID=1
-    # PRICE_WEI=1500000000000000000 # 1.5 ETH example
+    # PRICE_WEI=100000000000000000 # 0.001 ETH example
     # TENANT_ADDRESS=0x...
-    # AMOUNT_WEI=100000000000000000 # 0.1 ETH example
+    # AMOUNT_WEI=100000000000000000 # 0.O1 ETH example
     # ... (add others as defined in specific scripts)
     ```
     *Load variables:* `source .env` or export directly.
 
 ### Deployment
 
-* Use the deployment scripts in the `script/` directory (e.g., `DeployAll.s.sol`).
+* Use the deployment scripts in the `script/` directory (e.g., `DeployRealEstateER721.s.sol`).
 * Ensure `MY_PK` in `.env` is the desired **deployer/owner** key.
-* Run: `forge script script/YourDeployScript.s.sol:YourDeployScript --rpc-url $RPC_URL --private-key $MY_PK --broadcast [--verify]`
+* Run: `forge script script/DeployRealEstateER721.s.sol:DeployRealEstateER721 --rpc-url $RPC_URL --private-key $MY_PK --broadcast [--verify]`
 * Record the deployed contract addresses and update interaction scripts / frontend configs.
 
 ### Running Interaction Scripts

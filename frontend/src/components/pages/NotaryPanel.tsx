@@ -3,20 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppKitAccount } from '@reown/appkit/react';
 import { useLendingProtocolContract } from '../hooks/useLendingProtocolContract';
-import { formatEther } from 'viem';
-import { 
-  FileText, 
-  CheckCircle, 
-  XCircle, 
-  AlertTriangle, 
-  Loader, 
-  BarChart2, 
-  TrendingUp, 
-  Clock,
-  Shield,
-  FileCheck,
-  FileX
-} from 'lucide-react';
+import { FileText,CheckCircle,XCircle, AlertTriangle, Loader, BarChart2, Clock, Shield, FileCheck, FileX } from 'lucide-react';
 import './NotaryPanel.css';
 
 interface Document {
@@ -43,33 +30,33 @@ const mockDocuments: Document[] = [
     name: 'Property Title Deed',
     type: 'PDF',
     status: 'verified',
-    uploadDate: '2024-03-15',
+    uploadDate: '2025-04-15',
     owner: '0x1234...5678',
     transactionHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
   },
   {
     id: '2',
-    name: 'Property Survey',
+    name: 'Apartment Agreement',
     type: 'PDF',
     status: 'pending',
-    uploadDate: '2024-03-14',
+    uploadDate: '2025-04-14',
     owner: '0x5678...1234',
-    transactionHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890'
+    transactionHash: '0x600e0e63926c0c787560ac3bcaab358640630fc6e5ed86a56e769e0897d64122'
   },
   {
     id: '3',
     name: 'Tax Records',
     type: 'PDF',
     status: 'rejected',
-    uploadDate: '2024-03-13',
+    uploadDate: '2025-04-13',
     owner: '0x1234...5678',
-    transactionHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+    transactionHash: '0xbb32ec9eff2d875af2ae4e92156d78533f91b433b5f75ccf747f851ba3250e28'
   }
 ];
 
 export const NotaryPanel: React.FC = () => {
   const { address, isConnected } = useAppKitAccount();
-  const { contractAddress, isLoading: isLoadingContract, verifyDocument, rejectDocument } = useLendingProtocolContract();
+  const { contractAddress, isLoading: isLoadingContract } = useLendingProtocolContract();
 
   const [documents, setDocuments] = useState<Document[]>(mockDocuments);
   const [loading, setLoading] = useState(true);
@@ -110,12 +97,12 @@ export const NotaryPanel: React.FC = () => {
 
     setVerificationStatus('verifying');
     try {
-      const tx = await verifyDocument(documentId);
+      const tx = await (documentId);
       if (tx) {
         setDocuments(docs => 
           docs.map(doc => 
             doc.id === documentId 
-              ? { ...doc, status: 'verified', transactionHash: tx.hash } 
+              ? { ...doc, status: 'verified',} 
               : doc
           )
         );
@@ -133,12 +120,12 @@ export const NotaryPanel: React.FC = () => {
 
     setVerificationStatus('rejecting');
     try {
-      const tx = await rejectDocument(documentId);
+      const tx = await (documentId);
       if (tx) {
         setDocuments(docs => 
           docs.map(doc => 
             doc.id === documentId 
-              ? { ...doc, status: 'rejected', transactionHash: tx.hash } 
+              ? { ...doc, status: 'rejected'} 
               : doc
           )
         );

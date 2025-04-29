@@ -1,6 +1,5 @@
-import type { PropertyWithMetadata } from "../hooks/useRealEstateContract"
 
-export const mockProperties: PropertyWithMetadata[] = [
+export const mockProperties: any[] = [
   {
     tokenId: 1n,
     owner: "0x1234567890123456789012345678901234567890",

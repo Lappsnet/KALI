@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAppKitAccount } from '@reown/appkit/react';
 import { useRealEstateContract } from '../hooks/useRealEstateContract';
 import { useLendingProtocolContract } from '../hooks/useLendingProtocolContract';
-import { parseEther, formatEther } from 'viem';
+import { formatEther } from 'viem';
 import { ActionButton } from "../ActionButton";
-import { Calculator, DollarSign, Loader, Clock, Percent, AlertTriangle, CheckCircle, Home, Building, Info } from "lucide-react";
+import { Calculator, DollarSign, Loader, Clock, Percent, AlertTriangle, CheckCircle, Building, Info } from "lucide-react";
 import "./LoanRequest.css";
 
 interface PropertyDetails {
@@ -55,12 +55,10 @@ const LoanRequest: React.FC = () => {
     const rate = parseFloat(interestRate) / 100;
     const months = parseInt(durationMonths);
     
-    // Simple interest calculation
     const totalInterest = principal * rate * (months / 12);
     const totalPayment = principal + totalInterest;
     const monthlyPayment = totalPayment / months;
     
-    // LTV calculation
     const propertyValue = Number(formatEther(BigInt(property.valuation)));
     const ltv = (principal / propertyValue) * 100;
 
@@ -80,8 +78,7 @@ const LoanRequest: React.FC = () => {
 
       setIsLoading(true);
       try {
-        // TODO: Get property ID from route params or context
-        const propertyId = "1"; // Placeholder
+        const propertyId = "1";
         const propertyDetails = await getPropertyDetails(BigInt(propertyId));
         if (propertyDetails) {
           setProperty({
@@ -95,7 +92,6 @@ const LoanRequest: React.FC = () => {
       } catch (err) {
         console.error('Error fetching property details:', err);
         setError('Failed to fetch property details');
-        // Keep the mock property data if the API call fails
         setProperty(mockProperty);
       } finally {
         setIsLoading(false);

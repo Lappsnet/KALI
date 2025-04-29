@@ -19,7 +19,6 @@ import { Line, Doughnut } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
 import './Dashboard.css';
 
-// Register ChartJS components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -41,7 +40,7 @@ interface BalanceData {
 }
 
 export const Dashboard = () => {
-  const { address, isConnected } = useAppKitAccount()
+  const { isConnected } = useAppKitAccount()
   const { chainId } = useAppKitNetwork()
   const [localAddress, setLocalAddress] = useState<`0x${string}` | undefined>();
 
@@ -50,7 +49,6 @@ export const Dashboard = () => {
   })
 
   useEffect(() => {
-    // Simulating address fetch - replace with actual logic
     setLocalAddress('0x1234567890123456789012345678901234567890');
   }, []);
 

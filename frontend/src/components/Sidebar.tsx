@@ -16,7 +16,6 @@ import {
   BarChart,
   FileText,
   Users,
-  BookOpen,
   DollarSign,
   Percent,
   History

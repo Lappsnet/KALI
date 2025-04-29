@@ -8,24 +8,11 @@ import {
   Loader, 
   AlertTriangle, 
   CheckCircle,
-  Bell,
-  Mail,
-  Lock,
-  Globe,
-  Eye,
-  EyeOff,
   Save,
-  XCircle,
   Settings as SettingsIcon,
-  User,
-  Key,
   ShieldCheck,
-  Smartphone,
   Globe2,
-  MailCheck,
-  BellRing,
-  MessageSquare
-} from 'lucide-react';
+  BellRing} from 'lucide-react';
 import './Settings.css';
 
 interface NotificationSettings {
@@ -45,7 +32,7 @@ interface SecuritySettings {
 }
 
 interface PrivacySettings {
-  profileVisibility: 'public' | 'private';
+  profileVisibility: any;
   showEmail: boolean;
   showPhone: boolean;
     showActivity: boolean;

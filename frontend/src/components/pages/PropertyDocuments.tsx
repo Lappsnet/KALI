@@ -3,9 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAppKitAccount } from '@reown/appkit/react';
-import { useLendingProtocolContract } from '../hooks/useLendingProtocolContract';
 import { FileText, Upload, Download, AlertTriangle, CheckCircle, History, Clock } from 'lucide-react';
-import { formatEther } from 'viem';
 import { ActionButton } from '../ActionButton';
 import './PropertyDocuments.css';
 
@@ -49,7 +47,7 @@ const mockDocuments: Document[] = [
 **Security Deposit:** $5,000
 **Lease Term:** 12 months
 **Start Date:** April 1, 2024
-**End Date:** March 31, 2025
+**End Date:** April 1, 2025
 **Special Terms:** 
 - Pets allowed with $500 additional deposit
 - Tenant responsible for utilities
@@ -63,10 +61,10 @@ const mockDocuments: Document[] = [
     name: 'Property Title Deed',
     type: 'PDF',
     size: '2.5 MB',
-    uploadDate: '2024-03-10',
+    uploadDate: '2025-04-10',
     ipfsHash: 'QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco',
     status: 'verified',
-    transactionHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890'
+    transactionHash: '0xbb32ec9eff2d875af2ae4e92156d78533f91b433b5f75ccf747f851ba3250e28'
   },
   {
     id: '3',
@@ -85,7 +83,7 @@ const mockDocumentHistory: DocumentHistory[] = [
     id: '1',
     documentId: '1',
     action: 'upload',
-    date: '2024-03-15',
+    date: '2025-04-15',
     by: '0x1234...5678',
     transactionHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
   },
@@ -101,7 +99,7 @@ const mockDocumentHistory: DocumentHistory[] = [
     id: '3',
     documentId: '2',
     action: 'upload',
-    date: '2024-03-10',
+    date: '2024-04-20',
     by: '0x1234...5678'
   }
 ];
@@ -109,7 +107,6 @@ const mockDocumentHistory: DocumentHistory[] = [
 export const PropertyDocuments: React.FC = () => {
   const { propertyId } = useParams<{ propertyId: string }>();
   const { address, isConnected } = useAppKitAccount();
-  const { contract, isLoading: isLoadingContract } = useLendingProtocolContract();
 
   const [documents, setDocuments] = useState<Document[]>(mockDocuments);
   const [history, setHistory] = useState<DocumentHistory[]>(mockDocumentHistory);
@@ -120,7 +117,7 @@ export const PropertyDocuments: React.FC = () => {
 
   useEffect(() => {
     const fetchDocuments = async () => {
-      if (!isConnected || !address || !contract) return;
+      if (!isConnected || !address) return;
 
       try {
         // TODO: Replace with actual contract call
@@ -135,7 +132,7 @@ export const PropertyDocuments: React.FC = () => {
     };
 
     fetchDocuments();
-  }, [isConnected, address, contract, propertyId]);
+  }, [isConnected, address, propertyId]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -145,7 +142,7 @@ export const PropertyDocuments: React.FC = () => {
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || !isConnected || !address || !contract) return;
+    if (!selectedFile || !isConnected || !address) return;
 
     setUploadStatus('uploading');
     setError(null);
@@ -161,7 +158,7 @@ export const PropertyDocuments: React.FC = () => {
       
       // For now, simulate successful upload
       await new Promise(resolve => setTimeout(resolve, 2000));
-      const mockHash = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
+      const mockHash = '0xbb32ec9eff2d875af2ae4e92156d78533f91b433b5f75ccf747f851ba3250e28';
       
       // Add new document to state
       const newDocument: Document = {
@@ -197,7 +194,7 @@ export const PropertyDocuments: React.FC = () => {
     }
   };
 
-  const handleDownload = async (document: Document) => {
+  const handleDownload = async (document: any) => {
     try {
       if (document.name === 'Property Agreement - Prop5 Perez') {
         // Create a blob with the agreement content
@@ -211,7 +208,6 @@ export const PropertyDocuments: React.FC = () => {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
       } else {
-        // TODO: Implement IPFS download for other documents
         // const file = await downloadFromIPFS(document.ipfsHash);
         // const url = window.URL.createObjectURL(file);
         // const a = document.createElement('a');

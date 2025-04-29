@@ -2,7 +2,6 @@
 pragma solidity ^0.8.20;
 
 import {Script, console} from "forge-std/Script.sol";
-// Adjust import paths if needed
 import {LendingProtocol} from "../src/LendingProtocol.sol";
 import {RealEstateERC721} from "../src/RealEstateERC721.sol";
 
@@ -12,12 +11,18 @@ import {RealEstateERC721} from "../src/RealEstateERC721.sol";
  * @dev Other env vars may be needed depending on actions (e.g., LOAN_ID, PROPERTY_ID, AMOUNT).
  */
 contract InteractLendingProtocol is Script {
+    address immutable LENDING_PROTOCOL_ADDRESS;
+    address immutable REAL_ESTATE_ADDRESS;
 
-    address constant LENDING_PROTOCOL_ADDRESS = vm.envAddress("LENDING_PROTOCOL_ADDRESS");
-    address constant REAL_ESTATE_ADDRESS = vm.envAddress("REAL_ESTATE_ADDRESS");
+    LendingProtocol public lendingProtocol;
+    RealEstateERC721 public propertyToken;
 
-    LendingProtocol public lendingProtocol = LendingProtocol(payable(LENDING_PROTOCOL_ADDRESS));
-    RealEstateERC721 public propertyToken = RealEstateERC721(REAL_ESTATE_ADDRESS);
+    constructor() {
+        LENDING_PROTOCOL_ADDRESS = vm.envAddress("LENDING_PROTOCOL_ADDRESS");
+        REAL_ESTATE_ADDRESS = vm.envAddress("REAL_ESTATE_ADDRESS");
+        lendingProtocol = LendingProtocol(payable(LENDING_PROTOCOL_ADDRESS));
+        propertyToken = RealEstateERC721(REAL_ESTATE_ADDRESS);
+    }
 
 
     function run() external {

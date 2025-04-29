@@ -1,17 +1,14 @@
 "use client"
 
-import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react"
+import { useAppKitAccount } from "@reown/appkit/react"
 import { useBalance } from "wagmi"
 import { Link } from "react-router-dom"
 import { Building, DollarSign, BarChart2, Wallet } from "lucide-react"
 
 export const Dashboard = () => {
   const { address, isConnected } = useAppKitAccount()
-  const { chain } = useAppKitNetwork()
-
   const { data: balanceData } = useBalance({
-    address,
-    watch: true,
+    address: address as `0x${string}`,
   })
 
   if (!isConnected) {
@@ -74,7 +71,7 @@ export const Dashboard = () => {
           </div>
           <div className="stat-content">
             <h3>Network</h3>
-            <div className="stat-value">{chain?.name || "Not connected"}</div>
+            <div className="stat-value">{"Not connected"}</div>
           </div>
         </div>
       </div>

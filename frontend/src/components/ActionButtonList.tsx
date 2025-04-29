@@ -2,11 +2,11 @@ import { useEffect } from 'react';
 import { useDisconnect, useAppKit, useAppKitNetwork, useAppKitAccount  } from '@reown/appkit/react'
 import { parseGwei, type Address } from 'viem'
 import { useEstimateGas, useSendTransaction, useSignMessage, useBalance } from 'wagmi'
-import { networks } from '../config'
+import { pharos } from '../config';
 
 // test transaction
 const TEST_TX = {
-  to: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045" as Address, // vitalik address
+  to: "0x251d8803f71a8402dD96893E0709588e99F6267c" as Address,
   value: parseGwei('0.0001')
 }
 
@@ -17,17 +17,17 @@ interface ActionButtonListProps {
 }
 
 export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionButtonListProps) => {
-    const { disconnect } = useDisconnect(); // AppKit hook to disconnect
-    const { open } = useAppKit(); // AppKit hook to open the modal
-    const { switchNetwork } = useAppKitNetwork(); // AppKithook to switch network
-    const { address, isConnected } = useAppKitAccount() // AppKit hook to get the address and check if the user is connected
+    const { disconnect } = useDisconnect();
+    const { open } = useAppKit();
+    const { switchNetwork } = useAppKitNetwork();
+    const { address, isConnected } = useAppKitAccount()
 
-    const { data: gas } = useEstimateGas({...TEST_TX}); // Wagmi hook to estimate gas
-    const { data: hash, sendTransaction, } = useSendTransaction(); // Wagmi hook to send a transaction
-    const { signMessageAsync } = useSignMessage() // Wagmi hook to sign a message
+    const { data: gas } = useEstimateGas({...TEST_TX});
+    const { data: hash, sendTransaction, } = useSendTransaction();
+    const { signMessageAsync } = useSignMessage()
     const { refetch } = useBalance({
       address: address as Address
-    }); // Wagmi hook to get the balance
+    });
 
     
     useEffect(() => {
@@ -41,7 +41,7 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
       try {
         sendTransaction({
           ...TEST_TX,
-          gas // Add the gas to the transaction
+          gas
         });
       } catch (err) {
         console.log('Error sending transaction:', err);
@@ -50,7 +50,7 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
 
     // function to sing a msg 
     const handleSignMsg = async () => {
-      const msg = "Hello Reown AppKit!" // message to sign
+      const msg = "Hello Reown AppKit!"
       const sig = await signMessageAsync({ message: msg, account: address as Address }); 
       sendSignMsg(sig);
     }
@@ -75,7 +75,7 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
     <div >
         <button onClick={() => open()}>Open</button>
         <button onClick={handleDisconnect}>Disconnect</button>
-        <button onClick={() => switchNetwork(networks[1]) }>Switch</button>
+        <button onClick={() => switchNetwork(pharos)}>Switch to Pharos</button>
         <button onClick={handleSignMsg}>Sign msg</button>
         <button onClick={handleSendTx}>Send tx</button>
         <button onClick={handleGetBalance}>Get Balance</button>  

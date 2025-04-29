@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { useAppKitAccount } from '@reown/appkit/react';
 import { useNavigate } from 'react-router-dom';
 import { useRealEstateContract } from '../hooks/useRealEstateContract';
-import { BigNumber } from '@ethersproject/bignumber';
 
 interface PropertyFormData {
   title: string;

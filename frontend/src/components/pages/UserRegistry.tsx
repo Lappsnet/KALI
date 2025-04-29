@@ -16,7 +16,7 @@ interface UserProfile {
 }
 
 export const UserRegistry = () => {
-  const { isConnected, address } = useAppKitAccount()
+  const { isConnected } = useAppKitAccount()
   const [users, setUsers] = useState<UserProfile[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

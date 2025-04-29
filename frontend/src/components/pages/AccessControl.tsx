@@ -13,7 +13,7 @@ interface UserRole {
 }
 
 export const AccessControl = () => {
-  const { isConnected, address } = useAppKitAccount()
+  const { isConnected } = useAppKitAccount()
   const [users, setUsers] = useState<UserRole[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

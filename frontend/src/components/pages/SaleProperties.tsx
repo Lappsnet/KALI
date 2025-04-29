@@ -7,7 +7,7 @@ import { useAppKitAccount } from "@reown/appkit/react"
 import { PropertyCard } from "../../components/PropertyCard"
 import { ActionButton } from "../ActionButton"
 import { DollarSign, Plus, Loader, FileText } from "lucide-react"
-import { useRealEstateContract, type PropertyWithMetadata } from "../hooks/useRealEstateContract"
+import { useRealEstateContract } from "../hooks/useRealEstateContract"
 import { useRealEstateSaleContract } from "../hooks/useRealEstateSaleContract"
 import { formatEther } from "viem"
 import "../../styles/SaleProperties.css"
@@ -17,9 +17,9 @@ export const SaleProperties = () => {
   const { getMyProperties } = useRealEstateContract()
   const { createSale, isLoading: isLoadingSale } = useRealEstateSaleContract()
 
-  const [properties, setProperties] = useState<PropertyWithMetadata[]>([])
+  const [properties, setProperties] = useState<any[]>([])
   const [showListModal, setShowListModal] = useState(false)
-  const [selectedProperty, setSelectedProperty] = useState<PropertyWithMetadata | null>(null)
+  const [selectedProperty, setSelectedProperty] = useState<any | null>(null)
   const [listingPrice, setListingPrice] = useState("")
   const [saleDocument, setSaleDocument] = useState("")
   const [isLoadingData, setIsLoadingData] = useState(false)
@@ -42,29 +42,19 @@ export const SaleProperties = () => {
     }
   }
 
-  const handlePropertyClick = (property: PropertyWithMetadata) => {
-    setSelectedProperty(property)
-    setListingPrice(formatEther(property.valuationRaw))
-    setShowListModal(true)
-  }
-
   const handleCreateSale = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!selectedProperty) return
 
     try {
-      // In a real app, you would upload the sale document to IPFS
-      // For this example, we'll use a placeholder URI
-      const saleDocumentURI = `ipfs://QmExample/sale-${selectedProperty.tokenId.toString()}`
+      const saleDocumentURI = `ipfs:// ${selectedProperty.tokenId.toString()}`
 
       await createSale(selectedProperty.tokenId, listingPrice, saleDocumentURI, (saleId) => {
         console.log("Sale created with ID:", saleId.toString())
-        // Refresh properties
         loadProperties()
       })
 
-      // Close modal
       setShowListModal(false)
       setSelectedProperty(null)
     } catch (error) {
@@ -92,7 +82,7 @@ export const SaleProperties = () => {
       </div>
 
       <div className="section-actions">
-        <ActionButton onClick={() => (window.location.href = "/dashboard/mint-properties")}>
+        <ActionButton onClick={() => (window.location.href = "/dashboard/list-properties")}>
           <Plus size={16} />
           <span>Mint New Property</span>
         </ActionButton>
@@ -113,7 +103,7 @@ export const SaleProperties = () => {
               price={`${formatEther(property.valuationRaw)} ETH`}
               image={property.metadata?.image || "/suburban-house-exterior.png"}
               status={property.active ? "For Sale" : "Owned"}
-              onClick={() => handlePropertyClick(property)}
+              tokenId={property.tokenId}
             />
           ))}
         </div>

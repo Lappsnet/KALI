@@ -2,9 +2,8 @@
 
 import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react"
 import { useBalance } from "wagmi"
-import { Activity, Wallet, FileCode, Network } from "lucide-react"
+import { Activity, Wallet, FileCode, Network, DollarSign } from "lucide-react"
 import { PropertyList } from "./PropertyList"
-import { PropertyMetrics } from "./PropertyMetrics"
 import { ErrorMessage } from "./common/ErrorMessage"
 
 export const Dashboard = () => {
@@ -90,9 +89,27 @@ export const Dashboard = () => {
           </div>
         </div>
       </div>
-
       <div className="dashboard-section">
-        <PropertyMetrics />
+        <div className="metrics-grid">
+          <div className="metric-card">
+            <div className="metric-icon">
+              <Activity size={24} />
+            </div>
+            <div className="metric-content">
+              <h4>Total Properties</h4>
+              <div className="metric-value">0</div>
+            </div>
+          </div>
+          <div className="metric-card">
+            <div className="metric-icon">
+              <DollarSign size={24} />
+            </div>
+            <div className="metric-content">
+              <h4>Total Value</h4>
+              <div className="metric-value">$0</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="dashboard-section">

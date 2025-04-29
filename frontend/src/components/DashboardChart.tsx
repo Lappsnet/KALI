@@ -143,7 +143,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({ className }) => 
             }));
           }
         },
-        onHover: (event: any, item: any) => {
+        onHover: (_event: any, item: any) => {
           if (item) {
             setActiveSegment(item.index);
           }

@@ -12,7 +12,7 @@ import "./LoanDetails.css"
 export const LoanDetails = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { address, isConnected } = useAppKitAccount()
+  const { isConnected } = useAppKitAccount()
   const { getLoan, makeRepayment, isLoading: isLoadingLoan } = useLendingProtocolContract()
   const { getPropertyDetails, isLoading: isLoadingProperty } = useRealEstateContract()
 

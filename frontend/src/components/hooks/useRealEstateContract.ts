@@ -2,9 +2,9 @@
 
 import { useCallback, useState, useEffect, useMemo } from "react";
 import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react";
-import {useWriteContract, useWaitForTransactionReceipt, useConfig, type Config,} from "wagmi";
+import {useWriteContract, useWaitForTransactionReceipt, useConfig,} from "wagmi";
 import { readContract } from "@wagmi/core";
-import { type Address, formatEther, parseEther, decodeEventLog, type Hex, AbiStateMutability } from "viem";
+import { type Address, type Hex } from "viem";
 
 import RealEstateERC721ABI from "../abis/RealEstateERC721.abi.json";
 import { CONTRACT_ADDRESSES } from "../../config/index.ts";
@@ -50,7 +50,7 @@ export interface UseRealEstateContractReturn {
   ) => Promise<void>;
 }
 
-export function useRealEstateContract(): UseRealEstateContractReturn {
+export function useRealEstateContract(): any {
   const { address: account, isConnected } = useAppKitAccount();
   const { chainId } = useAppKitNetwork();
   const wagmiConfig = useConfig();

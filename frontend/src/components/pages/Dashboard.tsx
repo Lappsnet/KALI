@@ -1,19 +1,16 @@
 "use client"
 
-import React from 'react';
-import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react"
+import { useAppKitAccount } from "@reown/appkit/react"
 import { useBalance } from "wagmi"
-import { Link } from "react-router-dom"
-import { Building, DollarSign, BarChart2, Wallet, TrendingUp, ChartPie, Activity, Users } from "lucide-react"
+import { Building, DollarSign, TrendingUp, Users } from "lucide-react"
 import { DashboardChart } from '../DashboardChart';
 import '../../styles/Dashboard.css';
 import '../../styles/DashboardChart.css';
 
 export const Dashboard = () => {
   const { address, isConnected } = useAppKitAccount()
-  const { chainId } = useAppKitNetwork()
 
-  const { data: balanceData } = useBalance({
+  useBalance({
     address: address as `0x${string}`,
   })
 
@@ -27,20 +24,7 @@ export const Dashboard = () => {
     bestPerformerPercent: 156.7,
   }
 
-  const riskMetrics = {
-    portfolioBeta: 1.2,
-    sharpeRatio: 2.1,
-    volatility: 32.5,
-    maxDrawdown: -25.3,
-  }
 
-  const assetAllocation = [
-    { name: "Layer 1", percentage: 25 },
-    { name: "Meme Coins", percentage: 35 },
-    { name: "DeFi", percentage: 20 },
-    { name: "NFTs", percentage: 10 },
-    { name: "Stablecoins", percentage: 10 },
-  ]
 
   const activityStats = {
     activeBets: { count: 3, value: 2800 },
@@ -94,8 +78,8 @@ export const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h1>Overview of RWA portfolio</h1>
-        <p>Track your properties, tenants, and earnings</p>
+        <h1></h1>
+        <p>Track your propertiesand earnings</p>
       </div>
 
       <div className="stats-grid">

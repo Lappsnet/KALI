@@ -28,7 +28,7 @@ export enum RentalStatus {
 
 
 export function useRentalAgreementContract() {
-  const { address, isConnected } = useAppKitAccount();
+  const { isConnected } = useAppKitAccount();
   const { chainId } = useAppKitNetwork();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +52,6 @@ export function useRentalAgreementContract() {
   });
 
 
-    // Get DEFAULT_ADMIN_ROLE bytes32
     const getDefaultAdminRole = useCallback(async (): Promise<string | null> => {
         if (!contractAddress || !isConnected) return null;
 
@@ -127,12 +126,6 @@ export function useRentalAgreementContract() {
 
           const rentalData = result.data as unknown as Rental;
 
-          const formattedRental = {
-            ...rentalData,
-            startDate: new Date(Number(rentalData.startDate) * 1000),
-            endDate: new Date(Number(rentalData.endDate) * 1000),
-            lastPaymentDate: new Date(Number(rentalData.lastPaymentDate) * 1000),
-          };
 
           return rentalData;
 

@@ -1,7 +1,7 @@
 import { defineChain } from '@reown/appkit/networks';
 
 // Define the custom network
-const customNetwork = defineChain({
+export const pharos = defineChain({
   id: 50002,
   caipNetworkId: 'eip155:50002',
   chainNamespace: 'eip155',

@@ -5,9 +5,6 @@ import { useAppKitAccount } from "@reown/appkit/react";
 import { useRealEstateContract, type PropertyDetails } from "./hooks/useRealEstateContract";
 import { PropertyCard } from "./PropertyCard";
 import { Button } from "./common/Button";
-import { LoadingSpinner } from "./common/LoadingSpinner";
-import { ErrorMessage } from "./common/ErrorMessage";
-import { MintProperties } from "./pages/MintProperties";
 import { type Address } from "viem";
 
 interface DisplayProperty {
@@ -92,11 +89,6 @@ export const PropertyList = () => {
     fetchProperties();
   }, [fetchProperties]);
 
-  const handleMintSuccess = () => {
-    setShowCreateModal(false);
-    setLoadingMessage("Mint successful! Refreshing list...");
-    setTimeout(() => fetchProperties(), 2000);
-  };
 
   return (
     <div className="property-list" style={styles.container}>
@@ -124,11 +116,6 @@ export const PropertyList = () => {
        {showCreateModal && (
          <div style={styles.modalBackdrop}>
             <div style={styles.modalContent}>
-                <MintProperties
-                    // Pass necessary props if MintProperties needs them
-                    // Example prop to close modal on success (needs implementation in MintProperties)
-                    // onSuccessCallback={handleMintSuccess}
-                />
                 <Button onClick={() => setShowCreateModal(false)} variant="secondary" style={{marginTop: '15px'}}>Close</Button>
             </div>
          </div>
@@ -157,8 +144,11 @@ export const PropertyList = () => {
             <PropertyCard
               key={prop.tokenId.toString()}
               tokenId={prop.tokenId}
-              owner={prop.owner}
-              details={prop.details}
+              title={prop.details?.metadata?.name || "Unknown Property"}
+              address={prop.details?.location || "Unknown Location"}
+              price={prop.details?.valuation ? `${prop.details.valuation} ETH` : "0 ETH"}
+              image={prop.details?.metadata?.image || "/suburban-house-exterior.png"}
+              status={prop.owner ? "Owned" : "Available"}
             />
           ))}
         </div>

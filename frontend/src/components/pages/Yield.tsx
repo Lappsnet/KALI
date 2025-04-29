@@ -155,7 +155,7 @@ export const Yield: React.FC = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Yield Dashboard</h1>
+        <h1></h1>
         <p>Track and manage your investment yields</p>
       </div>
 

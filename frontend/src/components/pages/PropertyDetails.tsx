@@ -1,14 +1,11 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAccount } from 'wagmi'
 import { useRealEstateContract } from '../hooks/useRealEstateContract'
-import { useRealEstateSaleContract } from '../hooks/useRealEstateSaleContract'
 import { getMockPropertyDetails } from '../../mocks/loanData'
 import { formatEther } from 'viem'
-import { ActionButton } from "../ActionButton"
-import { DollarSign, Check, X, Loader, CreditCard } from "lucide-react"
 
 interface PropertyDetails {
   tokenId: bigint
@@ -30,10 +27,6 @@ export const PropertyDetails = () => {
   const [property, setProperty] = useState<PropertyDetails | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [salePrice, setSalePrice] = useState<bigint | null>(null)
-  const [rentPrice, setRentPrice] = useState<bigint | null>(null)
-  const [loanAmount, setLoanAmount] = useState<bigint | null>(null)
-  const [isOwner, setIsOwner] = useState(false)
 
   const { getPropertyDetails, getOwnerOf } = useRealEstateContract()
 
@@ -101,7 +94,6 @@ export const PropertyDetails = () => {
         }
 
         setProperty(propertyDetails)
-        setIsOwner(propertyDetails.owner === address)
       } catch (err) {
         setError('Failed to load property details')
         console.error('Error loading property:', err)

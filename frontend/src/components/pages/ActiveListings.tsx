@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { useAppKitAccount } from "@reown/appkit/react"
-import { Building, DollarSign, MapPin, Calendar, Tag } from "lucide-react"
+import { DollarSign, MapPin, Calendar, Tag } from "lucide-react"
 import { useRealEstateSaleContract } from "../hooks/useRealEstateSaleContract"
+import { useRealEstateContract, type UseRealEstateContractReturn } from "../hooks/useRealEstateContract"
 import { formatEther } from "viem"
 
 interface Listing {
@@ -21,7 +22,8 @@ interface Listing {
 
 export const ActiveListings = () => {
   const { isConnected } = useAppKitAccount()
-  const { getActiveListings } = useRealEstateSaleContract()
+  const { getSale, getActiveSaleForProperty } = useRealEstateSaleContract()
+  const { getAllTokenIds, getPropertyDetails } = useRealEstateContract() as UseRealEstateContractReturn
   const [listings, setListings] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -30,7 +32,35 @@ export const ActiveListings = () => {
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const activeListings = await getActiveListings()
+        // Get all properties and their active sales
+        const properties = await getAllTokenIds()
+        if (!properties) {
+          setError("Failed to fetch properties")
+          return
+        }
+
+        const activeListings: Listing[] = []
+        for (const propertyId of properties) {
+          const saleId = await getActiveSaleForProperty(propertyId)
+          if (saleId) {
+            const sale = await getSale(saleId)
+            const propertyDetails = await getPropertyDetails(propertyId)
+            if (sale && propertyDetails) {
+              activeListings.push({
+                id: saleId.toString(),
+                propertyId: propertyId.toString(),
+                title: propertyDetails.metadata.name,
+                description: propertyDetails.metadata.description,
+                price: sale.price.toString(),
+                location: propertyDetails.location,
+                status: sale.status === 1 ? "active" : sale.status === 2 ? "pending" : "sold",
+                image: propertyDetails.metadata.image,
+                seller: sale.seller,
+                createdAt: new Date(Number(sale.createdAt) * 1000).toISOString()
+              })
+            }
+          }
+        }
         setListings(activeListings)
       } catch (err) {
         setError("Failed to fetch listings")
@@ -40,7 +70,7 @@ export const ActiveListings = () => {
     }
 
     fetchListings()
-  }, [])
+  }, [getSale, getActiveSaleForProperty, getAllTokenIds, getPropertyDetails])
 
   const filteredListings = listings.filter(
     (listing) => filter === "all" || listing.status === filter

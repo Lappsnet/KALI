@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, DollarSign, Calendar, User } from 'lucide-react';
+import { Home, DollarSign, Calendar,} from 'lucide-react';
 import './MyTokens.css';
 
 interface Token {
@@ -64,9 +64,9 @@ const MyTokens: React.FC = () => {
   return (
     <div className="my-tokens-container">
       <div className="tokens-header">
-        <h1>My Tokens</h1>
+        <h1>My Rental Tokens</h1>
         <Link to="/tokens/create" className="create-button">
-          Create New Token
+          Create New Rental
         </Link>
       </div>
 

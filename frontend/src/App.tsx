@@ -1,7 +1,6 @@
 "use client";
 
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAppKit } from "@reown/appkit";
 import { WagmiProvider } from 'wagmi';
@@ -31,8 +30,6 @@ import { AccessControl } from "./components/pages/AccessControl";
 import { UserRegistry } from "./components/pages/UserRegistry";
 import { Profile } from "./components/pages/Profile";
 import { ListProperty } from "./components/pages/ListProperty";
-import { ErrorBoundary } from "./components/ErrorBoundary";
-
 import "./styles/App.css";
 
 const queryClient = new QueryClient();

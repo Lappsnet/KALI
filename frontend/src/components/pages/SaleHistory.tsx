@@ -5,8 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useAppKitAccount } from '@reown/appkit/react';
 import { useLendingProtocolContract } from '../hooks/useLendingProtocolContract';
 import { formatEther } from 'viem';
-import { DollarSign, TrendingUp, Clock, ArrowUpRight, Loader, AlertTriangle, CheckCircle, History, Calendar, BarChart2, LineChart } from 'lucide-react';
-import { ActionButton } from '../ActionButton';
+import { TrendingUp, ArrowUpRight, Loader, AlertTriangle, History, LineChart } from 'lucide-react';
 import './SaleHistory.css';
 
 interface Sale {
@@ -34,11 +33,11 @@ const mockSales: Sale[] = [
     price: '2500000000000000000000',
     date: '2024-03-15',
     status: 'completed',
-    transactionHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+    transactionHash: '0xbb32ec9eff2d875af2ae4e92156d78533f91b433b5f75ccf747f851ba3250e28'
   },
   {
     id: '2',
-    propertyId: 'prop5',
+    propertyId: 'prop2',
     seller: '0x5678...1234',
     buyer: '0x1234...5678',
     price: '2000000000000000000000',
@@ -48,7 +47,7 @@ const mockSales: Sale[] = [
   },
   {
     id: '3',
-    propertyId: 'prop5',
+    propertyId: 'prop3',
     seller: '0x1234...5678',
     buyer: '0x5678...1234',
     price: '1800000000000000000000',
@@ -58,7 +57,7 @@ const mockSales: Sale[] = [
   },
   {
     id: '4',
-    propertyId: 'prop5',
+    propertyId: 'prop4',
     seller: '0x5678...1234',
     buyer: '0x1234...5678',
     price: '2200000000000000000000',
@@ -105,7 +104,6 @@ export const SaleHistory: React.FC = () => {
       try {
         // TODO: Replace with actual contract call
         // const propertySales = await contract.getPropertySales(propertyId);
-        // For now, use mock data
         setSales(mockSales);
         setPriceTrends(mockPriceTrends);
       } catch (err) {
