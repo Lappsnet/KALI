@@ -1,4 +1,4 @@
-# KALI Real Estate Platform: The Future of Property Transactions on Pharos
+# KALI Real Estate Marketplace: The Future of RWA Transactions on Pharos
 
 **Unlock the potential of real estate through seamless, secure, and transparent tokenization.**
 
@@ -38,7 +38,7 @@ KALI is optimized for deployment on the **Pharos Network**, chosen for its key a
 * **Network Name:** Pharos Network (or Pharos Devnet)
 * **Chain ID:** `50002`
 * **RPC URL:** `https://devnet.dplabs-internal.com`
-* **Currency Symbol:** `ETH` *(Verify)*
+* **Currency Symbol:** `PTT`
 * **Block Explorer:** `https://pharosscan.xyz/`
 
 ---
@@ -53,12 +53,12 @@ This project utilizes the **Foundry** framework.
 * **Git:** To clone the repository.
 * **Wallet & Funds:** A wallet (like MetaMask) configured for the Pharos Network and funded with its native gas token (Pharos Token).  
 
-**WARNING** Use separate addresses/keys for testing different roles.
+**WARNING** Use separate addresses/keys to test different roles.
 
 ### Configuration
 
 1.  **Clone:** `git clone <https://github.com/Lappsnet/KALI.git> && cd <KALI>`
-2.  **Install Dependencies:** `forge install` (if applicable)
+2.  **Install Dependencies:** `forge install`
 3.  **Compile:** `forge build`
 4.  **Environment Variables:** Create/populate a `.env` file (add to `.gitignore`!) in the project root:
 
@@ -85,7 +85,7 @@ This project utilizes the **Foundry** framework.
 * Use the deployment scripts in the `script/` directory (e.g., `DeployRealEstateER721.s.sol`).
 * Ensure `MY_PK` in `.env` is the desired **deployer/owner** key.
 * Run: `forge script script/DeployRealEstateER721.s.sol:DeployRealEstateER721 --rpc-url $RPC_URL --private-key $MY_PK --broadcast [--verify]`
-* Record the deployed contract addresses and update interaction scripts / frontend configs.
+* Record the deployed contract addresses and update interaction scripts/frontend configs.
 
 ### Running Interaction Scripts
 
